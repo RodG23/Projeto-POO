@@ -2,7 +2,7 @@ import java.util.Set;
 
 public class Fatura {
     
-    private static int numFaturas;
+    private static int numFaturas = 0;
 
     enum Tp {
         COMPRA,

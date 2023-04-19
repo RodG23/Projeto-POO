@@ -15,6 +15,6 @@ public class Tshirt extends Artigo {
         PALMEIRAS
     }
 
-    private Tam tamanho; //Guarda o tamanho da tshirt.
-    private Pad padrao; //Guarda o padrão da tshirt.
+    private final Tam tamanho; //Guarda o tamanho da tshirt.
+    private final Pad padrao; //Guarda o padrão da tshirt.
 }

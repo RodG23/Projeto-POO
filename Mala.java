@@ -6,8 +6,8 @@ public class Mala extends Artigo{
         GRANDE
     }
 
-    private Boolean premium; //Indica se a mala é Premium.
-    private Dim dimensao; //Guarda a dimensão da mala.
-    private String material; //Guarda o material da mala.
-    private int anoLancamento; //Guarda o ano de lançamento da coleção.
+    private final Boolean premium; //Indica se a mala é Premium.
+    private final Dim dimensao; //Guarda a dimensão da mala.
+    private final String material; //Guarda o material da mala.
+    private final int anoLancamento; //Guarda o ano de lançamento da coleção.
 }

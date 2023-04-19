@@ -10,7 +10,7 @@ public class Fatura {
     }
 
     private final int numEmissao;
-    private Tp tipo;
+    private final Tp tipo;
     private Set<Artigo> artigos;
     private double valorTotal;
 }

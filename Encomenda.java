@@ -21,7 +21,7 @@ public class Encomenda {
     private final int id; //Guarda o número de identificação de uma encomenda.
     private St estado; //Guarda o estado de uma encomenda.
     private Dim dimensao; //Guarda a dimensão de uma encomenda.
-    private LocalDate dataCriacao; //Guarda a data de criação de uma encomenda.
+    private final LocalDate dataCriacao; //Guarda a data de criação de uma encomenda.
     private Set<Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
     private double precoFinal; //Guarda o preço final da encomenda.
 }

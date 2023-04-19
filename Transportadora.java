@@ -19,10 +19,6 @@ public class Transportadora {
 
     /**
      * Construtor parametrizado. Total auferido não é parâmetro pois numa transportadora nova é 0.
-     * @param cp -> Custo base de encomenda pequena.
-     * @param cm -> Custo base de encomenda média.
-     * @param cg -> Custo base de encomenda grande.
-     * @param imp -> Valor de imposto praticado pela transportadora.
      */
     public Transportadora(double cp, double cm, double cg, double imp) {
         this.custoPequena = cp;
@@ -34,7 +30,6 @@ public class Transportadora {
 
     /**
      * Construtor de cópia.
-     * @param umaTransportadora -> Transportadora a copiar.
      */
     public Transportadora(Transportadora umaTransportadora) {
         this.custoPequena = umaTransportadora.getCustoPequena();
@@ -46,7 +41,6 @@ public class Transportadora {
 
     /**
      * Getters das variáveis de instância de uma transportadora.
-     * @return
      */
     public double getCustoPequena() {
         return this.custoPequena;

@@ -3,7 +3,7 @@ import java.util.Set;
 
 public class Utilizador {
     
-    private static int numUsers; //Mantém contagem de users e é utilizada para o id de um user.
+    private static int numUsers = 0; //Mantém contagem de users e é utilizada para o id de um user.
 
     private final int id; //Guarda a identificação única de um user, inalterável.
     private String email; //Guarda o email de um user.

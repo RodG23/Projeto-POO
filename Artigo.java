@@ -22,13 +22,13 @@ public class Artigo {
     }
 
     private final int codBarras; //Guarda a identificação de um artigo.
-    private Cond condicao; //Guarda a condição de um artigo.
-    private Tp tipo; //Guarda o tipo de artigo.
-    private St estado; //Guarda o estado de um artigo.
-    private int numDonos; //Guarda o número de donos anteriores de um artigo.
+    private final Cond condicao; //Guarda a condição de um artigo.
+    private final Tp tipo; //Guarda o tipo de artigo.
+    private final St estado; //Guarda o estado de um artigo.
+    private final int numDonos; //Guarda o número de donos anteriores de um artigo.
     private Transportadora transportadora; //Guarda a transportadora pre-definida de um artigo (alteravel).
     private String descricao; //Guarda a descrição de um artigo.
-    private String marca; //Guarda a marca de um artigo.
+    private final String marca; //Guarda a marca de um artigo.
     private double precoBase; //Guarda o preço base de um artigo.
     private double correcaoPreco; //Guarda a percentagem (relativa ao preço base) de correção de preço.
 }

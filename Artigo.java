@@ -7,12 +7,6 @@ public class Artigo {
         USADO
     }
 
-    enum Tp { //Enum dos tipos possíveis de um artigo.
-        SAPATILHA,
-        TSHIRT,
-        MALA
-    }
-
     enum St { //Enum dos estados possíveis de um artigo.
         MAU,
         MEDIO,
@@ -23,7 +17,6 @@ public class Artigo {
 
     private final int codBarras; //Guarda a identificação de um artigo.
     private final Cond condicao; //Guarda a condição de um artigo.
-    private final Tp tipo; //Guarda o tipo de artigo.
     private final St estado; //Guarda o estado de um artigo.
     private final int numDonos; //Guarda o número de donos anteriores de um artigo.
     private Transportadora transportadora; //Guarda a transportadora pre-definida de um artigo (alteravel).

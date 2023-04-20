@@ -1,7 +1,6 @@
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Encomenda {
     
@@ -93,7 +92,7 @@ public class Encomenda {
     }
 
     /**
-     * Setters das variáveis de insância de uma encomenda.
+     * Setters das variáveis de instância de uma encomenda.
      */
     public void setEstado(St etd) {
         this.estado = etd;
@@ -156,3 +155,4 @@ public class Encomenda {
                encomenda.precoFinal == this.precoFinal;
     }
 }
+

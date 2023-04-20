@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Utilizador {
-    private static int numUsers; //Mantém contagem de users e é utilizada para o id de um user.
+    private static int numUsers = 1; //Mantém contagem de users e é utilizada para o id de um user.
 
     private final int id; //Guarda a identificação única de um user, inalterável.
     private String email; //Guarda o email de um user.
@@ -81,19 +81,20 @@ public class Utilizador {
     }
 
     public Utilizador(){
-        this.id = numUsers++;
+        this.id = numUsers;
+        numUsers++;
         this.email = "";
         this.nome = "";
         this.morada = "";
-        this.nif = (numUsers++)*(-1); // dava erro se nao inicializar
+        this.nif = -1;
         this.comprou = new HashMap<>();
         this.vendeu = new HashMap<>();
         this.aVenda = new HashMap<>();
     }
 
-    public Utilizador(int id, String email, String nome, String morada, int nif, Map<Integer, Artigo> comprou, Map<Integer, Artigo> vendeu, Map<Integer, Artigo> aVenda){
-        numUsers = id;
-        this.id = numUsers++;
+    public Utilizador(String email, String nome, String morada, int nif, Map<Integer, Artigo> comprou, Map<Integer, Artigo> vendeu, Map<Integer, Artigo> aVenda){
+        this.id = numUsers;
+        numUsers++;
         this.email = email;
         this.nome = nome;
         this.morada = morada;
@@ -107,8 +108,8 @@ public class Utilizador {
     }
 
     public Utilizador(Utilizador u){
-        numUsers = u.get_Id();
-        this.id = numUsers ++;
+        this.id = numUsers;
+        numUsers++;
         this.email = u.get_Email();
         this.nome = u.get_Nome();
         this.morada = u.get_Morada();
@@ -174,10 +175,8 @@ public class Utilizador {
 
     // Adiciona um artigo para venda
     public void aVenda_Artigo(Vintage vintage, Artigo a){
-        if(this.get_Comprados().containsKey(a.getCodBarras())){
             this.aVenda.put(a.getCodBarras(), a);
             vintage.addStock(a);
-        }
     }
 
     // atualiza informações das vendas dos usuário em todas as instâncias relevantes, incluindo a classe Vintage
@@ -187,13 +186,8 @@ public class Utilizador {
     }   
 
     // Adiciona um artigo aos comprados e remove do vendedor
-    public void compra_Artigo(Vintage vinted, Utilizador utilizador, Artigo a, int site){
-        if(site == 0 && vinted.get_Stock().containsKey(a.getCodBarras())){//comprar ao sistema
-            this.comprou.put(a.getCodBarras(), a);
-            //sistema
-            vinted.remStock(a);
-        }
-        else if(site == 1 && utilizador.get_AVenda().containsKey(a.getCodBarras())){//comprar a um utilizador
+    public void compra_Artigo(Vintage vinted, Utilizador utilizador, Artigo a){
+        if(utilizador.get_AVenda().containsKey(a.getCodBarras())){//comprar a um utilizador
             //comprador
             this.comprou.put(a.getCodBarras(), a);
             //vender
@@ -201,9 +195,5 @@ public class Utilizador {
             //sistema
             vinted.remStock(a);
         }
-        else if (site == 2){//adiciona o artigo ao stock do utilizador, nao compra a ninguem
-            this.comprou.put(a.getCodBarras(), a);
-        }
-
     }
 }

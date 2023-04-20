@@ -31,10 +31,10 @@ public class Artigo {
     public Artigo() {
         numArtigos++;
         this.codBarras = numArtigos;
-        this.condicao = null;
-        this.estado = null;
+        this.condicao = Cond.NOVO;
+        this.estado = St.EXCELENTE;
         this.numDonos = 0;
-        this.transportadora = null;
+        this.transportadora = new Transportadora();
         this.descricao = "";
         this.marca = "";
         this.precoBase = 0;

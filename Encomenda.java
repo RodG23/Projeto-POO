@@ -92,7 +92,7 @@ public class Encomenda {
     }
 
     /**
-     * Setters das variáveis de insância de uma encomenda.
+     * Setters das variáveis de instância de uma encomenda.
      */
     public void setEstado(St etd) {
         this.estado = etd;
@@ -155,3 +155,4 @@ public class Encomenda {
                encomenda.precoFinal == this.precoFinal;
     }
 }
+

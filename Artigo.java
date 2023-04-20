@@ -31,10 +31,10 @@ public class Artigo {
     public Artigo() {
         numArtigos++;
         this.codBarras = numArtigos;
-        this.condicao = Cond.NOVO;
-        this.estado = St.EXCELENTE;
+        this.condicao = null;
+        this.estado = null;
         this.numDonos = 0;
-        this.transportadora = new Transportadora();
+        this.transportadora = null;
         this.descricao = "";
         this.marca = "";
         this.precoBase = 0;
@@ -161,10 +161,10 @@ public class Artigo {
 
         sb.append("| Artigo |\n");
         sb.append(" Código de barras -> " + this.codBarras + "\n");
-        sb.append(" Condição -> " + this.condicao.toString() + "\n");
-        sb.append(" Estado -> " + this.estado.toString() + "\n");
+        sb.append(" Condição -> " + (this.condicao != null ? this.condicao.toString() : "") + "\n");
+        sb.append(" Estado -> " + (this.estado != null ? this.estado.toString() : "") + "\n");
         sb.append(" Número de Donos -> " + this.numDonos + "\n");
-        sb.append(" Transportadora:\n\n" + this.transportadora.toString() + "\n");
+        sb.append(" Transportadora -> " + (this.transportadora != null ? this.transportadora.toString() : "") + "\n");
         sb.append(" Descrição -> " + this.descricao + "\n");
         sb.append(" Marca -> " + this.marca + "\n");
         sb.append(" Preco Base -> " + this.precoBase + "\n");

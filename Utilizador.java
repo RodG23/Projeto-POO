@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Utilizador {
-    private static int numUsers = 1; //Mantém contagem de users e é utilizada para o id de um user.
+    private static int numUsers = 0; //Mantém contagem de users e é utilizada para o id de um user.
 
     private final int id; //Guarda a identificação única de um user, inalterável.
     private String email; //Guarda o email de um user.
@@ -81,8 +81,8 @@ public class Utilizador {
     }
 
     public Utilizador(){
-        this.id = numUsers;
         numUsers++;
+        this.id = numUsers;
         this.email = "";
         this.nome = "";
         this.morada = "";
@@ -93,8 +93,8 @@ public class Utilizador {
     }
 
     public Utilizador(String email, String nome, String morada, int nif, Map<Integer, Artigo> comprou, Map<Integer, Artigo> vendeu, Map<Integer, Artigo> aVenda){
-        this.id = numUsers;
         numUsers++;
+        this.id = numUsers;
         this.email = email;
         this.nome = nome;
         this.morada = morada;
@@ -108,8 +108,8 @@ public class Utilizador {
     }
 
     public Utilizador(Utilizador u){
-        this.id = numUsers;
         numUsers++;
+        this.id = numUsers;
         this.email = u.get_Email();
         this.nome = u.get_Nome();
         this.morada = u.get_Morada();

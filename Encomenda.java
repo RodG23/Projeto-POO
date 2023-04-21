@@ -1,6 +1,7 @@
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Encomenda {
     
@@ -23,7 +24,7 @@ public class Encomenda {
     private final LocalDate dataCriacao; //Guarda a data de criação de uma encomenda.
     private St estado; //Guarda o estado de uma encomenda.
     private Dim dimensao; //Guarda a dimensão de uma encomenda.
-    private Set<Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
+    private List<Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
     private double precoFinal; //Guarda o preço final da encomenda.
 
     /**
@@ -35,14 +36,14 @@ public class Encomenda {
         this.dataCriacao = LocalDate.now();
         this.estado = St.PENDENTE;
         this.dimensao = null;
-        this.artigos = new HashSet<Artigo>();
+        this.artigos = new ArrayList<Artigo>();
         this.precoFinal = 0;
     }
 
     /**
      * Construtor parametrizado.
      */
-    public Encomenda(St etd, Dim dim, Set<Artigo> art, double preco) {
+    public Encomenda(St etd, Dim dim, List<Artigo> art, double preco) {
         numEncomenda++;
         this.id = numEncomenda;
         this.dataCriacao = LocalDate.now();
@@ -59,7 +60,7 @@ public class Encomenda {
         this.id = umaEncomenda.getId();
         this.dataCriacao = umaEncomenda.getDataCriacao();
         this.estado =umaEncomenda.getEstado();
-        this.dimensao = umaEncomenda.getDimesao();
+        this.dimensao = umaEncomenda.getDimensao();
         this.artigos = umaEncomenda.getArtigos();
         this.precoFinal = umaEncomenda.getPrecoFinal();
     }
@@ -79,12 +80,12 @@ public class Encomenda {
         return this.estado;
     }
 
-    public Dim getDimesao() {
+    public Dim getDimensao() {
         return this.dimensao;
     }
 
-    public Set<Artigo> getArtigos() {
-        return new HashSet<Artigo>(this.artigos);
+    public List<Artigo> getArtigos() {
+        return this.artigos.stream().map(Artigo::clone).collect(Collectors.toList());
     }
 
     public double getPrecoFinal() {
@@ -102,7 +103,7 @@ public class Encomenda {
         this.dimensao = dim;
     }
 
-    public void setArtigos(Set<Artigo> art) {
+    public void setArtigos(List<Artigo> art) {
         this.artigos = art;
     }
 
@@ -116,6 +117,7 @@ public class Encomenda {
     /**
      * Método clone.
      */
+    @Override
     public Encomenda clone() {
         return new Encomenda(this);
     }
@@ -123,17 +125,18 @@ public class Encomenda {
     /**
      * Método toString.
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append("| Encomenda |\n");
-        sb.append(" Id -> " + this.id + "\n");
-        sb.append(" Data de criação -> " + this.dataCriacao + "\n");
-        sb.append(" Estado -> " + this.estado.toString() + "\n");
-        sb.append(" Dimensão -> " + this.dimensao.toString() + "\n");
+        sb.append(" Id -> " + this.getId() + "\n");
+        sb.append(" Data de criação -> " + this.getDataCriacao() + "\n");
+        sb.append(" Estado -> " + this.getEstado().toString() + "\n");
+        sb.append(" Dimensão -> " + this.getDimensao().toString() + "\n");
         sb.append(" Artigos:\n");
-        this.artigos.forEach(a -> sb.append(a.toString()));
-        sb.append(" Preço final -> " + this.precoFinal + "€\n");
+        this.getArtigos().forEach(a -> sb.append(a.toString()));
+        sb.append(" Preço final -> " + this.getPrecoFinal() + "€\n");
 
         return sb.toString();
     }
@@ -141,18 +144,19 @@ public class Encomenda {
     /**
      * Método equals.
      */
+    @Override
     public boolean equals(Object obj) {
         if(obj==this) 
             return true;
         if(obj==null || obj.getClass() != this.getClass()) 
             return false;
         Encomenda encomenda = (Encomenda) obj;
-        return encomenda.id == this.id &&
-               encomenda.dataCriacao.equals(this.dataCriacao) &&
-               encomenda.estado.equals(this.estado) &&
-               encomenda.dimensao.equals(this.dimensao) &&
-               encomenda.artigos.equals(this.artigos) &&
-               encomenda.precoFinal == this.precoFinal;
+        return encomenda.getId() == this.getId() &&
+               encomenda.getDataCriacao().equals(this.getDataCriacao()) &&
+               encomenda.getEstado().equals(this.getEstado()) &&
+               encomenda.getDimensao().equals(this.getDimensao()) &&
+               encomenda.getArtigos().equals(this.getArtigos()) &&
+               encomenda.getPrecoFinal() == this.getPrecoFinal();
     }
 }
 

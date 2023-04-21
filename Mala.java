@@ -10,19 +10,6 @@ public class Mala extends Artigo{
     private final String material; //Guarda o material da mala.
     private final int anoLancamento; //Guarda o ano de lançamento da coleção.
 
-    //Getters
-
-    public Dim get_Dimensao(){ 
-        return this.dimensao;
-    }
-
-    public String get_Material(){ 
-        return this.material;
-    }
-
-    public int get_ALancamento(){ 
-        return this.anoLancamento;
-    }
 
     public Mala(){
         super();
@@ -40,17 +27,29 @@ public class Mala extends Artigo{
 
     public Mala(Mala m){
         super(m);
-        this.dimensao = m.get_Dimensao();
-        this.material = m.get_Material();
-        this.anoLancamento = m.get_ALancamento();
+        this.dimensao = m.getDimensao();
+        this.material = m.getMaterial();
+        this.anoLancamento = m.getALancamento();
     }
 
-    @Override
+    //Getters
+
+    public Dim getDimensao(){ 
+        return this.dimensao;
+    }
+
+    public String getMaterial(){ 
+        return this.material;
+    }
+
+    public int getALancamento(){ 
+        return this.anoLancamento;
+    }
+
     public Mala clone(){
         return new Mala(this);
         }
 
-    @Override
     public String toString() {
         return "Malas {" +
                 "dimensao=" + dimensao +
@@ -60,16 +59,16 @@ public class Mala extends Artigo{
                 '}';
     }
     
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true ;
-        if (( o == null ) || ( this.getClass () != o.getClass ()))  return false ;
-        if (!super.equals(o)) return false;
-
-        Mala m = (Mala) o ;
-        return  this.dimensao == m.get_Dimensao() && this.material.equals(m.get_Material()) &&
-                this.anoLancamento == m.get_ALancamento();       
+    public boolean equals(Object obj) {
+        if (this == obj) 
+            return true ;
+        if (( obj == null ) || ( this.getClass () != obj.getClass ()))  
+            return false ;
+        if (!super.equals(obj)) 
+            return false;
+        Mala m = (Mala) obj ;
+        return  this.dimensao.equals(m.getDimensao()) && this.material.equals(m.getMaterial()) &&
+                this.anoLancamento == m.getALancamento();       
     }
 
 }

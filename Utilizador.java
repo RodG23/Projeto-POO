@@ -16,39 +16,39 @@ public class Utilizador {
 
     //Getters
 
-    public int get_Id(){ 
+    public int getId(){ 
         return this.id;
     }
 
-    public String get_Email(){
+    public String getEmail(){
         return this.email;
     }
 
-    public String get_Nome(){
+    public String getNome(){
         return this.nome;
     }
 
-    public String get_Morada(){
+    public String getMorada(){
         return this.morada;
     }
 
-    public int get_Nif(){
+    public int getNif(){
         return this.nif;
     }
 
-    public Map<Integer, Artigo> get_Comprados(){
+    public Map<Integer, Artigo> getComprados(){
         HashMap<Integer, Artigo> aux = new HashMap<>();
         aux.putAll(this.comprou);
         return aux;
     }
 
-    public Map<Integer, Artigo> get_Vendidos(){
+    public Map<Integer, Artigo> getVendidos(){
         HashMap<Integer, Artigo> aux = new HashMap<>();
         aux.putAll(this.vendeu);
         return aux;
     }
 
-    public Map<Integer, Artigo> get_AVenda(){
+    public Map<Integer, Artigo> getAVenda(){
         HashMap<Integer, Artigo> aux = new HashMap<>();
         aux.putAll(this.aVenda);
         return aux;
@@ -56,27 +56,27 @@ public class Utilizador {
 
     //Setters
 
-    public void set_Email(String email){
+    public void setEmail(String email){
         this.email = email;
     }
 
-    public void set_Nome(String nome){
+    public void setNome(String nome){
         this.nome = nome;
     }
 
-    public void set_Morada(String morada){
+    public void setMorada(String morada){
         this.morada = morada;
     }
 
-    public void set_Comprados(Map<Integer, Artigo> comprou){
+    public void setComprados(Map<Integer, Artigo> comprou){
         this.comprou = comprou;
     }
 
-    public void set_Vendidos(Map<Integer, Artigo> vendeu){
+    public void setVendidos(Map<Integer, Artigo> vendeu){
         this.vendeu = vendeu;
     }
 
-    public void set_AVenda(Map<Integer, Artigo> aVenda){
+    public void setAVenda(Map<Integer, Artigo> aVenda){
         this.aVenda = aVenda;
     }
 
@@ -110,13 +110,13 @@ public class Utilizador {
     public Utilizador(Utilizador u){
         numUsers++;
         this.id = numUsers;
-        this.email = u.get_Email();
-        this.nome = u.get_Nome();
-        this.morada = u.get_Morada();
-        this.nif = u.get_Nif();
-        this.comprou = u.get_Comprados();
-        this.vendeu = u.get_Vendidos();
-        this.aVenda = u.get_AVenda();
+        this.email = u.getEmail();
+        this.nome = u.getNome();
+        this.morada = u.getMorada();
+        this.nif = u.getNif();
+        this.comprou = u.getComprados();
+        this.vendeu = u.getVendidos();
+        this.aVenda = u.getAVenda();
     }
 
     @Override
@@ -126,36 +126,36 @@ public class Utilizador {
 
     @Override
     public String toString() {
-        String comprou_str = "{";
+        String comproustr = "{";
         for (int i : comprou.keySet()) {
-            comprou_str += i + "=" + comprou.get(i) + ", ";
+            comproustr += i + "=" + comprou.get(i) + ", ";
         }
         if (!comprou.isEmpty()) {
-            comprou_str = comprou_str.substring(0, comprou_str.length()-2);
+            comproustr = comproustr.substring(0, comproustr.length()-2);
         }
-        comprou_str += "}";
+        comproustr += "}";
         
-        String vendeu_str = "{";
+        String vendeustr = "{";
         for (int i : vendeu.keySet()) {
-            vendeu_str += i + "=" + vendeu.get(i) + ", ";
+            vendeustr += i + "=" + vendeu.get(i) + ", ";
         }
         if (!vendeu.isEmpty()) {
-            vendeu_str = vendeu_str.substring(0, vendeu_str.length()-2);
+            vendeustr = vendeustr.substring(0, vendeustr.length()-2);
         }
-        vendeu_str += "}";
+        vendeustr += "}";
         
-        String aVenda_str = "{";
+        String aVendastr = "{";
         for (int i : aVenda.keySet()) {
-            aVenda_str += i + "=" + aVenda.get(i) + ", ";
+            aVendastr += i + "=" + aVenda.get(i) + ", ";
         }
         if (!aVenda.isEmpty()) {
-            aVenda_str = aVenda_str.substring(0, aVenda_str.length()-2);
+            aVendastr = aVendastr.substring(0, aVendastr.length()-2);
         }
-        aVenda_str += "}";
+        aVendastr += "}";
         
         return "UTILIZADOR [id=" + id + ", email=" + email + ", nome=" + nome
-                + ", morada=" + morada + ", nif=" + nif + ", comprou=" + comprou_str
-                + ", vendeu=" + vendeu_str + ", aVenda=" + aVenda_str
+                + ", morada=" + morada + ", nif=" + nif + ", comprou=" + comproustr
+                + ", vendeu=" + vendeustr + ", aVenda=" + aVendastr
                 + "]";
     }
     
@@ -166,32 +166,32 @@ public class Utilizador {
         if (( o == null ) || ( this.getClass () != o.getClass ()))  return false ;
 
         Utilizador u = (Utilizador) o ;
-        return  this.email.equals(u.get_Email()) &&
-                this.nome.equals(u.get_Nome()) && this.morada.equals(u.get_Morada()) && this.nif == u.get_Nif() &&
-                this.comprou.equals(u.get_Comprados()) && this.vendeu.equals(u.get_Vendidos()) &&
-                this.aVenda.equals(u.get_AVenda());
+        return  this.email.equals(u.getEmail()) &&
+                this.nome.equals(u.getNome()) && this.morada.equals(u.getMorada()) && this.nif == u.getNif() &&
+                this.comprou.equals(u.getComprados()) && this.vendeu.equals(u.getVendidos()) &&
+                this.aVenda.equals(u.getAVenda());
 
     }
 
     // Adiciona um artigo para venda
-    public void aVenda_Artigo(Vintage vintage, Artigo a){
+    public void aVendaArtigo(Vintage vintage, Artigo a){
             this.aVenda.put(a.getCodBarras(), a);
             vintage.addStock(a);
     }
 
     // atualiza informações das vendas dos usuário em todas as instâncias relevantes, incluindo a classe Vintage
-    public void vende_Artigo(Artigo artigo) {
+    public void vendeArtigo(Artigo artigo) {
         this.vendeu.put(artigo.getCodBarras(), artigo);//poe o novo artigo dentro da hashMap dos vendidos
         this.aVenda.remove(artigo.getCodBarras());
     }   
 
     // Adiciona um artigo aos comprados e remove do vendedor
-    public void compra_Artigo(Vintage vinted, Utilizador utilizador, Artigo a){
-        if(utilizador.get_AVenda().containsKey(a.getCodBarras())){//comprar a um utilizador
+    public void compraArtigo(Vintage vinted, Utilizador utilizador, Artigo a){
+        if(utilizador.getAVenda().containsKey(a.getCodBarras())){//comprar a um utilizador
             //comprador
             this.comprou.put(a.getCodBarras(), a);
             //vender
-            utilizador.vende_Artigo(a);
+            utilizador.vendeArtigo(a);
             //sistema
             vinted.remStock(a);
         }

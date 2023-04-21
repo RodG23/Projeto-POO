@@ -19,23 +19,23 @@ public class Utilizador {
 
     //Getters
 
-    public int get_Id(){ 
+    public int getId(){ 
         return this.id;
     }
 
-    public String get_Email(){
+    public String getEmail(){
         return this.email;
     }
 
-    public String get_Nome(){
+    public String getNome(){
         return this.nome;
     }
 
-    public String get_Morada(){
+    public String getMorada(){
         return this.morada;
     }
 
-    public int get_Nif(){
+    public int getNif(){
         return this.nif;
     }
 
@@ -57,27 +57,27 @@ public class Utilizador {
 
     //Setters
 
-    public void set_Email(String email){
+    public void setEmail(String email){
         this.email = email;
     }
 
-    public void set_Nome(String nome){
+    public void setNome(String nome){
         this.nome = nome;
     }
 
-    public void set_Morada(String morada){
+    public void setMorada(String morada){
         this.morada = morada;
     }
 
-    public void set_Comprados(Map<Integer, Artigo> comprou){
+    public void setComprados(Map<Integer, Artigo> comprou){
         this.comprou = comprou;
     }
 
-    public void set_Vendidos(Map<Integer, Artigo> vendeu){
+    public void setVendidos(Map<Integer, Artigo> vendeu){
         this.vendeu = vendeu;
     }
 
-    public void set_AVenda(Map<Integer, Artigo> aVenda){
+    public void setAVenda(Map<Integer, Artigo> aVenda){
         this.aVenda = aVenda;
     }
 
@@ -126,7 +126,8 @@ public class Utilizador {
         this.vendeu = u.get_Vendidos();
         this.aVenda = u.get_AVenda();
         this.encomendas = u.get_Encomendas();
-    }
+        }
+
 
     @Override
     public Utilizador clone() {
@@ -142,7 +143,7 @@ public class Utilizador {
         if (!this.comprou.isEmpty()) {
             comprou_str = comprou_str.substring(0, comprou_str.length()-2);
         }
-        comprou_str += "}";
+        comproustr += "}";
         
         String vendeu_str = "{";
         for (int i : this.vendeu.keySet()) {
@@ -150,8 +151,9 @@ public class Utilizador {
         }
         if (!this.vendeu.isEmpty()) {
             vendeu_str = vendeu_str.substring(0, vendeu_str.length()-2);
+
         }
-        vendeu_str += "}";
+        vendeustr += "}";
         
         String aVenda_str = "{";
         for (int i : this.aVenda.keySet()) {
@@ -192,6 +194,7 @@ public class Utilizador {
 
     // Adiciona um artigo para venda no sistema
     public void aVenda_Artigo(Vintage vintage, Artigo a, Transportadora transportadora){
+
             this.aVenda.put(a.getCodBarras(), a);
             a.setTransportadora(transportadora);
             vintage.addStock(a);
@@ -223,6 +226,7 @@ public class Utilizador {
             if (enc.getEstado() == Encomenda.St.PENDENTE) {
                 enc.setEstado(Encomenda.St.FINALIZADA);;
             }
+
         }
     }
 }

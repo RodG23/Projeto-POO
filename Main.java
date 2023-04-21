@@ -1,7 +1,11 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
 
     public static void main(String[] args)
     {
+
         Vintage vinted = new Vintage();
         Mala a1 = new Mala();
         Sapatilha a2 = new Sapatilha();

@@ -1,5 +1,8 @@
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class Encomenda {
     
@@ -22,7 +25,7 @@ public class Encomenda {
     private final Tempo dataCriacao; //Guarda a data de criação de uma encomenda.
     private St estado; //Guarda o estado de uma encomenda.
     private Dim dimensao; //Guarda a dimensão de uma encomenda.
-    private Set<Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
+    private List<Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
     private double precoFinal; //Guarda o preço final da encomenda.
     private Tempo dataEntrega; //Data em que o artigo será entregue
     private final int tempoEntrega = 2;
@@ -36,7 +39,7 @@ public class Encomenda {
         this.dataCriacao = null;
         this.estado = St.PENDENTE;
         this.dimensao = null;
-        this.artigos = new HashSet<Artigo>();
+        this.artigos = new ArrayList<Artigo>();
         this.precoFinal = 0;
         this.dataEntrega = null;
     }
@@ -44,7 +47,8 @@ public class Encomenda {
     /**
      * Construtor parametrizado.
      */
-    public Encomenda(St etd, Dim dim, Set<Artigo> art, double preco, Tempo dataEntrega) {
+
+    public Encomenda(St etd, Dim dim, List<Artigo> art, double preco) {
         numEncomenda++;
         this.id = numEncomenda;
         this.dataCriacao = null;
@@ -63,7 +67,7 @@ public class Encomenda {
         this.id = numEncomenda;
         this.dataCriacao = umaEncomenda.getDataCriacao();
         this.estado =umaEncomenda.getEstado();
-        this.dimensao = umaEncomenda.getDimesao();
+        this.dimensao = umaEncomenda.getDimensao();
         this.artigos = umaEncomenda.getArtigos();
         this.precoFinal = umaEncomenda.getPrecoFinal();
         this.dataEntrega = umaEncomenda.getDataEntrega();
@@ -84,12 +88,12 @@ public class Encomenda {
         return this.estado;
     }
 
-    public Dim getDimesao() {
+    public Dim getDimensao() {
         return this.dimensao;
     }
 
-    public Set<Artigo> getArtigos() {
-        return new HashSet<Artigo>(this.artigos);
+    public List<Artigo> getArtigos() {
+        return this.artigos.stream().map(Artigo::clone).collect(Collectors.toList());
     }
 
     public double getPrecoFinal() {
@@ -115,7 +119,7 @@ public class Encomenda {
         this.dimensao = dim;
     }
 
-    public void setArtigos(Set<Artigo> art) {
+    public void setArtigos(List<Artigo> art) {
         this.artigos = art;
     }
 
@@ -133,6 +137,7 @@ public class Encomenda {
     /**
      * Método clone.
      */
+    @Override
     public Encomenda clone() {
         return new Encomenda(this);
     }
@@ -140,6 +145,7 @@ public class Encomenda {
     /**
      * Método toString.
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -160,18 +166,19 @@ public class Encomenda {
     /**
      * Método equals.
      */
+    @Override
     public boolean equals(Object obj) {
         if(obj==this) 
             return true;
         if(obj==null || obj.getClass() != this.getClass()) 
             return false;
         Encomenda encomenda = (Encomenda) obj;
-        return encomenda.id == this.id &&
-               encomenda.dataCriacao.equals(this.dataCriacao) &&
-               encomenda.estado.equals(this.estado) &&
-               encomenda.dimensao.equals(this.dimensao) &&
-               encomenda.artigos.equals(this.artigos) &&
-               encomenda.precoFinal == this.precoFinal &&
+        return encomenda.getId() == this.getId() &&
+               encomenda.getDataCriacao().equals(this.getDataCriacao()) &&
+               encomenda.getEstado().equals(this.getEstado()) &&
+               encomenda.getDimensao().equals(this.getDimensao()) &&
+               encomenda.getArtigos().equals(this.getArtigos()) &&
+               encomenda.getPrecoFinal() == this.getPrecoFinal() &&
                encomenda.dataEntrega.equals(this.getDataEntrega()) &&
                encomenda.tempoEntrega == this.tempoEntrega;
     }

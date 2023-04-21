@@ -92,6 +92,7 @@ public class Transportadora {
     /**
      * Método clone.
      */
+    @Override
     public Transportadora clone() {
         return new Transportadora(this);
     }
@@ -99,15 +100,16 @@ public class Transportadora {
     /**
      * Método toString.
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append("| Transportadora |\n");
-        sb.append(" Custo base por encomenda pequena -> " + this.custoPequena + "€\n");
-        sb.append(" Custo base por encomenda media -> " + this.custoMedia + "€\n");
-        sb.append(" Custo base por encomenda grande -> " + this.custoGrande + "€\n");
-        sb.append(" Valor de imposto -> " + this.imposto + "%\n");
-        sb.append(" Total auferido -> " + this.totalAuferido + "€\n");
+        sb.append(" Custo base por encomenda pequena -> " + this.getCustoPequena() + "€\n");
+        sb.append(" Custo base por encomenda media -> " + this.getCustoMedia() + "€\n");
+        sb.append(" Custo base por encomenda grande -> " + this.getCustoGrande() + "€\n");
+        sb.append(" Valor de imposto -> " + this.getImposto() + "%\n");
+        sb.append(" Total auferido -> " + this.getTotalAuferido() + "€\n");
 
         return sb.toString();
     }
@@ -115,16 +117,17 @@ public class Transportadora {
     /**
      * Método equals.
      */
+    @Override
     public boolean equals(Object obj) {
         if(obj==this) 
             return true;
         if(obj==null || obj.getClass() != this.getClass()) 
             return false;
         Transportadora transportadora = (Transportadora) obj;
-        return transportadora.custoPequena == this.custoPequena &&
-               transportadora.custoMedia == this.custoMedia &&
-               transportadora.custoGrande == this.custoGrande &&
-               transportadora.imposto == this.imposto &&
-               transportadora.totalAuferido == this.totalAuferido;
+        return transportadora.getCustoPequena() == this.getCustoPequena() &&
+               transportadora.getCustoMedia() == this.getCustoMedia() &&
+               transportadora.getCustoGrande() == this.getCustoGrande() &&
+               transportadora.getImposto() == this.getImposto() &&
+               transportadora.getTotalAuferido() == this.getTotalAuferido();
     }
 }

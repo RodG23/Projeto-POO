@@ -93,7 +93,7 @@ public class Artigo {
     }
 
     public Transportadora getTransportadora() {
-        return this.transportadora;
+        return this.transportadora.clone();
     }
 
     public String getDescricao() {
@@ -150,6 +150,7 @@ public class Artigo {
     /**
      * Método clone.
      */
+    @Override
     public Artigo clone() {
         return new Artigo(this);
     }
@@ -157,19 +158,20 @@ public class Artigo {
     /**
      * Método toString.
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append("| Artigo |\n");
-        sb.append(" Código de barras -> " + this.codBarras + "\n");
-        sb.append(" Condição -> " + (this.condicao != null ? this.condicao.toString() : "") + "\n");
-        sb.append(" Estado -> " + (this.estado != null ? this.estado.toString() : "") + "\n");
-        sb.append(" Número de Donos -> " + this.numDonos + "\n");
-        sb.append(" Transportadora -> " + (this.transportadora != null ? this.transportadora.toString() : "") + "\n");
-        sb.append(" Descrição -> " + this.descricao + "\n");
-        sb.append(" Marca -> " + this.marca + "\n");
-        sb.append(" Preco Base -> " + this.precoBase + "\n");
-        sb.append(" Correção de preço -> " + this.correcaoPreco + "%\n");
+        sb.append(" Código de barras -> " + this.getCodBarras() + "\n");
+        sb.append(" Condição -> " + (this.getCondicao() != null ? this.getCondicao().toString() : "Não associada") + "\n");
+        sb.append(" Estado -> " + (this.getEstado() != null ? this.getEstado().toString() : "Não associado") + "\n");
+        sb.append(" Número de Donos -> " + this.getNumDonos() + "\n");
+        sb.append(" Transportadora -> \n" + (this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada") + "\n");
+        sb.append(" Descrição -> " + this.getDescricao() + "\n");
+        sb.append(" Marca -> " + this.getMarca() + "\n");
+        sb.append(" Preco Base -> " + this.getPrecoBase() + "\n");
+        sb.append(" Correção de preço -> " + this.getCorrecaoPreco() + "%\n");
 
         return sb.toString();
     }
@@ -177,20 +179,21 @@ public class Artigo {
     /**
      * Método equals.
      */
+    @Override
     public boolean equals(Object obj) {
         if(obj==this) 
-        return true;
+            return true;
         if(obj==null || obj.getClass() != this.getClass()) 
-        return false;
+            return false;
         Artigo artigo = (Artigo) obj;
-        return artigo.codBarras == this.codBarras &&
-               artigo.condicao.equals(this.condicao) &&
-               artigo.estado.equals(this.estado) &&
-               artigo.numDonos == this.numDonos &&
-               artigo.transportadora.equals(this.transportadora) &&
-               artigo.descricao.equals(this.descricao) &&
-               artigo.marca.equals(this.marca) &&
-               artigo.precoBase == this.precoBase &&
-               artigo.correcaoPreco == this.correcaoPreco;
+        return artigo.getCodBarras() == this.getCodBarras() &&
+               artigo.getCondicao().equals(this.getCondicao()) &&
+               artigo.getEstado().equals(this.getEstado()) &&
+               artigo.getNumDonos() == this.getNumDonos() &&
+               artigo.getTransportadora().equals(this.getTransportadora()) &&
+               artigo.getDescricao().equals(this.getDescricao()) &&
+               artigo.getMarca().equals(this.getMarca()) &&
+               artigo.getPrecoBase() == this.getPrecoBase() &&
+               artigo.getCorrecaoPreco() == this.getCorrecaoPreco();
     }
 }

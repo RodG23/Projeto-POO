@@ -1,4 +1,3 @@
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,7 +9,7 @@ public class Encomenda {
         PENDENTE,
         FINALIZADA,
         EXPEDIDA,
-        ENTRGUE
+        ENTREGUE
     }
 
     enum Dim { //Enum dos diferentes tamanhos de uma encomenda.
@@ -20,11 +19,13 @@ public class Encomenda {
     }
 
     private final int id; //Guarda o número de identificação de uma encomenda.
-    private final LocalDate dataCriacao; //Guarda a data de criação de uma encomenda.
+    private final Tempo dataCriacao; //Guarda a data de criação de uma encomenda.
     private St estado; //Guarda o estado de uma encomenda.
     private Dim dimensao; //Guarda a dimensão de uma encomenda.
     private Set<Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
     private double precoFinal; //Guarda o preço final da encomenda.
+    private Tempo dataEntrega; //Data em que o artigo será entregue
+    private final int tempoEntrega = 2;
 
     /**
      * Construtor vazio.
@@ -32,36 +33,40 @@ public class Encomenda {
     public Encomenda() {
         numEncomenda++;
         this.id = numEncomenda;
-        this.dataCriacao = LocalDate.now();
+        this.dataCriacao = null;
         this.estado = St.PENDENTE;
         this.dimensao = null;
         this.artigos = new HashSet<Artigo>();
         this.precoFinal = 0;
+        this.dataEntrega = null;
     }
 
     /**
      * Construtor parametrizado.
      */
-    public Encomenda(St etd, Dim dim, Set<Artigo> art, double preco) {
+    public Encomenda(St etd, Dim dim, Set<Artigo> art, double preco, Tempo dataEntrega) {
         numEncomenda++;
         this.id = numEncomenda;
-        this.dataCriacao = LocalDate.now();
+        this.dataCriacao = null;
         this.estado = etd;
         this.dimensao = dim;
         this.artigos = art;
         this.precoFinal = preco; 
+        this.dataEntrega = dataEntrega;
     }
 
     /**
      * Construtor de cópia.
      */
     public Encomenda(Encomenda umaEncomenda) {
-        this.id = umaEncomenda.getId();
+        numEncomenda++;
+        this.id = numEncomenda;
         this.dataCriacao = umaEncomenda.getDataCriacao();
         this.estado =umaEncomenda.getEstado();
         this.dimensao = umaEncomenda.getDimesao();
         this.artigos = umaEncomenda.getArtigos();
         this.precoFinal = umaEncomenda.getPrecoFinal();
+        this.dataEntrega = umaEncomenda.getDataEntrega();
     }
 
     /**
@@ -71,7 +76,7 @@ public class Encomenda {
         return this.id;
     }
 
-    public LocalDate getDataCriacao() {
+    public Tempo getDataCriacao() {
         return this.dataCriacao;
     }
 
@@ -91,6 +96,14 @@ public class Encomenda {
         return this.precoFinal;
     }
 
+    public int getTempEntrega() {
+        return this.tempoEntrega;
+    }
+
+    public Tempo getDataEntrega() {
+        return this.dataEntrega;
+    }
+
     /**
      * Setters das variáveis de instância de uma encomenda.
      */
@@ -104,6 +117,10 @@ public class Encomenda {
 
     public void setArtigos(Set<Artigo> art) {
         this.artigos = art;
+    }
+
+    public void setDataEntrega(Tempo dataEntrega) {
+        this.dataEntrega = dataEntrega;
     }
 
     /**
@@ -128,12 +145,14 @@ public class Encomenda {
 
         sb.append("| Encomenda |\n");
         sb.append(" Id -> " + this.id + "\n");
-        sb.append(" Data de criação -> " + this.dataCriacao + "\n");
+        sb.append(" Data de criação -> " + (this.dataCriacao != null ? this.dataCriacao.toString() : "") + "\n");
         sb.append(" Estado -> " + this.estado.toString() + "\n");
-        sb.append(" Dimensão -> " + this.dimensao.toString() + "\n");
+        sb.append(" Dimensão -> " + (this.dimensao != null ? this.dimensao.toString() : "") + "\n");
         sb.append(" Artigos:\n");
         this.artigos.forEach(a -> sb.append(a.toString()));
         sb.append(" Preço final -> " + this.precoFinal + "€\n");
+        sb.append(" Data de entrega -> " + this.dataEntrega + "%\n");
+        sb.append(" Tempo para entrega -> " + this.tempoEntrega + "%\n");
 
         return sb.toString();
     }
@@ -152,7 +171,13 @@ public class Encomenda {
                encomenda.estado.equals(this.estado) &&
                encomenda.dimensao.equals(this.dimensao) &&
                encomenda.artigos.equals(this.artigos) &&
-               encomenda.precoFinal == this.precoFinal;
+               encomenda.precoFinal == this.precoFinal &&
+               encomenda.dataEntrega.equals(this.getDataEntrega()) &&
+               encomenda.tempoEntrega == this.tempoEntrega;
+    }
+
+    public void addArtigo(Artigo a){
+        this.artigos.add(a);
     }
 }
 

@@ -1,5 +1,7 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Utilizador {
     private static int numUsers = 0; //Mantém contagem de users e é utilizada para o id de um user.
@@ -12,6 +14,7 @@ public class Utilizador {
     private Map<Integer,Artigo> aVenda; //Guarda os artigos que o user tem à venda (codBarras,Artigo).
     private Map<Integer,Artigo> vendeu; //Guarda os artigos que o user já vendeu (codBarras,Artigo).
     private Map<Integer,Artigo> comprou; //Guarda os artigos que o user já comprou (codBarras,Artigo).
+    private Set<Encomenda> encomendas;// Guarda as encomendas que o user fez numa list.
     //private Set<Fatura> faturas; //Guarda o conjunto das faturas de compra e venda de um user.
 
     //Getters
@@ -36,22 +39,20 @@ public class Utilizador {
         return this.nif;
     }
 
-    public Map<Integer, Artigo> getComprados(){
-        HashMap<Integer, Artigo> aux = new HashMap<>();
-        aux.putAll(this.comprou);
-        return aux;
+    public Map<Integer, Artigo> get_Comprados(){
+        return this.comprou;
     }
 
-    public Map<Integer, Artigo> getVendidos(){
-        HashMap<Integer, Artigo> aux = new HashMap<>();
-        aux.putAll(this.vendeu);
-        return aux;
+    public Map<Integer, Artigo> get_Vendidos(){
+        return this.vendeu;
     }
 
-    public Map<Integer, Artigo> getAVenda(){
-        HashMap<Integer, Artigo> aux = new HashMap<>();
-        aux.putAll(this.aVenda);
-        return aux;
+    public Map<Integer, Artigo> get_AVenda(){
+        return this.aVenda;
+    }
+
+    public Set<Encomenda> get_Encomendas(){
+        return this.encomendas;
     }
 
     //Setters
@@ -80,6 +81,10 @@ public class Utilizador {
         this.aVenda = aVenda;
     }
 
+    public void set_Encomendas(Set<Encomenda> encomendas){
+        this.encomendas = encomendas;
+    }
+
     public Utilizador(){
         numUsers++;
         this.id = numUsers;
@@ -90,9 +95,10 @@ public class Utilizador {
         this.comprou = new HashMap<>();
         this.vendeu = new HashMap<>();
         this.aVenda = new HashMap<>();
+        this.encomendas = new HashSet<>();
     }
 
-    public Utilizador(String email, String nome, String morada, int nif, Map<Integer, Artigo> comprou, Map<Integer, Artigo> vendeu, Map<Integer, Artigo> aVenda){
+    public Utilizador(String email, String nome, String morada, int nif, Map<Integer, Artigo> comprou, Map<Integer, Artigo> vendeu, Map<Integer, Artigo> aVenda, Set<Encomenda> encomendas){
         numUsers++;
         this.id = numUsers;
         this.email = email;
@@ -105,19 +111,23 @@ public class Utilizador {
         this.vendeu.putAll(vendeu);
         this.aVenda= new HashMap<>();
         this.aVenda.putAll(aVenda);
+        this.encomendas= new HashSet<>();
+        this.encomendas.addAll(encomendas);
     }
 
     public Utilizador(Utilizador u){
         numUsers++;
         this.id = numUsers;
-        this.email = u.getEmail();
-        this.nome = u.getNome();
-        this.morada = u.getMorada();
-        this.nif = u.getNif();
-        this.comprou = u.getComprados();
-        this.vendeu = u.getVendidos();
-        this.aVenda = u.getAVenda();
-    }
+        this.email = u.get_Email();
+        this.nome = u.get_Nome();
+        this.morada = u.get_Morada();
+        this.nif = u.get_Nif();
+        this.comprou = u.get_Comprados();
+        this.vendeu = u.get_Vendidos();
+        this.aVenda = u.get_AVenda();
+        this.encomendas = u.get_Encomendas();
+        }
+
 
     @Override
     public Utilizador clone() {
@@ -126,36 +136,46 @@ public class Utilizador {
 
     @Override
     public String toString() {
-        String comproustr = "{";
-        for (int i : comprou.keySet()) {
-            comproustr += i + "=" + comprou.get(i) + ", ";
+        String comprou_str = "{";
+        for (int i : this.comprou.keySet()) {
+            comprou_str += i + "=" + this.comprou.get(i) + ", ";
         }
-        if (!comprou.isEmpty()) {
-            comproustr = comproustr.substring(0, comproustr.length()-2);
+        if (!this.comprou.isEmpty()) {
+            comprou_str = comprou_str.substring(0, comprou_str.length()-2);
         }
         comproustr += "}";
         
-        String vendeustr = "{";
-        for (int i : vendeu.keySet()) {
-            vendeustr += i + "=" + vendeu.get(i) + ", ";
+        String vendeu_str = "{";
+        for (int i : this.vendeu.keySet()) {
+            vendeu_str += i + "=" + this.vendeu.get(i) + ", ";
         }
-        if (!vendeu.isEmpty()) {
-            vendeustr = vendeustr.substring(0, vendeustr.length()-2);
+        if (!this.vendeu.isEmpty()) {
+            vendeu_str = vendeu_str.substring(0, vendeu_str.length()-2);
+
         }
         vendeustr += "}";
         
-        String aVendastr = "{";
-        for (int i : aVenda.keySet()) {
-            aVendastr += i + "=" + aVenda.get(i) + ", ";
+        String aVenda_str = "{";
+        for (int i : this.aVenda.keySet()) {
+            aVenda_str += i + "=" + this.aVenda.get(i) + ", ";
         }
-        if (!aVenda.isEmpty()) {
-            aVendastr = aVendastr.substring(0, aVendastr.length()-2);
+        if (!this.aVenda.isEmpty()) {
+            aVenda_str = aVenda_str.substring(0, aVenda_str.length()-2);
         }
-        aVendastr += "}";
+        aVenda_str += "}";
+
+        String encomendas_Str = "{";
+        for (int i =0 ; i < this.encomendas.size(); i++) {
+            encomendas_Str += i + "=" + this.encomendas + ", ";
+        }
+        if (!this.encomendas.isEmpty()) {
+            encomendas_Str = encomendas_Str.substring(0, encomendas_Str.length()-2);
+        }
+        encomendas_Str += "}";
         
         return "UTILIZADOR [id=" + id + ", email=" + email + ", nome=" + nome
-                + ", morada=" + morada + ", nif=" + nif + ", comprou=" + comproustr
-                + ", vendeu=" + vendeustr + ", aVenda=" + aVendastr
+                + ", morada=" + morada + ", nif=" + nif + ", comprou=" + comprou_str
+                + ", vendeu=" + vendeu_str + ", aVenda=" + aVenda_str + ", encomendou=" + encomendas_Str
                 + "]";
     }
     
@@ -166,34 +186,47 @@ public class Utilizador {
         if (( o == null ) || ( this.getClass () != o.getClass ()))  return false ;
 
         Utilizador u = (Utilizador) o ;
-        return  this.email.equals(u.getEmail()) &&
-                this.nome.equals(u.getNome()) && this.morada.equals(u.getMorada()) && this.nif == u.getNif() &&
-                this.comprou.equals(u.getComprados()) && this.vendeu.equals(u.getVendidos()) &&
-                this.aVenda.equals(u.getAVenda());
-
+        return  this.email.equals(u.get_Email()) &&
+                this.nome.equals(u.get_Nome()) && this.morada.equals(u.get_Morada()) && this.nif == u.get_Nif() &&
+                this.comprou.equals(u.get_Comprados()) && this.vendeu.equals(u.get_Vendidos()) &&
+                this.aVenda.equals(u.get_AVenda()) && this.encomendas.equals(u.get_Encomendas());
     }
 
-    // Adiciona um artigo para venda
-    public void aVendaArtigo(Vintage vintage, Artigo a){
+    // Adiciona um artigo para venda no sistema
+    public void aVenda_Artigo(Vintage vintage, Artigo a, Transportadora transportadora){
+
             this.aVenda.put(a.getCodBarras(), a);
+            a.setTransportadora(transportadora);
             vintage.addStock(a);
+    } 
+
+    public Encomenda encontrarEncomendaPendente(Set<Encomenda> encomendas) {
+        for (Encomenda enc : encomendas) {
+            if (enc.getEstado() == Encomenda.St.PENDENTE) {
+                return enc;
+            }
+        }
+        return null;
     }
 
-    // atualiza informações das vendas dos usuário em todas as instâncias relevantes, incluindo a classe Vintage
-    public void vendeArtigo(Artigo artigo) {
-        this.vendeu.put(artigo.getCodBarras(), artigo);//poe o novo artigo dentro da hashMap dos vendidos
-        this.aVenda.remove(artigo.getCodBarras());
-    }   
+    // atualiza informações da encomenda do usuário em todas as instâncias relevantes, incluindo a classe Vintage
+    public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
+        Encomenda aux = encontrarEncomendaPendente(this.encomendas);
+        if (aux == null) {
+            aux = new Encomenda();
+        }
+        aux.addArtigo(artigo);
+        this.encomendas.add(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
+        vendedor.aVenda.remove(artigo.getCodBarras());
+        vinted.remStock(artigo);
+    }  
 
-    // Adiciona um artigo aos comprados e remove do vendedor
-    public void compraArtigo(Vintage vinted, Utilizador utilizador, Artigo a){
-        if(utilizador.getAVenda().containsKey(a.getCodBarras())){//comprar a um utilizador
-            //comprador
-            this.comprou.put(a.getCodBarras(), a);
-            //vender
-            utilizador.vendeArtigo(a);
-            //sistema
-            vinted.remStock(a);
+    public void finalizarEncomenda(){
+        for (Encomenda enc : this.encomendas) {
+            if (enc.getEstado() == Encomenda.St.PENDENTE) {
+                enc.setEstado(Encomenda.St.FINALIZADA);;
+            }
+
         }
     }
 }

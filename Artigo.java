@@ -61,8 +61,7 @@ public class Artigo {
      * Construtor de cópia.
      */
     public Artigo(Artigo umArtigo) {
-        numArtigos++;
-        this.codBarras = numArtigos;
+        this.codBarras = umArtigo.getCodBarras();
         this.condicao = umArtigo.getCondicao();
         this.estado = umArtigo.getEstado();
         this.numDonos = umArtigo.getNumDonos();

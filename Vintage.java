@@ -244,10 +244,9 @@ public class Vintage {
                 this.getDataAtual().equals(v.getDataAtual());
     }
 
-    //////// Falta definir daqui para baixo de acordo com o que fiz até aqui. podem deixar comigo//////
     public Encomenda encontrarEncomendaFinalizada(Utilizador utilizador) {
-        for (Encomenda enc : utilizador.getEncomendas()) {
-            if (enc.getEstado() == Encomenda.St.FINALIZADA) {
+        for (Encomenda enc : utilizador.getEncomendas().values()) {
+            if (enc.getEstado().equals(Encomenda.St.FINALIZADA)) {
                 return enc;
             }
         }
@@ -268,21 +267,21 @@ public class Vintage {
 
     // Entrega a encomenda passado o tempo necessário
     public void entregaEncomenda(Utilizador comprador, Utilizador vendedor){
-        for (Encomenda enc : comprador.get_Encomendas()) {
+        for (Encomenda enc : comprador.getEncomendas().values()) {
             if (enc.getDataEntrega().equals(this.getDataAtual())) {
                 // Obter a lista de artigos da encomenda
-                Set<Artigo> artigosEncomenda = enc.getArtigos();
+                Map<Integer,Artigo> artigosEncomenda = enc.getArtigos();
                 // Adicionar cada artigo ao histórico de compras do utilizador
-                artigosEncomenda.forEach(artigo -> { 
-                    comprador.get_Comprados().put(artigo.getCodBarras(), artigo);
-                    vendedor.get_Vendidos().put(artigo.getCodBarras(), artigo);
+                artigosEncomenda.values().forEach(artigo -> { 
+                    comprador.getComprou().put(artigo.getCodBarras(), artigo.clone());
+                    vendedor.getVendeu().put(artigo.getCodBarras(), artigo.clone());
                 });
-                comprador.get_Encomendas().remove(enc);
+                comprador.getEncomendas().remove(enc);
                 // Não é necessário iterar mais se a encomenda já foi encontrada e removida
                 break;
             }
         }
-        this.encomendas.put(comprador.get_Id(), comprador.get_Encomendas());
+        this.encomendas.put(comprador.getId(), comprador.getEncomendas());
     }
         
     public void avancaTempo(Utilizador comprador, Utilizador vendedor, Tempo dataAtual){
@@ -295,9 +294,8 @@ public class Vintage {
     public void atualiza_UtilizadorVendas(Utilizador u) {
         // Atualiza a lista de artigos vendidos do utilizador
        
-        Map<Integer, Artigo> aux = new HashMap<>(u.get_Vendidos());//vai buscar a HashMap das vendas do utilizador dado como parãmetro
-        Set<Artigo> set = new HashSet<>(aux.values());//passa todos os artigos dessa hashMap para um Set
-        this.vendas.put(u.get_Id(), set);//troca o Set através do id unico do utilizador
+        Map<Integer, Artigo> aux = new HashMap<>(u.getVendeu());//vai buscar a HashMap das vendas do utilizador dado como parãmetro
+        this.vendas.put(u.getId(), aux);//troca o Set através do id unico do utilizador
     }
 
     /* 

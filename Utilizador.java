@@ -1,7 +1,5 @@
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Utilizador {
     private static int numUsers = 0; //Mantém contagem de users e é utilizada para o id de um user.
@@ -285,18 +283,16 @@ public class Utilizador {
                 this.getFaturas().equals(user.getFaturas());
     }
 
-    ////////////////////Daqui para baixo falta mudar as coisas relativas à encomenda ser um map, deixem comigo//////////////////
-
     // Adiciona um artigo para venda no sistema
     public void aVenda_Artigo(Vintage vintage, Artigo a, Transportadora transportadora){
 
-            this.aVenda.put(a.getCodBarras(), a);
-            a.setTransportadora(transportadora);
-            vintage.addStock(a);
+        a.setTransportadora(transportadora);
+        this.aVenda.put(a.getCodBarras(), a);
+        vintage.addStock(a);
     } 
 
-    public Encomenda encontrarEncomendaPendente(Set<Encomenda> encomendas) {
-        for (Encomenda enc : encomendas) {
+    public Encomenda encontrarEncomendaPendente(Map<Integer,Encomenda> encomendas) {
+        for (Encomenda enc : encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
                 return enc;
             }
@@ -305,23 +301,24 @@ public class Utilizador {
     }
 
     // atualiza informações da encomenda do usuário em todas as instâncias relevantes, incluindo a classe Vintage
+    
+    /// O vendedor épassado como parâmetro ou só o artigo? Qual faz mais sentido? Se passar só o artigo vou a vintage procurar o dono e depois é que removo.
     public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
         Encomenda aux = encontrarEncomendaPendente(this.encomendas);
         if (aux == null) {
             aux = new Encomenda();
         }
         aux.addArtigo(artigo);
-        this.encomendas.add(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
+        this.encomendas.put(aux.getId(),aux.clone());//poe a encomenda dentro da hashMap das encomendas do utilizador
         vendedor.aVenda.remove(artigo.getCodBarras());
         vinted.remStock(artigo);
     }  
 
     public void finalizarEncomenda(){
-        for (Encomenda enc : this.encomendas) {
-            if (enc.getEstado() == Encomenda.St.PENDENTE) {
+        for (Encomenda enc : this.encomendas.values()) {
+            if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
                 enc.setEstado(Encomenda.St.FINALIZADA);;
             }
-
         }
     }
 }

@@ -91,8 +91,9 @@ public class Artigo {
         return this.numDonos;
     }
 
+    //Não se faz clone pelo mesmo motivo do set, suponho.
     public Transportadora getTransportadora() {
-        return this.transportadora.clone();
+        return this.transportadora;
     }
 
     public String getDescricao() {
@@ -126,6 +127,7 @@ public class Artigo {
         this.numDonos = donos;
     }
 
+    //Não faz clone para quando se alterar o valor de uma transportadora alterar em todos os seus artigos, suponho.
     public void setTransportadora(Transportadora umaTransportadora) {
         this.transportadora = umaTransportadora;
     }

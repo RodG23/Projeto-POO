@@ -14,56 +14,90 @@ public class Tshirt extends Artigo{
             PALMEIRAS
         }
     
-        private final Tam tamanho; //Guarda o tamanho da tshirt.
-        private final Pad padrao; //Guarda o padrão da tshirt.
+        private Tam tamanho; //Guarda o tamanho da tshirt.
+        private Pad padrao; //Guarda o padrão da tshirt.
     
-    //Getters
-    public Tam get_Tam(){
-        return this.tamanho;
-    }
-
-    public Pad get_padrao(){
-        return this.padrao;
-    }
-
+    /**
+     * Construtores
+     */
     public Tshirt(){
         super();
-        this.tamanho = Tam.S;
-        this.padrao = Pad.LISO;
+        this.tamanho = null;
+        this.padrao = null;
 
     }
 
     public Tshirt(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Tam tamanho, Pad padrao){
-        super(cond, etd, donos,trans,desc,mrc,pb,cp);
+        super(cond, etd, donos, trans, desc, mrc, pb, cp);
         this.tamanho = tamanho;
         this.padrao = padrao;
     }
 
     public Tshirt(Tshirt t){
         super(t);
-        this.tamanho = t.get_Tam();
-        this.padrao = t.get_padrao();
+        this.tamanho = t.getTamanho();
+        this.padrao = t.getPadrao();
     }
 
+    /**
+     * Getters
+     */ 
+    public Tam getTamanho(){
+        return this.tamanho;
+    }
+
+    public Pad getPadrao(){
+        return this.padrao;
+    }
+
+    /**
+     * Setters
+     */
+    public void setTamanho(Tam tam) {
+        this.tamanho = tam;
+    }
+
+    public void setPadrao(Pad pad) {
+        this.padrao = pad;
+    }
+
+    /**
+     * Método clone.
+     */
     @Override
     public Tshirt clone() {
         return new Tshirt(this) ;
-        }
+    }
 
+    /**
+     * Método toString.
+     */
     @Override
     public String toString() {
-        return "Tshirts {" + "Tamanho: " + tamanho + " | Padrao: " + padrao + " | " + super.toString() + "}";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(super.toString());
+        sb.append(" :T-Shirt:\n");
+        sb.append(" Tamanho -> " + this.getTamanho() + "\n");
+        sb.append(" Padrão -> " + this.getPadrao() + "\n");
+
+        return sb.toString();
     }
     
-
+    /**
+     * Método equals.
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true ;
-        if (( o == null ) || ( this.getClass () != o.getClass ()))  return false ;
-        if (!super.equals(o)) return false;
-
-        Tshirt t = (Tshirt) o ;
-        return this.tamanho == t.get_Tam() && this.padrao == t.get_padrao();      
+    public boolean equals(Object obj) {
+        if(this == obj) 
+            return true ;
+        if(( obj == null ) || ( this.getClass () != obj.getClass ()))  
+            return false ;
+        if(!super.equals(obj)) 
+            return false;
+        Tshirt t = (Tshirt) obj;
+        return  this.getTamanho().equals(t.getTamanho()) && 
+                this.getPadrao().equals(t.getPadrao());      
     }
 
 }

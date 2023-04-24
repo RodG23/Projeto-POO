@@ -72,7 +72,7 @@ public class Utilizador {
     }
 
     public Utilizador(Utilizador umUser){
-        this.id = numUsers;
+        this.id = umUser.getId();
         this.email = umUser.getEmail();
         this.nome = umUser.getNome();
         this.morada = umUser.getMorada();

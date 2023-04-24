@@ -148,10 +148,12 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
         this.correcaoPreco = cp;
     }
     
-        /**
+    /**
      * Método clone.
      */
     public abstract Artigo clone();
+
+
     /**
      * Método toString.
      */
@@ -195,6 +197,7 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
                artigo.getCorrecaoPreco() == this.getCorrecaoPreco();
     }
 
+    
     @Override
     public void precoBaseNovo() {
         this.setPrecoBase(this.precoBase - (this.precoBase / (this.estado.ordinal() + this.condicao.ordinal())));

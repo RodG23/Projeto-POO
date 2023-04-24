@@ -1,6 +1,3 @@
-
- 
-
 public class Tshirt extends Artigo{
     private static final double descBase = 0.5; //Guarda o desconto que se aplica às tshirts.
     

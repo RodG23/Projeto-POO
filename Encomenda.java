@@ -62,7 +62,6 @@ public class Encomenda {
      * Construtor de cópia.
      */
     public Encomenda(Encomenda umaEncomenda) {
-        numEncomenda++;
         this.id = numEncomenda;
         this.dataCriacao = umaEncomenda.getDataCriacao();
         this.estado =umaEncomenda.getEstado();

@@ -1,4 +1,5 @@
-import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Fatura {
     
@@ -10,86 +11,125 @@ public class Fatura {
     }
 
     private final int numEmissao;
-    private final Tp tipo;
-    private Set<Artigo> artigos;
+    private Tp tipo;
+    private Map<Integer,Artigo> artigos;
     private double valorTotal;
 
-    public static int get_NumFaturas() {
-        return numFaturas;
+    /**
+     * Construtores
+     */
+    public Fatura() {
+        numFaturas++;
+        this.numEmissao = numFaturas;
+        this.tipo = null;
+        this.artigos = new HashMap<>();
+        this.valorTotal = 0;
     }
-    
-    public int get_NumEmissao() {
+
+    public Fatura(Tp tipo, Map<Integer,Artigo> art, double valorTotal) {
+        numFaturas++;
+        this.numEmissao = numFaturas;
+        this.tipo = tipo;
+        this.artigos = new HashMap<Integer,Artigo>();
+        for(Map.Entry<Integer,Artigo> e : art.entrySet())
+        {
+            this.artigos.put(e.getKey(), e.getValue().clone());
+        }
+        this.valorTotal = valorTotal;
+    }
+
+    public Fatura(Fatura f) {
+        this.numEmissao = f.getNumEmissao();
+        this.tipo = f.getTipo();
+        this.artigos = f.getArtigos();
+        this.valorTotal = f.getValorTotal();
+    }
+
+    /**
+     * Getters
+     */
+    public int getNumEmissao() {
         return this.numEmissao;
     }
     
-    public Tp get_tipo() {
+    public Tp getTipo() {
         return this.tipo;
     }
 
-    public Set<Artigo> get_Artigos() {
-        return artigos;
+    public Map<Integer,Artigo> getArtigos() {
+        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
+        for (Map.Entry<Integer,Artigo> e : this.artigos.entrySet())
+        {
+            map.put(e.getKey(),e.getValue().clone());
+        }
+        return map;
     } 
 
-    public double get_ValorTotal() {
+    public double getValorTotal() {
         return this.valorTotal;
     }
 
-    // Setters
-
-    public void set_Artigos(Set<Artigo> artigos) {
-        this.artigos = artigos; 
+    /**
+     * Setters.
+     */
+    public void setArtigos(Map<Integer,Artigo> art) {
+        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
+        for (Map.Entry<Integer,Artigo> e : art.entrySet())
+        {
+            map.put(e.getKey(),e.getValue().clone());
+        }
+        this.artigos = map;
     }
 
-    public void set_ValorTotal(double valor) {
+    public void setValorTotal(double valor) {
         this.valorTotal = valor;
     }
 
-    // Construtores 
-
-    public Faturas() {
-        this.numEmissao = 0;
-        this.tipo = null;
-        this.artigos = new HashSet<>();
-        this.valorTotal = 0;
-
-        numFaturas++;
+    public void setTipo(Tp tp) {
+        this.tipo = tp;
     }
 
-    public Faturas(int numEmissao, Tp tipo, Set<Artigo> artigos, double valorTotal) {
-        this.numEmissao = numEmissao;
-        this.tipo = tipo;
-        this.artigos = artigos;
-        this.valorTotal = valorTotal;
-
-        numFaturas++;
-    }
-
-    public Faturas(Faturas fatura) {
-        this.numEmissao = fatura.get_NumEmissao();
-        this.tipo = fatura.get_tipo();
-        this.artigos = fatura.get_Artigos();
-        this.valorTotal = fatura.get_ValorTotal();
-
-        numFaturas++;
-    }
-
+    /**
+     * Método clone.
+     */
     @Override
-    public Faturas clone() {
-        return new Faturas(this);
+    public Fatura clone() {
+        return new Fatura(this);
     }
 
+    /**
+     * Método toString
+     */
     @Override
     public String toString() {
-        return "\n--- Faturas ---\n" + "Por fazer... = ";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("     | Fatura |\n");
+        sb.append(" Número de emissão -> " + this.getNumEmissao() + "\n");
+        sb.append(" Tipo -> " + this.getTipo().toString() + "\n");
+        sb.append(" Artigos:\n");
+        for(Artigo a : this.getArtigos().values())
+        {
+            sb.append(a.toString());
+        }
+        sb.append(" ValorTotal -> " + this.getValorTotal() + "\n");
+
+        return sb.toString();
     }
 
+    /**
+     * Método equals.
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true ;
-        if (( o == null ) || ( this.getClass () != o.getClass ()))  return false ;
-
-        Faturas f = (Faturas) o ;
-        return this.numEmissao == f.get_NumEmissao() && this.tipo == f.get_tipo() && this.artigos.equals(f.get_Artigos()) &&
-               this.valorTotal == f.get_ValorTotal();
+    public boolean equals(Object obj) {
+        if(this == obj) 
+            return true;
+        if(( obj == null ) || ( this.getClass () != obj.getClass ()))  
+            return false;
+        Fatura f = (Fatura) obj;
+        return  this.getNumEmissao() == f.getNumEmissao() && 
+                this.getTipo().equals(f.getTipo()) && 
+                this.getArtigos().equals(f.getArtigos()) &&
+                this.getValorTotal() == f.getValorTotal();
     }
 }

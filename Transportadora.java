@@ -1,4 +1,4 @@
-public class Transportadora {
+public class Transportadora implements TransportadoraPremium{
     
     private double custoPequena; //Guarda o valor base cobrado pela transportadora numa encomenda pequena.
     private double custoMedia; //Guarda o valor base cobrado pela transportadora numa encomenda media.
@@ -104,7 +104,7 @@ public class Transportadora {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("| Transportadora |\n");
+        sb.append("\n     | Transportadora |\n");
         sb.append(" Custo base por encomenda pequena -> " + this.getCustoPequena() + "€\n");
         sb.append(" Custo base por encomenda media -> " + this.getCustoMedia() + "€\n");
         sb.append(" Custo base por encomenda grande -> " + this.getCustoGrande() + "€\n");
@@ -129,5 +129,17 @@ public class Transportadora {
                transportadora.getCustoGrande() == this.getCustoGrande() &&
                transportadora.getImposto() == this.getImposto() &&
                transportadora.getTotalAuferido() == this.getTotalAuferido();
+    }
+
+    @Override
+    public void funcao() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'funcao'");
+    }
+
+    @Override
+    public void funcao2() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'funcao2'");
     }
 }

@@ -1,186 +1,252 @@
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
 
 public class Vintage {
+    private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo.
+    private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado.
+
     private Map<Integer, Artigo> stock; //Guardado o stock de artigos para venda (CodBarras,Artigo).
-    private Map<Integer, Set<Encomenda>> encomendas; //Guardadas encomendas feitas por um user (Id,conjunto de encomendas).
-    private Map<Integer, Set<Artigo>> vendas; //Guardadas as vendas feitas por user (Id, conjunto de artigos vendidos). 
+    private Map<Integer, Map<Integer,Encomenda>> encomendas; //Guardadas encomendas feitas por um user (Id,conjunto de encomendas).
+    private Map<Integer, Map<Integer,Artigo>> vendas; //Guardadas as vendas feitas por user (Id, conjunto de artigos vendidos). 
     private Map<String, String> creds; //Guardadas as credenciais de acesso à Vintage por users (email,pass).
     private double totalAuferido; //Guardado o total auferido pela Vintage no seu funcionamento.
-    private double taxaGSNovo; //Guardada a taxa de serviço por artigo novo.
-    private double taxaGSUsado; //Guardada a taxa de serviço por artigo usado.
     private Tempo dataAtual;//Data atual do sistema.
 
-
-    //Getters
-    public HashMap<Integer, Artigo> get_Stock(){
-        HashMap<Integer, Artigo> aux = new HashMap<>();
-        aux.putAll(this.stock);
-        return aux;
-    }
-
-    public HashMap<Integer, Set<Encomenda>> get_Encomendas(){
-        HashMap<Integer, Set<Encomenda>> aux = new HashMap<>();
-        aux.putAll(this.encomendas);
-        return aux;
-    }
-
-    public HashMap<Integer, Set<Artigo>> get_Vendas(){
-        HashMap<Integer, Set<Artigo>> aux = new HashMap<>();
-        aux.putAll(this.vendas);
-        return aux;
-    }
-
-    public HashMap<String, String> get_Creds(){
-        HashMap<String, String> aux = new HashMap<>();
-        aux.putAll(this.creds);
-        return aux;
-    }
-
-    public double get_TotalAuferido(){
-        return this.totalAuferido;
-    }
-    public double get_TaxaGSnovo(){
-        return this.taxaGSNovo;
-    }
-    public double get_TaxaGSusado(){
-        return this.taxaGSUsado;
-    }
-
-    public Tempo getDataAtual(){
-        return this.dataAtual;
-    }
-
-    //Setters
-    public void set_Stock(HashMap<Integer, Artigo> novoStock){
-        this.stock.clear();
-        this.stock.putAll(novoStock); 
-    
-    }
-
-    public void set_Encomendas(HashMap<Integer, Set<Encomenda>> novoValor){
-        this.encomendas.clear();
-        this.encomendas.putAll(novoValor);
-    }
-    
-    public void set_Vendas(HashMap<Integer, Set<Artigo>> novoValor){
-        this.vendas.clear();
-        this.vendas.putAll(novoValor);
-    }
-    
-    public void set_Creds(HashMap<String, String> novoValor){
-        this.creds.clear();
-        this.creds.putAll(novoValor);
-    }
-    
-
-    public void set_TaxaAuferido(double novaTaxa){
-        this.totalAuferido = novaTaxa;
-    }
-    
-    public void set_TaxaGSnovo(double novaTaxa){
-        this.taxaGSNovo = novaTaxa;
-    }
-    
-    public void set_TaxaGSusado(double novaTaxa){
-        this.taxaGSUsado = novaTaxa;
-    }
-
-    public void setDataAtual(Tempo dataAtual){
-        this.dataAtual = dataAtual;
-    }
-    
-    
-
+    /**
+     * Construtores
+     */
     public Vintage(){
-        this.stock = new HashMap<>();
-        this.encomendas = new HashMap<>();
-        this.vendas = new HashMap<>();
-        this.totalAuferido = -1;
-        this.taxaGSNovo = -1;
-        this.taxaGSUsado = -1;
+        this.stock = new HashMap<Integer,Artigo>();
+        this.encomendas = new HashMap<Integer,Map<Integer,Encomenda>>();
+        this.vendas = new HashMap<Integer,Map<Integer,Artigo>>();
+        this.creds = new HashMap<String,String>();
+        this.totalAuferido = 0;
         this.dataAtual = null;
     }
 
-    public Vintage(Map<Integer, Artigo> stock, Map<Integer, Set<Encomenda>> encomendas, Map<Integer, Set<Artigo>> vendas, Map<String, String> creds, double totalAuferido, double taxaGSNovo, double taxaGSUsado, Tempo dataAtual) {
-        this.stock = new HashMap<>(stock);
-        this.encomendas = new HashMap<>(encomendas);
-        this.vendas = new HashMap<>(vendas);
-        this.creds = new HashMap<>(creds);
+    public Vintage(Map<Integer, Artigo> stock, Map<Integer, Map<Integer,Encomenda>> encomendas, Map<Integer, Map<Integer,Artigo>> vendas, Map<String, String> creds, double totalAuferido, Tempo dataAtual) {
+        this.stock = new HashMap<Integer,Artigo>(stock);
+        this.encomendas = new HashMap<Integer,Map<Integer,Encomenda>>(encomendas);
+        this.vendas = new HashMap<Integer,Map<Integer,Artigo>>(vendas);
+        this.creds = new HashMap<String,String>(creds);
         this.totalAuferido = totalAuferido;
-        this.taxaGSNovo = taxaGSNovo;
-        this.taxaGSUsado = taxaGSUsado;
         this.dataAtual = dataAtual;
     }
 
 
     public Vintage(Vintage v) {
-        this.stock = v.get_Stock();
-        this.encomendas = v.get_Encomendas();
-        this.vendas = v.get_Vendas();
-        this.creds = v.get_Creds();
-        this.totalAuferido = v.get_TotalAuferido();
-        this.taxaGSNovo = v.get_TaxaGSnovo();
-        this.taxaGSUsado = v.get_TaxaGSusado();
+        this.stock = v.getStock();
+        this.encomendas = v.getEncomendas();
+        this.vendas = v.getVendas();
+        this.creds = v.getCreds();
+        this.totalAuferido = v.getTotalAuferido();
         this.dataAtual = v.getDataAtual();
     }
     
+    /**
+     * Getters
+     */
+    public Map<Integer, Artigo> getStock(){
+        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
+        for (Map.Entry<Integer,Artigo> e : this.stock.entrySet())
+        {
+            map.put(e.getKey(),e.getValue().clone());
+        }
+        return map;
+    }
 
+    public Map<Integer,Map<Integer,Encomenda>> getEncomendas(){
+        Map<Integer,Map<Integer,Encomenda>> map = new HashMap<Integer,Map<Integer,Encomenda>>();
+        for (Map.Entry<Integer,Map<Integer,Encomenda>> e : this.encomendas.entrySet())
+        {
+            Map<Integer,Encomenda> map2 = new HashMap<Integer,Encomenda>();
+            for(Map.Entry<Integer,Encomenda> e2 : e.getValue().entrySet())
+            {
+                map2.put(e2.getKey(), e2.getValue().clone());
+            }
+            map.put(e.getKey(), map2);
+        }
+        return map;
+    }
+
+    public Map<Integer, Map<Integer,Artigo>> getVendas(){
+        Map<Integer, Map<Integer,Artigo>> map = new HashMap<Integer,Map<Integer,Artigo>>();
+        for (Map.Entry<Integer,Map<Integer,Artigo>> e : this.vendas.entrySet())
+        {
+            Map<Integer,Artigo> map2 = new HashMap<Integer,Artigo>();
+            for(Map.Entry<Integer,Artigo> e2 : e.getValue().entrySet())
+            {
+                map2.put(e2.getKey(), e2.getValue().clone());
+            }
+            map.put(e.getKey(), map2);
+        }
+        return map;
+    }
+
+    public Map<String, String> getCreds(){
+        Map<String, String> map = new HashMap<String,String>();
+        for (Map.Entry<String,String> e : this.creds.entrySet())
+        {
+            map.put(e.getKey(),e.getValue());
+        }
+        return map;
+    }
+
+    public double getTotalAuferido(){
+        return this.totalAuferido;
+    }
+
+    public double getTaxaGSNovo(){
+        return Vintage.taxaGSNovo;
+    }
+
+    public double getTaxaGSUsado(){
+        return Vintage.taxaGSUsado;
+    }
+
+    public Tempo getDataAtual(){
+        return this.dataAtual.clone();
+    }
+
+    /**
+     * Setters.
+     */
+    public void setStock(Map<Integer, Artigo> novoStock){
+        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
+        for (Map.Entry<Integer,Artigo> e : novoStock.entrySet())
+        {
+            map.put(e.getKey(),e.getValue().clone());
+        }
+        this.stock = map;
+    }
+
+    public void setEncomendas(Map<Integer, Map<Integer,Encomenda>> novasEnc){
+        Map<Integer,Map<Integer,Encomenda>> map = new HashMap<Integer,Map<Integer,Encomenda>>();
+        for (Map.Entry<Integer,Map<Integer,Encomenda>> e : novasEnc.entrySet())
+        {
+            Map<Integer,Encomenda> map2 = new HashMap<Integer,Encomenda>();
+            for(Map.Entry<Integer,Encomenda> e2 : e.getValue().entrySet())
+            {
+                map2.put(e2.getKey(), e2.getValue().clone());
+            }
+            map.put(e.getKey(), map2);
+        }
+        this.encomendas = map;
+    }
+
+    public void setVendas(Map<Integer, Map<Integer,Artigo>> novasVendas){
+        Map<Integer, Map<Integer,Artigo>> map = new HashMap<Integer,Map<Integer,Artigo>>();
+        for (Map.Entry<Integer,Map<Integer,Artigo>> e : novasVendas.entrySet())
+        {
+            Map<Integer,Artigo> map2 = new HashMap<Integer,Artigo>();
+            for(Map.Entry<Integer,Artigo> e2 : e.getValue().entrySet())
+            {
+                map2.put(e2.getKey(), e2.getValue().clone());
+            }
+            map.put(e.getKey(), map2);
+        }
+        this.vendas = map;
+    }
+
+    public void setCreds(HashMap<String, String> novasCreds){
+        Map<String, String> map = new HashMap<String,String>();
+        for (Map.Entry<String,String> e : novasCreds.entrySet())
+        {
+            map.put(e.getKey(),e.getValue());
+        }
+        this.creds = map;
+    }
+
+
+    public void setTotalAuferido(double tot){
+        this.totalAuferido = tot;
+    }
+
+    public void setTaxaGSNovo(double novaTaxa){
+        Vintage.taxaGSNovo = novaTaxa;
+    }
+
+    public void setTaxaGSUsado(double novaTaxa){
+        Vintage.taxaGSUsado = novaTaxa;
+    }
+
+    public void setDataAtual(Tempo dataAtual){
+        this.dataAtual = dataAtual;
+    }
+
+    /**
+     * Método clone.
+     */
     @Override
     public Vintage clone() {
-        return new Vintage(this) ;
+        return new Vintage(this);
         }
 
-        @Override
-        public String toString() {
-            String stockStr = "{";
-            for (int i : this.stock.keySet()) {
-                stockStr += i + " =" + stock.get(i) + ", ";
+    /**
+     * Método toString.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(" ----- STOCK VINTAGE -----\n");
+        for(Artigo a : this.getStock().values())
+        {
+            sb.append(a.toString());
+        }
+        sb.append(" Encomendas realizadas:\n");
+        for(Map.Entry<Integer, Map<Integer,Encomenda>> e : this.getEncomendas().entrySet())
+        {
+            sb.append("     Utilizador " +e.getKey().toString() + ":\n");
+            for (Map.Entry<Integer,Encomenda> e2 : e.getValue().entrySet())
+            {
+                sb.append(e2.getValue().toString());
             }
-            if (!this.stock.isEmpty()) {
-                stockStr = stockStr.substring(0, stockStr.length()-2);
+        }
+        sb.append(" \nVendas efetuadas:\n");
+        for(Map.Entry<Integer, Map<Integer,Artigo>> e : this.getVendas().entrySet())
+        {
+            sb.append("     Utilizador " +e.getKey().toString() + ":");
+            for (Map.Entry<Integer,Artigo> e2 : e.getValue().entrySet())
+            {
+                sb.append(e2.getValue().toString());
             }
-            stockStr += "}";
-            
-            String encomendasStr = "{";
-            for (int i : this.encomendas.keySet()) {
-                encomendasStr += i + "=" + encomendas.get(i) + ", ";
-            }
-            if (!this.encomendas.isEmpty()) {
-                encomendasStr = encomendasStr.substring(0, encomendasStr.length()-2);
-            }
-            encomendasStr += "}";
-            
-            String vendasStr = "{";
-            for (int i : this.vendas.keySet()) {
-                vendasStr += i + "=" + vendas.get(i) + ", ";
-            }
-            if (!this.vendas.isEmpty()) {
-                vendasStr = vendasStr.substring(0, vendasStr.length()-2);
-            }
-            vendasStr += "}";
-            
-            return "VINTAGE [stock=" + stockStr + ", encomendas=" + encomendasStr + ", vendas=" + vendasStr + ", creds=" + creds + ", totalAuferido=" + totalAuferido + ", taxaGSNovo=" + taxaGSNovo + ", taxaGSUsado=" + taxaGSUsado + "]";
+        }
+        sb.append(" Credênciais de login:\n");
+        for(Map.Entry<String,String> a : this.getCreds().entrySet())
+        {
+            sb.append(" Email - " + a.getKey() + "| Password - " + a.getValue());
+        }
+        sb.append(" Total Auferido -> " + this.getTotalAuferido() + "\n\n");
+
+        sb.append(" ----- FIM DO STOCK -----\n");
+
+        return sb.toString();
         }
         
-
+    
+    /**
+     * Método equals.
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true ;
-        if (( o == null ) || ( this.getClass () != o.getClass ()))  return false ;
-
-        Vintage v = (Vintage) o ;
-        return  this.stock.equals(v.get_Stock()) && this.encomendas.equals(v.get_Encomendas()) &&
-                this.vendas.equals(v.get_Vendas())&& this.totalAuferido == v.get_TotalAuferido() && 
-                this.taxaGSNovo == v.get_TaxaGSnovo() && this.taxaGSUsado == v.get_TaxaGSusado() &&
-                this.dataAtual.equals(v.getDataAtual());
+    public boolean equals(Object obj) {
+        if(this == obj) 
+            return true ;
+        if(( obj == null ) || ( this.getClass () != obj.getClass ()))  
+            return false ;
+        Vintage v = (Vintage) obj ;
+        return  this.getStock().equals(v.getStock()) && 
+                this.getEncomendas().equals(v.getEncomendas()) &&
+                this.getVendas().equals(v.getVendas())&& 
+                this.getTotalAuferido() == v.getTotalAuferido() && 
+                this.getTaxaGSNovo() == v.getTaxaGSNovo() && 
+                this.getTaxaGSUsado() == v.getTaxaGSUsado() &&
+                this.getDataAtual().equals(v.getDataAtual());
     }
 
     public Encomenda encontrarEncomendaFinalizada(Utilizador utilizador) {
-        for (Encomenda enc : utilizador.get_Encomendas()) {
-            if (enc.getEstado() == Encomenda.St.FINALIZADA) {
+        for (Encomenda enc : utilizador.getEncomendas().values()) {
+            if (enc.getEstado().equals(Encomenda.St.FINALIZADA)) {
                 return enc;
             }
         }
@@ -197,40 +263,38 @@ public class Vintage {
             i++;
         }
         enc.setDataEntrega(aux); // avança os dias necessários
+        utilizador.getEncomendas().replace(enc.getId(), enc);
+        utilizador.setEncomendas(utilizador.getEncomendas());
     }
+    
 
     // Entrega a encomenda passado o tempo necessário
     public void entregaEncomenda(Utilizador comprador, Utilizador vendedor){
-        for (Encomenda enc : comprador.get_Encomendas()) {
+        for (Encomenda enc : comprador.getEncomendas().values()) {
             if (enc.getDataEntrega().equals(this.getDataAtual())) {
                 // Obter a lista de artigos da encomenda
-                Set<Artigo> artigosEncomenda = enc.getArtigos();
+                Map<Integer,Artigo> artigosEncomenda = enc.getArtigos();
                 // Adicionar cada artigo ao histórico de compras do utilizador
-                artigosEncomenda.forEach(artigo -> { 
-                    comprador.get_Comprados().put(artigo.getCodBarras(), artigo);
-                    vendedor.get_Vendidos().put(artigo.getCodBarras(), artigo);
+                artigosEncomenda.values().forEach(artigo -> { 
+                    comprador.getComprou().put(artigo.getCodBarras(), artigo.clone());
+                    comprador.setComprou(comprador.getComprou());
+                    vendedor.getVendeu().put(artigo.getCodBarras(), artigo.clone());
+                    vendedor.setVendeu(vendedor.getVendeu());
                 });
-                comprador.get_Encomendas().remove(enc);
+                this.encomendas.put(comprador.getId(), comprador.getEncomendas());
+                comprador.getEncomendas().remove(enc.getId());
+                comprador.setEncomendas(comprador.getEncomendas());
                 // Não é necessário iterar mais se a encomenda já foi encontrada e removida
                 break;
             }
         }
-        this.encomendas.put(comprador.get_Id(), comprador.get_Encomendas());
-    }
-        
-    public void avancaTempo(Utilizador comprador, Utilizador vendedor, Tempo dataAtual){
-        this.setDataAtual(dataAtual.avancaDia());
-
-        this.entregaEncomenda(comprador, vendedor);
     }
 
     //atualizar a HashMap vendas do utilizador
     public void atualiza_UtilizadorVendas(Utilizador u) {
         // Atualiza a lista de artigos vendidos do utilizador
-       
-        Map<Integer, Artigo> aux = new HashMap<>(u.get_Vendidos());//vai buscar a HashMap das vendas do utilizador dado como parãmetro
-        Set<Artigo> set = new HashSet<>(aux.values());//passa todos os artigos dessa hashMap para um Set
-        this.vendas.put(u.get_Id(), set);//troca o Set através do id unico do utilizador
+        Map<Integer, Artigo> aux = new HashMap<>(u.getVendeu());//vai buscar a HashMap das vendas do utilizador dado como parãmetro
+        this.vendas.put(u.getId(), aux);//troca o Set através do id unico do utilizador
     }
 
     /* 

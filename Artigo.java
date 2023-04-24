@@ -1,4 +1,4 @@
-public class Artigo {
+public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
     
     private static int numArtigos = 0; //Mantém contagem de artigos e é utilizada para o codBarras de um artigo.
 
@@ -91,8 +91,9 @@ public class Artigo {
         return this.numDonos;
     }
 
+    //Não se faz clone pelo mesmo motivo do set, suponho.
     public Transportadora getTransportadora() {
-        return this.transportadora.clone();
+        return this.transportadora;
     }
 
     public String getDescricao() {
@@ -126,6 +127,7 @@ public class Artigo {
         this.numDonos = donos;
     }
 
+    //Não faz clone para quando se alterar o valor de uma transportadora alterar em todos os seus artigos, suponho.
     public void setTransportadora(Transportadora umaTransportadora) {
         this.transportadora = umaTransportadora;
     }
@@ -145,35 +147,32 @@ public class Artigo {
     public void setCorrecaoPreco(double cp) {
         this.correcaoPreco = cp;
     }
-
-    /**
+    
+        /**
      * Método clone.
      */
-    @Override
-    public Artigo clone() {
-        return new Artigo(this);
-    }
-
+    public abstract Artigo clone();
     /**
      * Método toString.
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
-        sb.append("| Artigo |\n");
+    
+        sb.append("     | Artigo |\n");
         sb.append(" Código de barras -> " + this.getCodBarras() + "\n");
         sb.append(" Condição -> " + (this.getCondicao() != null ? this.getCondicao().toString() : "Não associada") + "\n");
         sb.append(" Estado -> " + (this.getEstado() != null ? this.getEstado().toString() : "Não associado") + "\n");
         sb.append(" Número de Donos -> " + this.getNumDonos() + "\n");
-        sb.append(" Transportadora -> \n" + (this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada") + "\n");
+        sb.append(this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada" + "\n");
         sb.append(" Descrição -> " + this.getDescricao() + "\n");
         sb.append(" Marca -> " + this.getMarca() + "\n");
-        sb.append(" Preco Base -> " + this.getPrecoBase() + "\n");
+        sb.append(" Preço Base -> " + this.getPrecoBase() + "€\n");
         sb.append(" Correção de preço -> " + this.getCorrecaoPreco() + "%\n");
-
+    
         return sb.toString();
     }
+    
 
     /**
      * Método equals.
@@ -194,5 +193,37 @@ public class Artigo {
                artigo.getMarca().equals(this.getMarca()) &&
                artigo.getPrecoBase() == this.getPrecoBase() &&
                artigo.getCorrecaoPreco() == this.getCorrecaoPreco();
+    }
+
+    @Override
+    public void precoBaseNovo() {
+        this.setPrecoBase(this.precoBase - (this.precoBase / (this.estado.ordinal() + this.condicao.ordinal())));
+
+    }
+
+    @Override
+    public void correcaoPrecoNovo() {
+        this.setCorrecaoPreco(this.precoBase + 10);
+    }
+
+    @Override
+    public void precoBaseUsada() {
+        this.setPrecoBase(this.precoBase - (this.precoBase / this.numDonos * (this.estado.ordinal() - this.condicao.ordinal())));
+    }
+
+
+    @Override
+    public void correcaoPrecoUsada() {
+        this.setCorrecaoPreco(this.precoBase + 5);
+    }
+
+    @Override
+    public void precoBasePremium() {
+        this.setPrecoBase(this.precoBase + (this.precoBase / this.numDonos * (this.estado.ordinal() + this.condicao.ordinal())));
+    }
+
+    @Override
+    public void correcaoPrecoPremium() {
+        this.setCorrecaoPreco(this.precoBase + 15);
     }
 }

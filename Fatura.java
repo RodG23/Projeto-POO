@@ -104,7 +104,7 @@ public class Fatura {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(" | Fatura |\n");
+        sb.append("     | Fatura |\n");
         sb.append(" Número de emissão -> " + this.getNumEmissao() + "\n");
         sb.append(" Tipo -> " + this.getTipo().toString() + "\n");
         sb.append(" Artigos:\n");

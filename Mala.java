@@ -80,8 +80,8 @@ public class Mala extends Artigo{
         StringBuilder sb = new StringBuilder();
 
         sb.append(super.toString());
-        sb.append(" :Mala:\n");
-        sb.append(" Dimensão -> " + this.getDimensao().toString() + "\n");
+        sb.append(" Mala:\n");
+        sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "") + "\n");
         sb.append(" Tamanho -> " + this.getMaterial() + "\n");
         sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n");
 

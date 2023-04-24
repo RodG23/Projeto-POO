@@ -87,7 +87,7 @@ public class Sapatilha extends Artigo{
         StringBuilder sb = new StringBuilder();
 
         sb.append(super.toString());
-        sb.append(" :Sapatilhas:\n");
+        sb.append(" Sapatilhas:\n");
         sb.append(" Atacadores -> " + this.getAtacadores() + "\n");
         sb.append(" Cor -> " + this.getCor() + "\n");
         sb.append(" Tamanho -> " + this.getTamanho() + "\n");

@@ -1,7 +1,5 @@
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
 
 public class Vintage {
     private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo.
@@ -107,7 +105,7 @@ public class Vintage {
     }
 
     public Tempo getDataAtual(){
-        return this.dataAtual;
+        return this.dataAtual.clone();
     }
 
     /**
@@ -191,21 +189,21 @@ public class Vintage {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(" STOCK:\n");
+        sb.append(" ----- STOCK VINTAGE -----\n");
         for(Artigo a : this.getStock().values())
         {
             sb.append(a.toString());
         }
-        sb.append(" Encomendas:\n");
+        sb.append(" Encomendas realizadas:\n");
         for(Map.Entry<Integer, Map<Integer,Encomenda>> e : this.getEncomendas().entrySet())
         {
-            sb.append("     Utilizador " +e.getKey().toString() + ":");
+            sb.append("     Utilizador " +e.getKey().toString() + ":\n");
             for (Map.Entry<Integer,Encomenda> e2 : e.getValue().entrySet())
             {
                 sb.append(e2.getValue().toString());
             }
         }
-        sb.append(" Vendas:\n");
+        sb.append(" \nVendas efetuadas:\n");
         for(Map.Entry<Integer, Map<Integer,Artigo>> e : this.getVendas().entrySet())
         {
             sb.append("     Utilizador " +e.getKey().toString() + ":");
@@ -217,9 +215,11 @@ public class Vintage {
         sb.append(" Credênciais de login:\n");
         for(Map.Entry<String,String> a : this.getCreds().entrySet())
         {
-            sb.append("Email - " + a.getKey() + "| Password - " + a.getValue());
+            sb.append(" Email - " + a.getKey() + "| Password - " + a.getValue());
         }
-        sb.append("Total Auferido -> " + this.getTotalAuferido());
+        sb.append(" Total Auferido -> " + this.getTotalAuferido() + "\n\n");
+
+        sb.append(" ----- FIM DO STOCK -----\n");
 
         return sb.toString();
         }
@@ -263,7 +263,10 @@ public class Vintage {
             i++;
         }
         enc.setDataEntrega(aux); // avança os dias necessários
+        utilizador.getEncomendas().replace(enc.getId(), enc);
+        utilizador.setEncomendas(utilizador.getEncomendas());
     }
+    
 
     // Entrega a encomenda passado o tempo necessário
     public void entregaEncomenda(Utilizador comprador, Utilizador vendedor){
@@ -274,26 +277,22 @@ public class Vintage {
                 // Adicionar cada artigo ao histórico de compras do utilizador
                 artigosEncomenda.values().forEach(artigo -> { 
                     comprador.getComprou().put(artigo.getCodBarras(), artigo.clone());
+                    comprador.setComprou(comprador.getComprou());
                     vendedor.getVendeu().put(artigo.getCodBarras(), artigo.clone());
+                    vendedor.setVendeu(vendedor.getVendeu());
                 });
-                comprador.getEncomendas().remove(enc);
+                this.encomendas.put(comprador.getId(), comprador.getEncomendas());
+                comprador.getEncomendas().remove(enc.getId());
+                comprador.setEncomendas(comprador.getEncomendas());
                 // Não é necessário iterar mais se a encomenda já foi encontrada e removida
                 break;
             }
         }
-        this.encomendas.put(comprador.getId(), comprador.getEncomendas());
-    }
-        
-    public void avancaTempo(Utilizador comprador, Utilizador vendedor, Tempo dataAtual){
-        this.setDataAtual(dataAtual.avancaDia());
-
-        this.entregaEncomenda(comprador, vendedor);
     }
 
     //atualizar a HashMap vendas do utilizador
     public void atualiza_UtilizadorVendas(Utilizador u) {
         // Atualiza a lista de artigos vendidos do utilizador
-       
         Map<Integer, Artigo> aux = new HashMap<>(u.getVendeu());//vai buscar a HashMap das vendas do utilizador dado como parãmetro
         this.vendas.put(u.getId(), aux);//troca o Set através do id unico do utilizador
     }

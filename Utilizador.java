@@ -12,7 +12,7 @@ public class Utilizador {
     private Map<Integer,Artigo> aVenda; //Guarda os artigos que o user tem à venda (codBarras,Artigo).
     private Map<Integer,Artigo> vendeu; //Guarda os artigos que o user já vendeu (codBarras,Artigo).
     private Map<Integer,Artigo> comprou; //Guarda os artigos que o user já comprou (codBarras,Artigo).
-    private Map<Integer,Encomenda> encomendas;// Guarda as encomendas que o user fez numa list.
+    private Map<Integer,Encomenda> encomendas;// Guarda as encomendas que o user fez numa hashMap(id, encomenda).
     private Map<Integer, Fatura> faturas; //Guarda as faturas de compra e venda de um user(numEmissao,Fatura).
 
     /**
@@ -108,6 +108,10 @@ public class Utilizador {
     }
 
     public Map<Integer, Artigo> getComprou(){
+        return this.comprou;
+    }
+    /* 
+    public Map<Integer, Artigo> getComprou(){
         Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
         for (Map.Entry<Integer,Artigo> e : this.comprou.entrySet())
         {
@@ -115,7 +119,13 @@ public class Utilizador {
         }
         return map;
     }
+*/
 
+    public Map<Integer, Artigo> getVendeu(){
+        return this.vendeu;
+    }
+
+    /*
     public Map<Integer, Artigo> getVendeu(){
         Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
         for (Map.Entry<Integer,Artigo> e : this.vendeu.entrySet())
@@ -124,6 +134,7 @@ public class Utilizador {
         }
         return map;
     }
+*/
 
     public Map<Integer, Artigo> getAVenda(){
         Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
@@ -140,7 +151,7 @@ public class Utilizador {
         {
             map.put(e.getKey(),e.getValue().clone());
         }
-        return map;
+        return this.encomendas;
     }
 
     public Map<Integer,Fatura> getFaturas(){
@@ -226,41 +237,56 @@ public class Utilizador {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
-        sb.append("| Utilizador |\n");
-        sb.append(" Id -> " + this.getId() + "\n");
-        sb.append(" Email -> " + this.getEmail() + "\n");
-        sb.append(" Nome -> " + this.getNome() + "\n");
-        sb.append(" Morada -> " + this.getMorada() + "\n");
-        sb.append(" NIF -> " + this.getNif() + "\n");
+    
+        sb.append("\n ----- Perfil do Utilizador " + this.getId() + " -----\n");
+        sb.append(" Id: " + this.getId() + "\n");
+        sb.append(" Nome: " + this.getNome() + "\n");
+        sb.append(" Email: " + this.getEmail() + "\n");
+        sb.append(" Morada: " + this.getMorada() + "\n");
+        sb.append(" NIF: " + this.getNif() + "\n\n");
+        
         sb.append(" A Venda:\n");
         for(Artigo a : this.getAVenda().values())
         {
+            sb.append("\n");
             sb.append(a.toString());
         }
+        sb.append("\n");
+    
         sb.append(" Vendeu:\n");
         for(Artigo a : this.getVendeu().values())
         {
+            sb.append("\n");
             sb.append(a.toString());
         }
+        sb.append("\n");
+    
         sb.append(" Comprou:\n");
         for(Artigo a : this.getComprou().values())
         {
+            sb.append("\n");
             sb.append(a.toString());
         }
+        sb.append("\n");
+    
         sb.append(" Encomendas:\n");
         for(Encomenda e : this.getEncomendas().values())
         {
+            sb.append("\n");
             sb.append(e.toString());
         }
+        sb.append("\n");
+    
         sb.append(" Faturas:\n");
         for(Fatura e : this.getFaturas().values())
         {
+            sb.append("\n");
             sb.append(e.toString());
         }
-
+        sb.append("\n ----- FIM do perfil do Utilizador " + this.getId() + " -----\n");
         return sb.toString();
     }
+    
 
     /**
      * Método equals.
@@ -284,11 +310,11 @@ public class Utilizador {
     }
 
     // Adiciona um artigo para venda no sistema
-    public void aVenda_Artigo(Vintage vintage, Artigo a, Transportadora transportadora){
+    public void aVendaArtigo(Vintage vintage, Artigo a, Transportadora transportadora){
 
-        a.setTransportadora(transportadora);
-        this.aVenda.put(a.getCodBarras(), a);
-        vintage.addStock(a);
+            this.aVenda.put(a.getCodBarras(), a);
+            a.setTransportadora(transportadora);
+            vintage.addStock(a);
     } 
 
     public Encomenda encontrarEncomendaPendente(Map<Integer,Encomenda> encomendas) {
@@ -301,9 +327,7 @@ public class Utilizador {
     }
 
     // atualiza informações da encomenda do usuário em todas as instâncias relevantes, incluindo a classe Vintage
-    
-    /// O vendedor épassado como parâmetro ou só o artigo? Qual faz mais sentido? Se passar só o artigo vou a vintage procurar o dono e depois é que removo.
-    public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
+        public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
         Encomenda aux = encontrarEncomendaPendente(this.encomendas);
         if (aux == null) {
             aux = new Encomenda();
@@ -315,9 +339,11 @@ public class Utilizador {
     }  
 
     public void finalizarEncomenda(){
+        Tempo aux = new Tempo();
         for (Encomenda enc : this.encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
-                enc.setEstado(Encomenda.St.FINALIZADA);;
+                enc.setEstado(Encomenda.St.FINALIZADA);
+                enc.setDataEntrega(aux);
             }
         }
     }

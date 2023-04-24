@@ -65,7 +65,7 @@ public class Encomenda {
      * Construtor de cópia.
      */
     public Encomenda(Encomenda umaEncomenda) {
-        this.id = numEncomenda;
+        this.id = umaEncomenda.getId();
         this.dataCriacao = umaEncomenda.getDataCriacao();
         this.estado =umaEncomenda.getEstado();
         this.dimensao = umaEncomenda.getDimensao();
@@ -177,9 +177,9 @@ public class Encomenda {
 
         sb.append(" ----- ENCOMENDA ----- \n");
         sb.append(" Id -> " + this.getId() + "\n");
-        sb.append(" Data de criação -> " + (this.getDataCriacao() != null ? this.getDataCriacao().toString() : "") + "\n");
+        sb.append(" Data de criação -> " + (this.getDataCriacao() != null ? this.getDataCriacao().toString() : "Não associada") + "\n");
         sb.append(" Estado -> " + this.getEstado().toString() + "\n");
-        sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "") + "\n");
+        sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "Não associada") + "\n");
         sb.append("\n Artigos na encomenda:\n");
         this.getArtigos().forEach((chave,valor) -> sb.append( " Chave: " + chave.toString() + "\n"));
         sb.append(" Preço final -> " + this.getPrecoFinal() + "€\n");

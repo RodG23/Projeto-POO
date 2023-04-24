@@ -1,7 +1,6 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Encomenda {
@@ -22,13 +21,11 @@ public class Encomenda {
     }
 
     private final int id; //Guarda o número de identificação de uma encomenda.
-    private final Tempo dataCriacao; //Guarda a data de criação de uma encomenda.
+    private LocalDate dataCriacao; //Guarda a data de criação de uma encomenda.
     private St estado; //Guarda o estado de uma encomenda.
     private Dim dimensao; //Guarda a dimensão de uma encomenda.
-    private List<Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
+    private Map<Integer,Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
     private double precoFinal; //Guarda o preço final da encomenda.
-    private Tempo dataEntrega; //Data em que o artigo será entregue
-    private final int tempoEntrega = 2;
 
     /**
      * Construtor vazio.
@@ -39,38 +36,38 @@ public class Encomenda {
         this.dataCriacao = null;
         this.estado = St.PENDENTE;
         this.dimensao = null;
-        this.artigos = new ArrayList<Artigo>();
+        this.artigos = new HashMap<Integer,Artigo>();
         this.precoFinal = 0;
-        this.dataEntrega = null;
     }
 
     /**
      * Construtor parametrizado.
      */
 
-    public Encomenda(St etd, Dim dim, List<Artigo> art, double preco) {
+    public Encomenda(St etd, Dim dim, Map<Integer,Artigo> art, double preco) {
         numEncomenda++;
         this.id = numEncomenda;
         this.dataCriacao = null;
         this.estado = etd;
         this.dimensao = dim;
-        this.artigos = art;
+        this.artigos = new HashMap<Integer,Artigo>();
+        for(Map.Entry<Integer,Artigo> e : art.entrySet())
+        {
+            this.artigos.put(e.getKey(), e.getValue().clone());
+        }
         this.precoFinal = preco; 
-        this.dataEntrega = dataEntrega;
     }
 
     /**
      * Construtor de cópia.
      */
     public Encomenda(Encomenda umaEncomenda) {
-        numEncomenda++;
         this.id = numEncomenda;
         this.dataCriacao = umaEncomenda.getDataCriacao();
         this.estado =umaEncomenda.getEstado();
         this.dimensao = umaEncomenda.getDimensao();
         this.artigos = umaEncomenda.getArtigos();
         this.precoFinal = umaEncomenda.getPrecoFinal();
-        this.dataEntrega = umaEncomenda.getDataEntrega();
     }
 
     /**
@@ -80,7 +77,7 @@ public class Encomenda {
         return this.id;
     }
 
-    public Tempo getDataCriacao() {
+    public LocalDate getDataCriacao() {
         return this.dataCriacao;
     }
 
@@ -92,20 +89,17 @@ public class Encomenda {
         return this.dimensao;
     }
 
-    public List<Artigo> getArtigos() {
-        return this.artigos.stream().map(Artigo::clone).collect(Collectors.toList());
+    public Map<Integer,Artigo> getArtigos() {
+        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
+        for (Map.Entry<Integer,Artigo> e : this.artigos.entrySet())
+        {
+            map.put(e.getKey(),e.getValue().clone());
+        }
+        return map;
     }
 
     public double getPrecoFinal() {
         return this.precoFinal;
-    }
-
-    public int getTempEntrega() {
-        return this.tempoEntrega;
-    }
-
-    public Tempo getDataEntrega() {
-        return this.dataEntrega;
     }
 
     /**
@@ -119,12 +113,17 @@ public class Encomenda {
         this.dimensao = dim;
     }
 
-    public void setArtigos(List<Artigo> art) {
-        this.artigos = art;
+    public void setDataCriacao(LocalDate data) {
+        this.dataCriacao = data;
     }
 
-    public void setDataEntrega(Tempo dataEntrega) {
-        this.dataEntrega = dataEntrega;
+    public void setArtigos(Map<Integer,Artigo> art) {
+        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
+        for (Map.Entry<Integer,Artigo> e : art.entrySet())
+        {
+            map.put(e.getKey(),e.getValue().clone());
+        }
+        this.artigos = map;
     }
 
     /**
@@ -132,6 +131,21 @@ public class Encomenda {
      */
     public void addPrecoFinal(double cost) {
         this.precoFinal += cost;
+    }
+
+    /**
+     * Adiciona um artigo a uma encomenda.
+     */
+    public void addArtigo(Artigo a) {
+        this.artigos.put(a.getCodBarras(), a.clone());
+    }
+
+    /**
+     * Remove um artigo de uma encomenda, dado o seu código de barras.
+     * @param id
+     */
+    public void removeArtigo(Integer codBarras) {
+        this.artigos.remove(codBarras);
     }
 
     /**
@@ -150,15 +164,16 @@ public class Encomenda {
         StringBuilder sb = new StringBuilder();
 
         sb.append("| Encomenda |\n");
-        sb.append(" Id -> " + this.id + "\n");
-        sb.append(" Data de criação -> " + (this.dataCriacao != null ? this.dataCriacao.toString() : "") + "\n");
-        sb.append(" Estado -> " + this.estado.toString() + "\n");
-        sb.append(" Dimensão -> " + (this.dimensao != null ? this.dimensao.toString() : "") + "\n");
+        sb.append(" Id -> " + this.getId() + "\n");
+        sb.append(" Data de criação -> " + (this.getDataCriacao() != null ? this.getDataCriacao().toString() : "") + "\n");
+        sb.append(" Estado -> " + this.getEstado().toString() + "\n");
+        sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "") + "\n");
         sb.append(" Artigos:\n");
-        this.artigos.forEach(a -> sb.append(a.toString()));
-        sb.append(" Preço final -> " + this.precoFinal + "€\n");
-        sb.append(" Data de entrega -> " + this.dataEntrega + "%\n");
-        sb.append(" Tempo para entrega -> " + this.tempoEntrega + "%\n");
+        for(Artigo a : this.getArtigos().values())
+        {
+            sb.append(a.toString());
+        }
+        sb.append(" Preço final -> " + this.getPrecoFinal() + "€\n");
 
         return sb.toString();
     }
@@ -178,13 +193,7 @@ public class Encomenda {
                encomenda.getEstado().equals(this.getEstado()) &&
                encomenda.getDimensao().equals(this.getDimensao()) &&
                encomenda.getArtigos().equals(this.getArtigos()) &&
-               encomenda.getPrecoFinal() == this.getPrecoFinal() &&
-               encomenda.dataEntrega.equals(this.getDataEntrega()) &&
-               encomenda.tempoEntrega == this.tempoEntrega;
-    }
-
-    public void addArtigo(Artigo a){
-        this.artigos.add(a);
+               encomenda.getPrecoFinal() == this.getPrecoFinal();
     }
 }
 

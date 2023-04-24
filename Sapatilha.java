@@ -1,29 +1,14 @@
 public class Sapatilha extends Artigo{
-    private final boolean atacadores; //Indica se a sapatilha tem atacadores.
-    private final String cor; //Guarda a cor da sapatilha.
-    private final int tamanho; //Guarda o tamanho da sapatilha.
-    private final int anoLancamento; //Guarda o ano de lançamento da coleção.
 
+    private boolean atacadores; //Indica se a sapatilha tem atacadores.
+    private String cor; //Guarda a cor da sapatilha.
+    private int tamanho; //Guarda o tamanho da sapatilha.
+    private int anoLancamento; //Guarda o ano de lançamento da coleção.
     //exemplo de um preco base : precoBase =− (precoBase/numeroDonos ∗ estadoU tilizacao)
     
-    //Getters
-
-    public int get_Tam(){ 
-        return this.tamanho;
-    }
-
-    public Boolean get_Atacadores(){ 
-        return this.atacadores;
-    }
-
-    public String get_Cor(){ 
-        return this.cor;
-    }
-
-    public int get_ALancamento(){ 
-        return this.anoLancamento;
-    }
-
+    /**
+     * Construtores
+     */
     public Sapatilha(){
         super();
         this.tamanho = -1;
@@ -32,8 +17,8 @@ public class Sapatilha extends Artigo{
         this.anoLancamento = -1;
     }
 
-    public Sapatilha(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, boolean atacadores, String cor, int tamanho, int anoLancamento){
-        super(cond, etd, donos,trans,desc,mrc,pb,cp);
+    public Sapatilha(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
+        super(cond, etd, donos, trans, desc, mrc, pb, cp);
         this.tamanho = tamanho;
         this.atacadores = atacadores;
         this.cor = cor;
@@ -42,37 +27,91 @@ public class Sapatilha extends Artigo{
 
     public Sapatilha(Sapatilha s){
         super(s);
-        this.tamanho = s.get_Tam();
-        this.atacadores = s.get_Atacadores();
-        this.cor = s.get_Cor();
-        this.anoLancamento = s.get_ALancamento();
+        this.tamanho = s.getTamanho();
+        this.atacadores = s.getAtacadores();
+        this.cor = s.getCor();
+        this.anoLancamento = s.getAnoLancamento();
     }
 
+    /**
+     * Getters
+     */
+    public int getTamanho(){ 
+        return this.tamanho;
+    }
+
+    public Boolean getAtacadores(){ 
+        return this.atacadores;
+    }
+
+    public String getCor(){ 
+        return this.cor;
+    }
+
+    public int getAnoLancamento(){ 
+        return this.anoLancamento;
+    }
+
+    /**
+     * Setters
+     */
+    public void setTamanho(int tam) {
+        this.tamanho = tam;
+    }
+
+    public void setAtacadores(boolean atac) {
+        this.atacadores = atac;
+    }
+
+    public void setCor(String c) {
+        this.cor = c;
+    }
+
+    public void setAnoLancamento(int ano) {
+        this.anoLancamento = ano;
+    }
+
+    /**
+     * Método clone.
+     */
     @Override
     public Sapatilha clone() {
         return new Sapatilha(this) ;
-        }
+    }
 
+    /**
+     * Método toString.
+     */
     @Override
     public String toString() {
-        return "Sapatilhas {" +
-                "atacadores=" + atacadores +
-                ", cor='" + cor +
-                ", tamanho=" + tamanho +
-                ", anoLancamento=" + anoLancamento +
-                ", " + super.toString() +
-                '}';
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(super.toString());
+        sb.append(" :Sapatilhas:\n");
+        sb.append(" Atacadores -> " + this.getAtacadores() + "\n");
+        sb.append(" Cor -> " + this.getCor() + "\n");
+        sb.append(" Tamanho -> " + this.getTamanho() + "\n");
+        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n");
+
+        return sb.toString();
     }
     
+    /**
+     * Método equals.
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true ;
-        if (( o == null ) || ( this.getClass () != o.getClass ()))  return false ;
-        if (!super.equals(o)) return false;
-
-        Sapatilha s = (Sapatilha) o ;
-        return this.tamanho == s.get_Tam() && this.atacadores == s.get_Atacadores() &&
-               this.cor.equals(s.get_Cor()) && this.anoLancamento == s.get_ALancamento();            
+    public boolean equals(Object obj) {
+        if(this == obj) 
+            return true ;
+        if((obj == null ) || ( this.getClass () != obj.getClass ()))  
+            return false ;
+        if(!super.equals(obj)) 
+            return false;
+        Sapatilha s = (Sapatilha) obj ;
+        return  this.getTamanho() == s.getTamanho() && 
+                this.getAtacadores().equals(s.getAtacadores()) &&
+                this.getCor().equals(s.getCor()) && 
+                this.getAnoLancamento() == s.getAnoLancamento();            
     }
 
 }

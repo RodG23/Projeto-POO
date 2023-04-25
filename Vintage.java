@@ -266,30 +266,6 @@ public class Vintage {
         utilizador.adicionaEncEncomendas(enc);
         this.encomendas.put(utilizador.getId(), utilizador.getEncomendas());
     }
-    
-    // Entrega a encomenda passado o tempo necessário
-    public void entregaEncomenda(Utilizador comprador, Utilizador vendedor){
-        for (Encomenda enc : comprador.getEncomendas().values()) {
-            if (enc.getDataEntrega().equals(this.getDataAtual())) {
-                // Obter a lista de artigos da encomenda
-                Map<Integer,Artigo> artigosEncomenda = enc.getArtigos();
-                // Adicionar cada artigo ao histórico de compras do utilizador
-                artigosEncomenda.values().forEach(artigo -> { 
-                    comprador.adicionaArtigoCompras(artigo);
-                    comprador.setComprou(comprador.getComprou());
-
-                    vendedor.adicionaArtigoVendas(artigo);
-                    vendedor.setVendeu(vendedor.getVendeu());
-                    vendedor.getAVenda().values().remove(artigo);
-                });
-                this.encomendas.put(comprador.getId(), comprador.getEncomendas());
-                comprador.getEncomendas().remove(enc.getId());
-                comprador.setEncomendas(comprador.getEncomendas());
-                // Não é necessário iterar mais se a encomenda já foi encontrada e removida
-                break;
-            }
-        }
-    }
 
     public void atualizaEncomendas() {
         // Percorre todas as encomendas
@@ -299,8 +275,6 @@ public class Vintage {
             for (Encomenda encomenda : encomendasUtilizadores.values()) {
 
                 //verificar se o dia da entrega da encomenda chegou
-                System.out.println(encomenda.getDataEntrega());
-                System.out.println(this.dataAtual);
                 if (encomenda.getDataEntrega().equals(this.getDataAtual())) {
 
                     for (Utilizador compradorAUX : this.creds.values()) {

@@ -1,15 +1,23 @@
+import java.time.LocalDate;
+
 public class Main {
     public static void main(String[] args){
+
     Vintage vinted = new Vintage();
     Mala a1 = new Mala();
     Sapatilha a2 = new Sapatilha();
     Tshirt a3 = new Tshirt();
     Utilizador u1 = new Utilizador();
+    Credenciais cr1 = new Credenciais("jonasfmagalhaes@gmail.com", "12345");
     Utilizador u2 = new Utilizador();
+    Credenciais cr2 = new Credenciais("gugaefmagalhaes@gmail.com", "67890");
     Transportadora t = new Transportadora();
     Transportadora t2 = new Transportadora();
-    Tempo tempo = new Tempo();
-    vinted.setDataAtual(tempo);
+    vinted.setDataAtual(LocalDate.now());
+
+    //regista utilizadores
+    vinted.registaUtilizador(cr1, u1);
+    vinted.registaUtilizador(cr2, u2);
 
     // perfil do utilizador u1 tem um mala e umas sapatilhas à venda
     u1.aVendaArtigo(vinted, a1, t);
@@ -27,16 +35,15 @@ public class Main {
      // a encomenda de u2 é expedida
     vinted.enviarEncomenda(u2);
 
-    // avançar dois dias
-    vinted.setDataAtual(tempo.avancaDia());
-    vinted.setDataAtual(tempo.avancaDia());
-
-    vinted.entregaEncomenda(u2, u1);
+    //o sistema é atualizado com o avançar dos dias
+    vinted.avancaData("30/05/2023");
 
     System.out.println(u2.toString());
     System.out.println(u1.toString());
 
     //neste momento o artigo a1 deve sair do stock visto que foi comprado pelo utilizador u2
-    System.out.println(vinted.toString());
+    //System.out.println(vinted.toString());
+    //scanner.close();
     }
+    
 }

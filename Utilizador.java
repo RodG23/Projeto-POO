@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public class Utilizador {
     private Map<Integer,Artigo> aVenda; //Guarda os artigos que o user tem à venda (codBarras,Artigo).
     private Map<Integer,Artigo> vendeu; //Guarda os artigos que o user já vendeu (codBarras,Artigo).
     private Map<Integer,Artigo> comprou; //Guarda os artigos que o user já comprou (codBarras,Artigo).
-    private Map<Integer,Encomenda> encomendas;// Guarda as encomendas que o user fez numa hashMap(id, encomenda).
+    private Map<Integer,Encomenda> encomendas;// Guarda as encomendas que o user fez numa hashMap(id do comprador, encomenda).
     private Map<Integer, Fatura> faturas; //Guarda as faturas de compra e venda de um user(numEmissao,Fatura).
 
     /**
@@ -108,10 +109,6 @@ public class Utilizador {
     }
 
     public Map<Integer, Artigo> getComprou(){
-        return this.comprou;
-    }
-    /* 
-    public Map<Integer, Artigo> getComprou(){
         Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
         for (Map.Entry<Integer,Artigo> e : this.comprou.entrySet())
         {
@@ -119,13 +116,7 @@ public class Utilizador {
         }
         return map;
     }
-*/
 
-    public Map<Integer, Artigo> getVendeu(){
-        return this.vendeu;
-    }
-
-    /*
     public Map<Integer, Artigo> getVendeu(){
         Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
         for (Map.Entry<Integer,Artigo> e : this.vendeu.entrySet())
@@ -134,7 +125,6 @@ public class Utilizador {
         }
         return map;
     }
-*/
 
     public Map<Integer, Artigo> getAVenda(){
         Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
@@ -151,7 +141,7 @@ public class Utilizador {
         {
             map.put(e.getKey(),e.getValue().clone());
         }
-        return this.encomendas;
+        return map;
     }
 
     public Map<Integer,Fatura> getFaturas(){
@@ -310,11 +300,10 @@ public class Utilizador {
     }
 
     // Adiciona um artigo para venda no sistema
-    public void aVendaArtigo(Vintage vintage, Artigo a, Transportadora transportadora){
-
-            this.aVenda.put(a.getCodBarras(), a);
-            a.setTransportadora(transportadora);
-            vintage.addStock(a);
+    public void aVendaArtigo(Vintage vintage, Artigo artigo, Transportadora transportadora){
+            artigo.setTransportadora(transportadora);
+            this.adicionaArtigoAVenda(artigo);
+            vintage.addStock(artigo);
     } 
 
     public Encomenda encontrarEncomendaPendente(Map<Integer,Encomenda> encomendas) {
@@ -327,24 +316,55 @@ public class Utilizador {
     }
 
     // atualiza informações da encomenda do usuário em todas as instâncias relevantes, incluindo a classe Vintage
-        public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
-        Encomenda aux = encontrarEncomendaPendente(this.encomendas);
+    public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
+    Encomenda aux = encontrarEncomendaPendente(this.encomendas);
         if (aux == null) {
             aux = new Encomenda();
         }
         aux.addArtigo(artigo);
-        this.encomendas.put(aux.getId(),aux.clone());//poe a encomenda dentro da hashMap das encomendas do utilizador
-        vendedor.aVenda.remove(artigo.getCodBarras());
+        this.adicionaEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
         vinted.remStock(artigo);
     }  
 
     public void finalizarEncomenda(){
-        Tempo aux = new Tempo();
+        LocalDate aux = LocalDate.now();
         for (Encomenda enc : this.encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
                 enc.setEstado(Encomenda.St.FINALIZADA);
                 enc.setDataEntrega(aux);
             }
         }
+    }
+
+    public void adicionaArtigoVendas(Artigo a){
+       this.vendeu.put(a.getCodBarras(), a.clone());
+    }
+
+    public void removeArtigoVendas(Artigo a){
+        this.vendeu.remove(a.getCodBarras());
+    }
+
+    public void adicionaArtigoCompras(Artigo a){
+        this.comprou.put(a.getCodBarras(), a.clone());
+    }
+
+    public void removeArtigoCompras(Artigo a){
+        this.comprou.remove(a.getCodBarras());
+    }
+
+    public void adicionaArtigoAVenda(Artigo a){
+        this.aVenda.put(a.getCodBarras(), a.clone());
+    }
+
+    public void removeArtigoAVenda(Artigo a){
+        this.aVenda.remove(a.getCodBarras());
+    }
+
+    public void adicionaEncEncomendas(Encomenda enc){
+        this.encomendas.put(enc.getId(), enc.clone());
+    }
+
+    public void removeEncEncomenda(Encomenda enc){
+        this.encomendas.remove(enc.getId());
     }
 }

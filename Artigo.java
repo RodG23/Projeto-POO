@@ -185,6 +185,7 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
             return false;
         Artigo artigo = (Artigo) obj;
         return artigo.getCodBarras() == this.getCodBarras() &&
+               this.getCondicao() != null &&
                artigo.getCondicao().equals(this.getCondicao()) &&
                artigo.getEstado().equals(this.getEstado()) &&
                artigo.getNumDonos() == this.getNumDonos() &&

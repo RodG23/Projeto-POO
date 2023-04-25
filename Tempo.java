@@ -51,20 +51,23 @@ public class Tempo {
         }
     }
     
-    public Tempo avancaDia() {
-        this.dia++;
-        // verificar se o dia atual ultrapassou o número de dias do mês atual
-        if (this.dia > diasNoMes()) {
-            this.dia = 1;
-            this.mes++;
-            // verificar se o mês atual ultrapassou o número de meses no ano atual
-            if (this.mes > 12) {
-                this.mes = 1;
-                this.ano++;
+    public Tempo avancaDia(int x) {
+        for(int i = 0; i<x; i++){
+            this.dia ++;
+            // verificar se o dia atual ultrapassou o número de dias do mês atual
+            if (this.dia > diasNoMes()) {
+                this.dia = 1;
+                this.mes++;
+                // verificar se o mês atual ultrapassou o número de meses no ano atual
+                if (this.mes > 12) {
+                    this.mes = 1;
+                    this.ano++;
+                }
             }
         }
         return this;
     }
+
     @Override
     public Tempo clone() {
         return new Tempo(this);

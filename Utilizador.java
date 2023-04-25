@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -326,7 +327,7 @@ public class Utilizador {
     }  
 
     public void finalizarEncomenda(){
-        Tempo aux = new Tempo();
+        LocalDate aux = LocalDate.now();
         for (Encomenda enc : this.encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
                 enc.setEstado(Encomenda.St.FINALIZADA);

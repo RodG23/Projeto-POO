@@ -25,7 +25,7 @@ public class Encomenda {
     private Dim dimensao; //Guarda a dimensão de uma encomenda.
     private Map<Integer,Artigo> artigos; //Guarda o conjunto de artigos que constitui a encomenda.
     private double precoFinal; //Guarda o preço final da encomenda.
-    private Tempo dataEntrega; //Data em que o artigo será entregue
+    private LocalDate dataEntrega; //Data em que o artigo será entregue
     private final int tempoEntrega = 2; // Tempo que demora à encomenda a ser entregue.
 
     /**
@@ -46,7 +46,7 @@ public class Encomenda {
      * Construtor parametrizado.
      */
 
-    public Encomenda(St etd, Dim dim, Map<Integer,Artigo> art, double preco, Tempo dataEntrega) {
+    public Encomenda(St etd, Dim dim, Map<Integer,Artigo> art, double preco, LocalDate dataEntrega) {
         numEncomenda++;
         this.id = numEncomenda;
         this.dataCriacao = null;
@@ -106,7 +106,7 @@ public class Encomenda {
         return this.precoFinal;
     }
 
-    public Tempo getDataEntrega() {
+    public LocalDate getDataEntrega() {
         return this.dataEntrega;
     }
 
@@ -134,7 +134,7 @@ public class Encomenda {
         this.artigos = map;
     }
 
-    public void setDataEntrega(Tempo dataEntrega) {
+    public void setDataEntrega(LocalDate dataEntrega) {
         this.dataEntrega = dataEntrega;
     }
 

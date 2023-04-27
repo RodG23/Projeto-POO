@@ -318,12 +318,25 @@ public class Utilizador {
     // atualiza informações da encomenda do usuário em todas as instâncias relevantes, incluindo a classe Vintage
     public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
     Encomenda aux = encontrarEncomendaPendente(this.encomendas);
+    //Caso onde se adiciona o primeiro artigo à encomenda
         if (aux == null) {
             aux = new Encomenda();
         }
-        aux.addArtigo(artigo);
-        this.adicionaEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
-        vinted.remStock(artigo);
+        try{
+            Artigo a = vinted.getStock().get(artigo.getCodBarras());
+            aux.addArtigo(a.clone());
+            this.adicionaEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
+            vinted.remStock(a.clone());
+        }catch(NullPointerException e){
+            System.out.println("Artigo "+ artigo.getCodBarras() + " fora de stock\n");
+        }
+     /*  
+        if(vinted.getStock().containsKey(artigo.getCodBarras())){
+            aux.addArtigo(artigo.clone());
+            this.adicionaEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
+            vinted.remStock(artigo.clone());
+        }
+    */
     }  
 
     public void finalizarEncomenda(){

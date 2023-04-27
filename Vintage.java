@@ -5,6 +5,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.tree.ExpandVetoException;
+
 public class Vintage {
     private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo.
     private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado.
@@ -198,7 +200,7 @@ public class Vintage {
         {
             sb.append(a.toString());
         }
-        sb.append(" Encomendas realizadas:\n");
+        sb.append(" Encomendas em processo:\n");
         for(Map.Entry<Integer, Map<Integer,Encomenda>> e : this.getEncomendas().entrySet())
         {
             sb.append("     Utilizador " +e.getKey().toString() + ":\n");
@@ -210,7 +212,7 @@ public class Vintage {
         sb.append(" \nVendas efetuadas:\n");
         for(Map.Entry<Integer, Map<Integer,Artigo>> e : this.getVendas().entrySet())
         {
-            sb.append("     Utilizador " +e.getKey().toString() + ":");
+            sb.append("     Utilizador " +e.getKey().toString() + ":\n");
             for (Map.Entry<Integer,Artigo> e2 : e.getValue().entrySet())
             {
                 sb.append(e2.getValue().toString());
@@ -219,7 +221,7 @@ public class Vintage {
         sb.append(" Credênciais de login:\n");
         for(Map.Entry<Credenciais, Utilizador> a : this.getCreds().entrySet())
         {
-            sb.append(" Utilizador " + a.getValue().getId() + "\n" + a.getKey().toString());
+            sb.append("     Utilizador " + a.getValue().getId() + "\n" + a.getKey().toString());
         }
         sb.append(" Total Auferido -> " + this.getTotalAuferido() + "\n\n");
 
@@ -259,15 +261,20 @@ public class Vintage {
 
     public void enviarEncomenda(Utilizador utilizador){
         Encomenda enc = encontrarEncomendaFinalizada(utilizador);
-        enc.setEstado(Encomenda.St.EXPEDIDA);
-        LocalDate aux = this.getDataAtual();
+        try{
+            enc.setEstado(Encomenda.St.EXPEDIDA);
+            LocalDate aux = this.getDataAtual();
 
-        // definir o dia de entrega da encomenda (passado DOIS dias da sua finalização, enc.getTempEntrega() = 2)
-        aux = aux.plusDays(enc.getTempEntrega());
-
-        enc.setDataEntrega(aux); // avança os dias necessários
-        utilizador.adicionaEncEncomendas(enc);
-        this.encomendas.put(utilizador.getId(), utilizador.getEncomendas());
+            // definir o dia de entrega da encomenda (passado DOIS dias da sua finalização, enc.getTempEntrega() = 2)
+            aux = aux.plusDays(enc.getTempEntrega());
+    
+            enc.setDataEntrega(aux); // avança os dias necessários
+            utilizador.adicionaEncEncomendas(enc);
+            this.encomendas.put(utilizador.getId(), utilizador.getEncomendas());
+        }
+        catch(NullPointerException e){
+            System.out.println("A encomenda do Utilizador " + utilizador.getId() + " não existe\n");
+        }
     }
 
     public void atualizaEncomendas() {
@@ -286,10 +293,7 @@ public class Vintage {
                             break;
                         }
                     }
-                    if (comprador == null) {
-                        throw new RuntimeException("Nenhum comprador encontrado para concluir a encomenda");
-                    }
-                    else {
+                    try{
                         // Obter a lista de artigos da encomenda
                         Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
 
@@ -303,30 +307,39 @@ public class Vintage {
                                     break;
                                 }
                             }
-                            if (vendedor == null) {
-                                throw new RuntimeException("Nenhum vendedor encontrado para concluir a encomenda");
-                            }
-                            else{
-                                // Adicionar cada artigo à hashMap de compras do comprador
-                                comprador.adicionaArtigoCompras(artigo);
-
+                            try{
                                 // Adicionar cada artigo à hashMap de vendas do vendedor respetivo
                                 vendedor.adicionaArtigoVendas(artigo);
 
                                 // Remover o artigo da lista de artigos à venda do vendedor
                                 vendedor.removeArtigoAVenda(artigo);
 
+                                // Adicionar cada artigo à hashMap de compras do comprador
+                                comprador.adicionaArtigoCompras(artigo);
+
                                 // Adicionar o artigo na lista de vendidos do sistema
                                 this.vendas.put(vendedor.getId(), vendedor.getVendeu());
+
+                            } 
+                            catch(NullPointerException e)  {
+                                System.out.println("Artigo não encontrado\n");
                             }
-                                
-                        }
+
+                            catch(Exception e){
+                                System.out.println("Nenhum vendedor foi encontrado para concluir a encomenda\n");
+                            } 
+
+
                         //Remover a encomenda que foi entregue da hashMap, encomendas, do comprador
                         comprador.removeEncEncomenda(encomenda);
+                        }
+
+                    } catch(Exception e){
+                        System.out.println("Nenhum comprador encontrado para concluir a encomenda");
                     }
                     
                     // Verificar se o comprador tem mais encomendas na hashMap, se sim atualiza caso contrário remove a chave da mesma
-                    if(comprador.getEncomendas() != null){
+                    if(!comprador.getEncomendas().isEmpty()){
                         this.encomendas.replace(comprador.getId(), comprador.getEncomendas());
                     }
                     else {
@@ -338,7 +351,7 @@ public class Vintage {
     } 
 
     public void addStock(Artigo a){
-        this.stock.put(a.getCodBarras(), a);
+        this.stock.put(a.getCodBarras(), a.clone());
     }
 
     public void remStock(Artigo a){

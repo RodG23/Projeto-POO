@@ -40,7 +40,7 @@ public class Credenciais {
 
         sb.append("     | Credenciais |\n");
         sb.append(" Email -> " + this.getEmail() + "\n");
-        sb.append(" Password -> " + this.getPassword() + "\n");
+        sb.append(" Password -> " + this.getPassword() + "\n\n");
 
         return sb.toString();
     }

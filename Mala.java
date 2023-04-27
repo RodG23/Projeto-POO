@@ -83,7 +83,7 @@ public class Mala extends Artigo{
         sb.append(" Mala:\n");
         sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "") + "\n");
         sb.append(" Tamanho -> " + this.getMaterial() + "\n");
-        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n");
+        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n\n");
 
         return sb.toString();
     }

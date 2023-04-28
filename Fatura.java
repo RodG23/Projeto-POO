@@ -112,7 +112,7 @@ public class Fatura {
         {
             sb.append(a.toString());
         }
-        sb.append(" ValorTotal -> " + this.getValorTotal() + "\n");
+        sb.append(" ValorTotal -> " + this.getValorTotal() + "€\n");
 
         return sb.toString();
     }
@@ -132,4 +132,17 @@ public class Fatura {
                 this.getArtigos().equals(f.getArtigos()) &&
                 this.getValorTotal() == f.getValorTotal();
     }
+
+    public void addArtigo(Artigo artigo){
+        this.artigos.put(artigo.getCodBarras(), artigo.clone());
+    }
+
+    public void removeArtigo(Artigo artigo){
+        this.artigos.remove(artigo.getCodBarras());
+    }
+
+    public void calculaValorTotal() {
+        this.valorTotal = this.artigos.values().stream().mapToDouble(Artigo::getPrecoBase).sum();
+    }
+    
 }

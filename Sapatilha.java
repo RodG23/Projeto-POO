@@ -91,7 +91,7 @@ public class Sapatilha extends Artigo{
         sb.append(" Atacadores -> " + this.getAtacadores() + "\n");
         sb.append(" Cor -> " + this.getCor() + "\n");
         sb.append(" Tamanho -> " + this.getTamanho() + "\n");
-        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n\n");
+        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n");
 
         return sb.toString();
     }

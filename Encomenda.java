@@ -139,28 +139,6 @@ public class Encomenda {
     }
 
     /**
-     * Adiciona ao custo da encomenda o valor do artigo adicionado.
-     */
-    public void addPrecoFinal(double cost) {
-        this.precoFinal += cost;
-    }
-
-        /**
-     * Adiciona um artigo a uma encomenda.
-     */
-    public void addArtigo(Artigo a) {
-        this.artigos.put(a.getCodBarras(), a.clone());
-    }
-
-    /**
-     * Remove um artigo de uma encomenda, dado o seu código de barras.
-     * @param id
-     */
-    public void removeArtigo(Integer codBarras) {
-        this.artigos.remove(codBarras);
-    }
-
-    /**
      * Método clone.
      */
     @Override
@@ -206,6 +184,28 @@ public class Encomenda {
                encomenda.getArtigos().equals(this.getArtigos()) &&
                encomenda.getPrecoFinal() == this.getPrecoFinal() &&
                encomenda.dataEntrega.equals(this.getDataEntrega());
+    }
+
+    /**
+     * Adiciona ao custo da encomenda o valor do artigo adicionado.
+     */
+    public void addPrecoFinal(double cost) {
+        this.precoFinal += cost;
+    }
+
+    /**
+     * Adiciona um artigo a uma encomenda.
+     */
+    public void addArtigo(Artigo a) {
+        this.artigos.put(a.getCodBarras(), a.clone());
+    }
+
+    /**
+     * Remove um artigo de uma encomenda, dado o seu código de barras.
+     * @param id
+     */
+    public void removeArtigo(Integer codBarras) {
+        this.artigos.remove(codBarras);
     }
 }
 

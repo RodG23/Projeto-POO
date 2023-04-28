@@ -5,8 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.tree.ExpandVetoException;
-
 public class Vintage {
     private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo.
     private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado.
@@ -14,7 +12,7 @@ public class Vintage {
     private Map<Integer, Artigo> stock; //Guardado o stock de artigos para venda (CodBarras,Artigo).
     private Map<Integer, Map<Integer,Encomenda>> encomendas; //Guardadas encomendas feitas por um user (Id do comprador,conjunto de encomendas).
     private Map<Integer, Map<Integer,Artigo>> vendas; //Guardadas as vendas feitas por user (Id do vendedor, conjunto de artigos vendidos). 
-    private Map<Credenciais, Utilizador> creds; //Guardadas as credenciais de acesso à Vintage por users (credenciais,utilizador).
+    private Map<String, Utilizador> creds; //Guardadas o email de acesso à Vintage por users (String,utilizador).
     private double totalAuferido; //Guardado o total auferido pela Vintage no seu funcionamento.
     private LocalDate dataAtual;//Data atual do sistema.
 
@@ -25,16 +23,16 @@ public class Vintage {
         this.stock = new HashMap<Integer,Artigo>();
         this.encomendas = new HashMap<Integer,Map<Integer,Encomenda>>();
         this.vendas = new HashMap<Integer,Map<Integer,Artigo>>();
-        this.creds = new HashMap<Credenciais, Utilizador>();
+        this.creds = new HashMap<String, Utilizador>();
         this.totalAuferido = 0;
         this.dataAtual = null;
     }
 
-    public Vintage(Map<Integer, Artigo> stock, Map<Integer, Map<Integer,Encomenda>> encomendas, Map<Integer, Map<Integer,Artigo>> vendas, Map<Credenciais, Utilizador> creds, double totalAuferido, LocalDate dataAtual) {
+    public Vintage(Map<Integer, Artigo> stock, Map<Integer, Map<Integer,Encomenda>> encomendas, Map<Integer, Map<Integer,Artigo>> vendas, Map<String, Utilizador> creds, double totalAuferido, LocalDate dataAtual) {
         this.stock = new HashMap<Integer,Artigo>(stock);
         this.encomendas = new HashMap<Integer,Map<Integer,Encomenda>>(encomendas);
         this.vendas = new HashMap<Integer,Map<Integer,Artigo>>(vendas);
-        this.creds = new HashMap<Credenciais, Utilizador>(creds);
+        this.creds = new HashMap<String, Utilizador>(creds);
         this.totalAuferido = totalAuferido;
         this.dataAtual = dataAtual;
     }
@@ -89,9 +87,9 @@ public class Vintage {
         return map;
     }
 
-    public Map<Credenciais, Utilizador> getCreds(){
-        Map<Credenciais, Utilizador> map = new HashMap<Credenciais, Utilizador>();
-        for (Map.Entry<Credenciais, Utilizador> e : this.creds.entrySet())
+    public Map<String, Utilizador> getCreds(){
+        Map<String, Utilizador> map = new HashMap<String, Utilizador>();
+        for (Map.Entry<String, Utilizador> e : this.creds.entrySet())
         {
             map.put(e.getKey(),e.getValue());
         }
@@ -154,9 +152,9 @@ public class Vintage {
         this.vendas = map;
     }
 
-    public void setCreds(HashMap<Credenciais, Utilizador>novasCreds){
-        Map<Credenciais, Utilizador> map = new HashMap<Credenciais, Utilizador>();
-        for (Map.Entry<Credenciais, Utilizador> e : novasCreds.entrySet())
+    public void setCreds(HashMap<String, Utilizador>novasCreds){
+        Map<String, Utilizador> map = new HashMap<String, Utilizador>();
+        for (Map.Entry<String, Utilizador> e : novasCreds.entrySet())
         {
             map.put(e.getKey(),e.getValue());
         }
@@ -219,7 +217,7 @@ public class Vintage {
             }
         }
         sb.append(" Credênciais de login:\n");
-        for(Map.Entry<Credenciais, Utilizador> a : this.getCreds().entrySet())
+        for(Map.Entry<String, Utilizador> a : this.getCreds().entrySet())
         {
             sb.append("     Utilizador " + a.getValue().getId() + "\n" + a.getKey().toString());
         }
@@ -269,7 +267,7 @@ public class Vintage {
             aux = aux.plusDays(enc.getTempEntrega());
     
             enc.setDataEntrega(aux); // avança os dias necessários
-            utilizador.adicionaEncEncomendas(enc);
+            utilizador.addEncEncomendas(enc);
             this.encomendas.put(utilizador.getId(), utilizador.getEncomendas());
         }
         catch(NullPointerException e){
@@ -280,6 +278,10 @@ public class Vintage {
     public void atualizaEncomendas() {
         // Percorre todas as encomendas
         for (Map<Integer, Encomenda> encomendasUtilizadores : this.encomendas.values()) {
+            Fatura compfat = new Fatura();
+            compfat.setTipo(Fatura.Tp.COMPRA);
+            Fatura vendfat = new Fatura();
+            vendfat.setTipo(Fatura.Tp.VENDA);
 
             Utilizador comprador = null;
             for (Encomenda encomenda : encomendasUtilizadores.values()) {
@@ -307,17 +309,24 @@ public class Vintage {
                                     break;
                                 }
                             }
+                            // adiciona cada artigo à hashMap respetiva do utilizador
                             try{
-                                // Adicionar cada artigo à hashMap de vendas do vendedor respetivo
-                                vendedor.adicionaArtigoVendas(artigo);
+                                vendedor.addArtigoVendas(artigo.clone());
+                            
+                                vendedor.removeArtigoAVenda(artigo.clone());
 
-                                // Remover o artigo da lista de artigos à venda do vendedor
-                                vendedor.removeArtigoAVenda(artigo);
+                                vendedor.addArtigoFatura(vendfat, artigo.clone());
+                               
+                                comprador.addArtigoCompras(artigo.clone());
 
-                                // Adicionar cada artigo à hashMap de compras do comprador
-                                comprador.adicionaArtigoCompras(artigo);
+                                compfat.addArtigo(artigo.clone());
 
-                                // Adicionar o artigo na lista de vendidos do sistema
+                                vendfat.addArtigo(artigo.clone());
+
+                                comprador.addFatura(compfat);
+
+                                vendedor.addFatura(vendfat);
+                                    
                                 this.vendas.put(vendedor.getId(), vendedor.getVendeu());
 
                             } 
@@ -325,13 +334,9 @@ public class Vintage {
                                 System.out.println("Artigo não encontrado\n");
                             }
 
-                            catch(Exception e){
-                                System.out.println("Nenhum vendedor foi encontrado para concluir a encomenda\n");
-                            } 
-
-
                         //Remover a encomenda que foi entregue da hashMap, encomendas, do comprador
                         comprador.removeEncEncomenda(encomenda);
+                        vendedor.valorFatura(vendfat.getNumEmissao());
                         }
 
                     } catch(Exception e){
@@ -345,10 +350,23 @@ public class Vintage {
                     else {
                         this.encomendas.remove(comprador.getId());
                     }
+
                 }
+                comprador.valorFatura(compfat.getNumEmissao());
             }
         }
-    } 
+
+        // calcula o valor das faturas dos utilizadores
+        for(Utilizador utilizador : this.creds.values()){
+            double valorTotalFaturas = 0;
+            for(Fatura fatura : utilizador.getFaturas().values()) {
+                for(Artigo artigo : fatura.getArtigos().values()) {
+                    valorTotalFaturas += artigo.getPrecoBase();
+                }
+                fatura.setValorTotal(valorTotalFaturas);
+            }
+        }
+    }
 
     public void addStock(Artigo a){
         this.stock.put(a.getCodBarras(), a.clone());
@@ -371,7 +389,7 @@ public class Vintage {
         }
     }
 
-    public void registaUtilizador(Credenciais cred, Utilizador utilizador){
+    public void registaUtilizador(String cred, Utilizador utilizador){
         this.creds.put(cred, utilizador);
     }
 } 

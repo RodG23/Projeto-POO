@@ -4,23 +4,59 @@ public class Main {
     public static void main(String[] args){
 
     Vintage vinted = new Vintage();
-    Mala a1 = new Mala();
-    Sapatilha a2 = new Sapatilha();
-    Tshirt a3 = new Tshirt();
+    Mala a1 = new Mala(
+        Artigo.Cond.USADO, // condição: nova
+        Artigo.St.EXCELENTE, // estado: excelente
+        0, // número de donos anteriores
+        null, // transportadora: FedEx
+        "Mala de viagem resistente, com fecho TSA, quatro rodas giratórias e feita em polipropileno.", // descrição
+        "Samsonite", // marca
+        99.99, // preço base
+        0.10, // correção de preço: 10%
+        Mala.Dim.GRANDE, // dimensão: grande
+        "Polipropileno", // material
+        2022 // ano de lançamento
+    );
+    
+    Sapatilha a2 = new Sapatilha(
+        Artigo.Cond.NOVO, // condição: novo
+        Artigo.St.MEDIO, // estado: excelente
+        0, // número de donos anteriores
+        null, // transportadora: DHL
+        "Sapatilhas desportivas com tecnologia de absorção de impacto, perfeitas para treino intenso.", // descrição
+        "Nike", // marca
+        79.99, // preço base
+        0.05, // correção de preço: 5%
+        42, // tamanho
+        true, // tem atacadores
+        "Preto", // cor
+        2021 // ano de lançamento
+        );
+
+    Tshirt a3 = new Tshirt(
+        Artigo.Cond.NOVO, // condição: nova
+        Artigo.St.MUITO_BOM, // estado: excelente
+        0, // número de donos anteriores
+        null, // transportadora: DHL
+        "Tshirt desportiva em algodão orgânico, com corte ajustado e logótipo Adidas estampado no peito.", // descrição
+        "Adidas", // marca
+        39.99, // preço base
+        0.05, // correção de preço: 5%
+        Tshirt.Tam.L, // tamanho: grande
+        Tshirt.Pad.RISCAS // padrão: riscas
+        );
+    
     Utilizador u1 = new Utilizador();
-    Credenciais cr1 = new Credenciais("jonasfmagalhaes@gmail.com", "12345");
     Utilizador u2 = new Utilizador();
-    Credenciais cr2 = new Credenciais("gugaefmagalhaes@gmail.com", "67890");
     Utilizador u3 = new Utilizador();
-    Credenciais cr3 = new Credenciais("jota@gmail.com", "46464");
     Transportadora t = new Transportadora();
     Transportadora t2 = new Transportadora();
     vinted.setDataAtual(LocalDate.now());
 
     //regista utilizadores
-    vinted.registaUtilizador(cr1, u1);
-    vinted.registaUtilizador(cr2, u2);
-    vinted.registaUtilizador(cr3, u3);
+    vinted.registaUtilizador("jonas@gmail.com", u1);
+    vinted.registaUtilizador("guga.com", u2);
+    vinted.registaUtilizador("jota@gmail.com", u3);
 
     // perfil do utilizador u1 tem um mala e umas sapatilhas à venda
     u1.aVendaArtigo(vinted, a1, t);
@@ -41,12 +77,12 @@ public class Main {
     //o sistema é atualizado com o avançar dos dias
     vinted.avancaData("30/05/2023");
 
-    //System.out.println(u1.toString());
-    //System.out.println(u2.toString());
+    System.out.println(u1.toString());
+    System.out.println(u2.toString());
     //System.out.println(u3.toString());
 
     //neste momento o artigo a1 deve sair do stock visto que foi comprado pelo utilizador u2
-    System.out.println(vinted.toString());
+    //System.out.println(vinted.toString());
     //scanner.close();
     }
     

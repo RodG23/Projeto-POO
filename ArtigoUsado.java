@@ -1,4 +1,3 @@
 public interface ArtigoUsado {
-    public void precoBaseUsada();
-    public void correcaoPrecoUsada();
+    public double calcularValorArtigoUsado(int anoAtual);
 }

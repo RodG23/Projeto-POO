@@ -18,7 +18,7 @@ public class Sapatilha extends Artigo{
     }
 
     public Sapatilha(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
-        super(cond, etd, donos, trans, desc, mrc, pb, cp);
+        super(cond,etd, donos, trans, desc, mrc, pb, cp);
         this.tamanho = tamanho;
         this.atacadores = atacadores;
         this.cor = cor;
@@ -112,6 +112,28 @@ public class Sapatilha extends Artigo{
                 this.getAtacadores().equals(s.getAtacadores()) &&
                 this.getCor().equals(s.getCor()) && 
                 this.getAnoLancamento() == s.getAnoLancamento();            
+    }
+
+    public double calcularValorArtigo(){
+
+        double precoBase = super.getPrecoBase();
+        double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();
+        if(!super.getCondicao().equals(Artigo.Cond.PREMIUM) && (super.getCondicao().equals(Artigo.Cond.USADO) || this.tamanho > 45)){
+            valorFinal = precoBase - (precoBase/super.getNumDonos()* super.getEstado().ordinal());
+        }
+        return Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+    }
+
+    public double calcularValorArtigoUsado(int anoAtual) {
+        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.10 ; // diminui o valor 10% ao ano
+    }
+
+    public double calcularValorArtigoNovo(int anoAtual) {
+        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.05 ; // diminui o valor 10% ao ano
+    }
+
+    public double calcularValorArtigoPremium(int anoAtual) {
+        return this.calcularValorArtigo() + (anoAtual - this.anoLancamento)*0.10 ; // aumenta o valor 10% ao ano
     }
 
 }

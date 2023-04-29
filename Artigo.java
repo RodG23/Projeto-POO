@@ -4,7 +4,8 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
 
     enum Cond { //Enum das condições possíveis de um artigo.
         NOVO,
-        USADO
+        USADO,
+        PREMIUM,
     }
 
     enum St { //Enum dos estados possíveis de um artigo.
@@ -187,7 +188,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
             return false;
         Artigo artigo = (Artigo) obj;
         return artigo.getCodBarras() == this.getCodBarras() &&
-               this.getCondicao() != null &&
                artigo.getCondicao().equals(this.getCondicao()) &&
                artigo.getEstado().equals(this.getEstado()) &&
                artigo.getNumDonos() == this.getNumDonos() &&
@@ -198,36 +198,20 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
                artigo.getCorrecaoPreco() == this.getCorrecaoPreco();
     }
 
-    
-    @Override
-    public void precoBaseNovo() {
-        this.setPrecoBase(this.precoBase - (this.precoBase / (this.estado.ordinal() + this.condicao.ordinal())));
+    public abstract double calcularValorArtigo();
 
+    @Override
+    public double calcularValorArtigoNovo(int anoAtual) {
+        return calcularValorArtigo();
     }
 
     @Override
-    public void correcaoPrecoNovo() {
-        this.setCorrecaoPreco(this.precoBase + 10);
+    public double calcularValorArtigoUsado(int anoAtual) {
+        return calcularValorArtigo();
     }
 
     @Override
-    public void precoBaseUsada() {
-        this.setPrecoBase(this.precoBase - (this.precoBase / this.numDonos * (this.estado.ordinal() - this.condicao.ordinal())));
-    }
-
-
-    @Override
-    public void correcaoPrecoUsada() {
-        this.setCorrecaoPreco(this.precoBase + 5);
-    }
-
-    @Override
-    public void precoBasePremium() {
-        this.setPrecoBase(this.precoBase + (this.precoBase / this.numDonos * (this.estado.ordinal() + this.condicao.ordinal())));
-    }
-
-    @Override
-    public void correcaoPrecoPremium() {
-        this.setCorrecaoPreco(this.precoBase + 15);
+    public double calcularValorArtigoPremium(int anoAtual) {
+        return calcularValorArtigo();
     }
 }

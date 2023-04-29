@@ -1,4 +1,3 @@
 public interface ArtigoNovo {
-    public void precoBaseNovo();
-    public void correcaoPrecoNovo();
+    public double calcularValorArtigoNovo(int anoAtual);
 }

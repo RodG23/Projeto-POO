@@ -324,7 +324,7 @@ public class Utilizador {
         }
         try{
             Artigo a = vinted.getStock().get(artigo.getCodBarras());
-            aux.addArtigo(a.clone());
+            aux.addArtigoEncomenda(a.clone());
             this.addEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
             vinted.remStock(a.clone());
         }catch(NullPointerException e){
@@ -337,7 +337,7 @@ public class Utilizador {
         for (Encomenda enc : this.encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
                 enc.setEstado(Encomenda.St.FINALIZADA);
-                enc.setDataEntrega(aux);
+                enc.setDataCriacao(aux);
             }
         }
     }
@@ -374,14 +374,6 @@ public class Utilizador {
         this.encomendas.remove(enc.getId());
     }
 
-    public void addArtigoFatura(Fatura fatura, Artigo artigo){
-        fatura.addArtigo(artigo.clone());
-    }
-
-    public void removeArtigoFatura(Fatura fatura, Artigo artigo){
-        fatura.removeArtigo(artigo.clone());
-    }
-
     public void addFatura(Fatura fatura){
         this.faturas.put(fatura.getNumEmissao(), fatura.clone());
     }
@@ -390,10 +382,10 @@ public class Utilizador {
         this.faturas.remove(fatura.getNumEmissao());
     }
 
-    public void valorFatura(int chave){
+    public void valorFatura(int chave, int anoAtual, double taxaGSNovo, double taxaGSUsado, double taxaServiço){
         this.faturas.forEach((chave1,valor)-> {
             if(chave1 == chave){
-                valor.calculaValorTotal();
+                valor.calculaValorTotal(anoAtual, taxaGSNovo, taxaGSUsado, taxaServiço);
             }
         });
     }

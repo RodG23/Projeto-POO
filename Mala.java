@@ -20,8 +20,8 @@ public class Mala extends Artigo{
         this.anoLancamento = -1;
     }
 
-    public Mala(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Dim dimensao, String material, int anoLancamento){
-        super(cond, etd, donos, trans, desc, mrc, pb, cp);
+    public Mala(Cond cond,St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Dim dimensao, String material, int anoLancamento){
+        super(cond,etd, donos, trans, desc, mrc, pb, cp);
         this.dimensao = dimensao;
         this.material = material;
         this.anoLancamento = anoLancamento;
@@ -102,5 +102,28 @@ public class Mala extends Artigo{
         return  this.getDimensao().equals(m.getDimensao()) &&
                 this.getMaterial().equals(m.getMaterial()) &&
                 this.getAnoLancamento() == m.getAnoLancamento();       
+    }
+
+    public double calcularValorArtigo(){
+        double precoBase = super.getPrecoBase();
+        double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();
+        if(!super.getCondicao().equals(Artigo.Cond.PREMIUM)){
+            double dimMala = dimensao.ordinal();
+            double descontoDimensao = precoBase * (dimensao.ordinal()+1) * 0.05; // 5% de desconto por cada ponto de dimensão
+            valorFinal = precoBase - descontoDimensao;
+        }
+        return Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+    }
+
+    public double calcularValorArtigoUsado(int anoAtual) {
+        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.10 ; // diminui o valor 10% ao ano
+    }
+
+    public double calcularValorArtigoNovo(int anoAtual) {
+        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.05 ; // diminui o valor 10% ao ano
+    }
+
+    public double calcularValorArtigoPremium(int anoAtual) {
+        return this.calcularValorArtigo() + this.calcularValorArtigo() * (anoAtual - this.anoLancamento)*0.10 ; // aumenta o valor 10% ao ano
     }
 }

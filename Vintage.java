@@ -2,12 +2,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Vintage {
-    private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo.
-    private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado.
+    private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo(centimos).
+    private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado(centimos).
+    private static double taxaServiço = 0.05; //Guardada a taxa de serviço por artigo usado(percentagem).
 
     private Map<Integer, Artigo> stock; //Guardado o stock de artigos para venda (CodBarras,Artigo).
     private Map<Integer, Map<Integer,Encomenda>> encomendas; //Guardadas encomendas feitas por um user (Id do comprador,conjunto de encomendas).
@@ -262,10 +267,9 @@ public class Vintage {
         try{
             enc.setEstado(Encomenda.St.EXPEDIDA);
             LocalDate aux = this.getDataAtual();
-
             // definir o dia de entrega da encomenda (passado DOIS dias da sua finalização, enc.getTempEntrega() = 2)
             aux = aux.plusDays(enc.getTempEntrega());
-    
+
             enc.setDataEntrega(aux); // avança os dias necessários
             utilizador.addEncEncomendas(enc);
             this.encomendas.put(utilizador.getId(), utilizador.getEncomendas());
@@ -285,7 +289,7 @@ public class Vintage {
 
             Utilizador comprador = null;
             for (Encomenda encomenda : encomendasUtilizadores.values()) {
-
+    
                 //verificar se o dia da entrega da encomenda chegou
                 if (encomenda.getDataEntrega().isBefore(this.getDataAtual()) || encomenda.getDataEntrega().isEqual(this.getDataAtual())) {
 
@@ -295,10 +299,12 @@ public class Vintage {
                             break;
                         }
                     }
+                    int x = 0;
                     try{
                         // Obter a lista de artigos da encomenda
                         Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
 
+                        //numero de artigos para saber o tamanho da encomenda;
                         for(Artigo artigo : artigosEncomenda.values()){
 
                             // Encontrar o utilizador vendedor do artigo
@@ -311,59 +317,67 @@ public class Vintage {
                             }
                             // adiciona cada artigo à hashMap respetiva do utilizador
                             try{
-                                vendedor.addArtigoVendas(artigo.clone());
-                            
-                                vendedor.removeArtigoAVenda(artigo.clone());
+                                //cria a encomenda do vendedor
+                                Encomenda encVendedor = new Encomenda();
+                                encVendedor.setDimesao(Encomenda.Dim.PEQUENA);
+                                encVendedor.setEstado(Encomenda.St.ENTREGUE);
+                                encVendedor.setDataCriacao(encomenda.getDataCriacao());
+                                encVendedor.setDataEntrega(encomenda.getDataEntrega());
 
-                                vendedor.addArtigoFatura(vendfat, artigo.clone());
+                                //adiciona a fatura da encomenda ao vendedor
+                                encVendedor.addArtigoEncomenda(artigo.clone());
+                                vendfat.addEncFatura(encVendedor);
+                                vendedor.addFatura(vendfat);
+
+                                vendedor.addArtigoVendas(artigo.clone());
+                    
+                                vendedor.removeArtigoAVenda(artigo.clone());
                                
                                 comprador.addArtigoCompras(artigo.clone());
-
-                                compfat.addArtigo(artigo.clone());
-
-                                vendfat.addArtigo(artigo.clone());
-
-                                comprador.addFatura(compfat);
-
-                                vendedor.addFatura(vendfat);
                                     
                                 this.vendas.put(vendedor.getId(), vendedor.getVendeu());
-
                             } 
                             catch(NullPointerException e)  {
                                 System.out.println("Artigo não encontrado\n");
                             }
 
-                        //Remover a encomenda que foi entregue da hashMap, encomendas, do comprador
-                        comprador.removeEncEncomenda(encomenda);
-                        vendedor.valorFatura(vendfat.getNumEmissao());
+                        //calcula o valor da fatura do vendedor
+                        vendedor.valorFatura(vendfat.getNumEmissao(), this.getDataAtual().getYear(), taxaGSNovo, taxaGSUsado, (1-taxaServiço));
+                        x++;
                         }
-
-                    } catch(Exception e){
+                    } 
+                    catch(Exception e){
                         System.out.println("Nenhum comprador encontrado para concluir a encomenda");
                     }
                     
-                    // Verificar se o comprador tem mais encomendas na hashMap, se sim atualiza caso contrário remove a chave da mesma
+                    if(x == 1){
+                        encomenda.setDimesao(Encomenda.Dim.PEQUENA);
+                    }
+                    else if(x > 1 && x <=5){
+                        encomenda.setDimesao(Encomenda.Dim.MEDIA);
+                    }
+                    else if(x>6){
+                        encomenda.setDimesao(Encomenda.Dim.GRANDE);
+                    }
+                    //adiciona a fatura ao comprador
+                    encomenda.setEstado(Encomenda.St.ENTREGUE);
+                    compfat.addEncFatura(encomenda);
+                    comprador.addFatura(compfat);
+
+                    //calcula o valor da fatura do comprador
+                    comprador.valorFatura(compfat.getNumEmissao(), this.getDataAtual().getYear(), taxaGSNovo, taxaGSUsado, (1-taxaServiço));
+
+                    //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
+                    comprador.removeEncEncomenda(encomenda);
+
+                    // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
                     if(!comprador.getEncomendas().isEmpty()){
                         this.encomendas.replace(comprador.getId(), comprador.getEncomendas());
                     }
                     else {
                         this.encomendas.remove(comprador.getId());
                     }
-
                 }
-                comprador.valorFatura(compfat.getNumEmissao());
-            }
-        }
-
-        // calcula o valor das faturas dos utilizadores
-        for(Utilizador utilizador : this.creds.values()){
-            double valorTotalFaturas = 0;
-            for(Fatura fatura : utilizador.getFaturas().values()) {
-                for(Artigo artigo : fatura.getArtigos().values()) {
-                    valorTotalFaturas += artigo.getPrecoBase();
-                }
-                fatura.setValorTotal(valorTotalFaturas);
             }
         }
     }
@@ -392,4 +406,85 @@ public class Vintage {
     public void registaUtilizador(String cred, Utilizador utilizador){
         this.creds.put(cred, utilizador);
     }
-} 
+
+    //Saber quem foi o vendedor que mais faturou
+    public void maiorVendedor(LocalDate inferior, LocalDate superior){
+        double maiorFaturamento = 0.0;
+        Utilizador utilizadorMaiorFaturamento = null;
+        
+        for (Utilizador utilizador : this.creds.values()) {
+            double faturamento = 0.0;
+            
+            for (Fatura fatura : utilizador.getFaturas().values()) {
+                if(fatura.getTipo().equals(Fatura.Tp.VENDA)){
+                    if(fatura.getEncomenda().getDataEntrega().isAfter(inferior) && fatura.getEncomenda().getDataEntrega().isBefore(superior)){
+                        faturamento += fatura.getValorTotal();
+                    }
+                }
+            }
+            if (faturamento > maiorFaturamento) {
+                maiorFaturamento = faturamento;
+                utilizadorMaiorFaturamento = utilizador;
+            }
+        }
+        System.out.println("O utilizador que mais fatorou é o " + utilizadorMaiorFaturamento.getId()+  " com um total de " + maiorFaturamento + "\n");
+    }
+
+    public void encomendasVendedor(Utilizador vendedor){
+        for (Fatura fatura : vendedor.getFaturas().values()) {
+            if(fatura.getTipo().equals(Fatura.Tp.VENDA))
+                try{
+                    System.out.println("As encomendas emitidas pelo vendedor " + vendedor.getId() + " são as seguintes \n" + fatura.getEncomenda().toString());
+                }
+                catch(NullPointerException e){
+                    System.out.println("O utilizador não apresenta encomenda emitidas\n");
+                }
+        }
+    }
+
+    public void maisGanhador(LocalDate inferior, LocalDate superior){
+        double maiorFaturamento = 0.0;
+        Utilizador utilizadorMaiorFaturamento = null;
+        
+        for (Utilizador utilizador : this.creds.values()) {
+            double faturamento = 0.0;
+            
+            for (Fatura fatura : utilizador.getFaturas().values()) {
+                    if(fatura.getEncomenda().getDataEntrega().isAfter(inferior) && fatura.getEncomenda().getDataEntrega().isBefore(superior)){
+                        faturamento += fatura.getValorTotal();
+                    }
+            }
+            if (faturamento > maiorFaturamento) {
+                maiorFaturamento = faturamento;
+                utilizadorMaiorFaturamento = utilizador;
+            }
+        }
+        System.out.println("O utilizador que mais fatorou foi o " + utilizadorMaiorFaturamento.getId());
+    }
+
+    public void ordenarUtilizadoresPorFaturamento(LocalDate inferior, LocalDate superior) {
+        List<Utilizador> utilizadores = new ArrayList<>(this.creds.values());
+
+        //compara os fatoramentos
+        Comparator<Utilizador> comp = Comparator.comparingDouble(utilizador -> {
+            double faturamento = 0.0;
+                for (Fatura fatura : utilizador.getFaturas().values()) {
+                    //só por na lista quem tem faturas;
+                    if (fatura.getEncomenda().getDataEntrega().isAfter(inferior)
+                            && fatura.getEncomenda().getDataEntrega().isBefore(superior)) {
+                        faturamento += fatura.getValorTotal();
+                    }
+                }
+            return faturamento;
+        });
+            System.out.println("Lista dos id's dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getId).collect(Collectors.toList()));
+    }
+
+    //Há mais algum forma da vintage ganhar dinheiro para alem das taxas que cobra ao vendedor ?
+    public void ganhosVintage(){
+        for(Map<Integer,Artigo> e : this.vendas.values()){
+            this.totalAuferido = e.values().stream().mapToDouble(artigo -> {return artigo.calcularValorArtigo()*taxaServiço;}).sum();;
+        }
+        System.out.println("A Vintage fatorou: " + this.totalAuferido + "€");
+    }
+}

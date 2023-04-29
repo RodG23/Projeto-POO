@@ -134,6 +134,10 @@ public class Encomenda {
         this.artigos = map;
     }
 
+    public void setDataCriacao(LocalDate dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
     public void setDataEntrega(LocalDate dataEntrega) {
         this.dataEntrega = dataEntrega;
     }
@@ -187,16 +191,9 @@ public class Encomenda {
     }
 
     /**
-     * Adiciona ao custo da encomenda o valor do artigo adicionado.
-     */
-    public void addPrecoFinal(double cost) {
-        this.precoFinal += cost;
-    }
-
-    /**
      * Adiciona um artigo a uma encomenda.
      */
-    public void addArtigo(Artigo a) {
+    public void addArtigoEncomenda(Artigo a) {
         this.artigos.put(a.getCodBarras(), a.clone());
     }
 
@@ -206,6 +203,23 @@ public class Encomenda {
      */
     public void removeArtigo(Integer codBarras) {
         this.artigos.remove(codBarras);
+    }
+
+    public double valorEncomenda(int anoAtual, double taxaGSNovo, double taxaGSUsado){
+        double x = this.artigos.values().stream().mapToDouble(artigo -> {
+            if (artigo.getCondicao().equals(Artigo.Cond.NOVO)) {
+                return ((ArtigoNovo) artigo).calcularValorArtigoNovo(anoAtual) - taxaGSNovo; // chama o método correto para ArtigoNovo
+
+            } else if (artigo.getCondicao().equals(Artigo.Cond.USADO)) {
+                return ((ArtigoUsado) artigo).calcularValorArtigoUsado(anoAtual) - taxaGSUsado; // chama o método correto para ArtigoUsado
+
+            } else if (artigo.getCondicao().equals(Artigo.Cond.PREMIUM)) {
+                return ((ArtigoPremium) artigo).calcularValorArtigoPremium(anoAtual); // chama o método correto para ArtigoPremium
+            }
+            return 0;
+        }).sum();
+        this.precoFinal = x;
+        return x;
     }
 }
 

@@ -46,6 +46,7 @@ public class MalaNova extends Mala implements ArtigoNovo {
         return  true;       
     }
 
+    @Override
     public double calcularValorArtigo(){
         double precoBase = super.getPrecoBase();
         double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();

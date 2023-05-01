@@ -48,6 +48,7 @@ public class SapatilhaNova extends Sapatilha implements ArtigoNovo {
         return  true;        
     }
 
+    @Override
     public double calcularValorArtigo(){
 
         double precoBase = super.getPrecoBase();

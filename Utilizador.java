@@ -2,6 +2,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.plaf.metal.MetalBorders.TableHeaderBorder;
+
 public class Utilizador {
     private static int numUsers = 0; //Mantém contagem de users e é utilizada para o id de um user.
 
@@ -327,18 +329,22 @@ public class Utilizador {
             aux.addArtigoEncomenda(a.clone());
             this.addEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
             vinted.remStock(a.clone());
+
         }catch(NullPointerException e){
             System.out.println("Artigo "+ artigo.getCodBarras() + " fora de stock\n");
         }
     }  
 
-    public void finalizarEncomenda(){
+    public void finalizarEncomenda(Vintage vinted){
         LocalDate aux = LocalDate.now();
         for (Encomenda enc : this.encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
                 enc.setEstado(Encomenda.St.FINALIZADA);
                 enc.setDataCriacao(aux);
             }
+            double valorEncomenda = enc.valorEncomenda(vinted.getDataAtual().getYear(), vinted.getTaxaGSNovo(), vinted.getTaxaGSUsado());
+            //calcula o valor da encomenda
+            enc.setPrecoFinal(valorEncomenda);
         }
     }
 
@@ -382,12 +388,12 @@ public class Utilizador {
         this.faturas.remove(fatura.getNumEmissao());
     }
 
+    //calcula o valor das faturas para o utilizador
     public void valorFatura(int chave, int anoAtual, double taxaGSNovo, double taxaGSUsado, double taxaServiço){
         this.faturas.forEach((chave1,valor)-> {
             if(chave1 == chave){
-                valor.calculaValorTotal(anoAtual, taxaGSNovo, taxaGSUsado, taxaServiço);
+                valor.calculaFatura(anoAtual, taxaGSNovo, taxaGSUsado, taxaServiço);
             }
         });
     }
-
 }

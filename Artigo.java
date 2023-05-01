@@ -149,7 +149,7 @@ public abstract class Artigo{
         sb.append(" Código de barras -> " + this.getCodBarras() + "\n");
         sb.append(" Estado -> " + (this.getEstado() != null ? this.getEstado().toString() : "Não associado") + "\n");
         sb.append(" Número de Donos -> " + this.getNumDonos() + "\n");
-        sb.append(this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada" + "\n");
+        //sb.append(this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada" + "\n");
         sb.append(" Descrição -> " + this.getDescricao() + "\n");
         sb.append(" Marca -> " + this.getMarca() + "\n");
         sb.append(" Preço Base -> " + this.getPrecoBase() + "€\n");

@@ -9,8 +9,6 @@ public abstract class Mala extends Artigo{
     private Dim dimensao; //Guarda a dimensão da mala.
     private String material; //Guarda o material da mala.
     private int anoLancamento; //Guarda o ano de lançamento da coleção.
-    private boolean isNew;//saber se a mala é nova.
-    private boolean isPremium;//saber se o mala é premium.
 
     /**
      * Construtores
@@ -106,6 +104,10 @@ public abstract class Mala extends Artigo{
     }
 
     public double calcularValorArtigoNovo(int anoAtual){
+        return 0.0;
+    }
+
+    public double calcularValorArtigoPremium(int anoAtual) {
         return 0.0;
     }
 }

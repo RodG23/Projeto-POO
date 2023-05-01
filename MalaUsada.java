@@ -46,6 +46,7 @@ public class MalaUsada extends Mala implements ArtigoUsado {
         return  true;       
     }
 
+    @Override
     public double calcularValorArtigo(){
         double precoBase = super.getPrecoBase();
         double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();

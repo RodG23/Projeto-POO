@@ -1,5 +1,8 @@
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.tree.TreeNode;
 
 public class Fatura {
     
@@ -125,12 +128,28 @@ public class Fatura {
         this.encomenda = null;
     }
 
-    public void calculaValorTotal(int anoAtual, double taxaGSNovo, double taxaGSUsado, double taxaServiço) {
-        if (this.tipo == Tp.COMPRA) {
-            this.valorTotal = this.encomenda.valorEncomenda(anoAtual, taxaGSNovo, taxaGSUsado);
+    public void calculaFatura(int anoAtual, double taxaGSNovo, double taxaGSUsado, double taxaServiço) {
+
+        //para quem venda nao tem taxas sobre a venda dos produtos por isso tem que se fazer de novo a conta com alterações na formula
+        if (this.tipo == Tp.VENDA) {
+            double x = this.encomenda.getArtigos().values().stream().mapToDouble(artigo -> {
+                if (artigo instanceof ArtigoNovo) {
+                    return ((ArtigoNovo) artigo).calcularValorArtigoNovo(anoAtual); // chama o método correto para ArtigoNovo
+    
+                } else if (artigo instanceof ArtigoUsado) {
+                    return ((ArtigoUsado) artigo).calcularValorArtigoUsado(anoAtual); // chama o método correto para ArtigoUsado
+    
+                } else if(artigo instanceof ArtigoPremium){
+                    return ((ArtigoPremium) artigo).calcularValorArtigoPremium(anoAtual); // chama o método correto para ArtigoPremium
+                } else{
+                    return 0.0;
+                }
+            }).sum();
+            this.valorTotal = x * taxaServiço; // para garantir que envia a encomenda
+            this.encomenda.setPrecoFinal(this.valorTotal);
         }
         else{
-            this.valorTotal = this.encomenda.valorEncomenda(anoAtual, taxaGSNovo, taxaGSUsado) *taxaServiço;
+            this.valorTotal = this.encomenda.getPrecoFinal();
         }
     }
 

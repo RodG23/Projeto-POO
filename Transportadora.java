@@ -130,4 +130,21 @@ public class Transportadora{
                transportadora.getImposto() == this.getImposto() &&
                transportadora.getTotalAuferido() == this.getTotalAuferido();
     }
+
+    public double calcularValorExpedicaoPequeno(){
+        double precoBase = this.getCustoGrande();
+        double valorFinal = (precoBase * 0.50 * (1 + imposto))*0.5;
+        return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+    }
+
+    public double calcularValorExpedicaoMedio(){
+        double precoBase = this.getCustoGrande();
+        double valorFinal = (precoBase * 0.50 * (1 + imposto))*0.6;
+        return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+    }
+    public double calcularValorExpedicaoGrande(){
+        double precoBase = this.getCustoGrande();
+        double valorFinal = (precoBase * 0.50 * (1 + imposto))*0.9;
+        return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+    }
 }

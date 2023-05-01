@@ -1,5 +1,6 @@
-public class Tshirt extends Artigo{
+public abstract class Tshirt extends Artigo{
     private static final double descBase = 0.5; //Guarda o desconto que se aplica às tshirts.
+    private boolean isNew;//saber se a mala é nova.
     
     enum Tam { //Enum do tamanho da tshirt;
         S,
@@ -27,8 +28,8 @@ public class Tshirt extends Artigo{
 
     }
 
-    public Tshirt(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Tam tamanho, Pad padrao){
-        super(cond, etd, donos, trans, desc, mrc, pb, cp);
+    public Tshirt(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Tam tamanho, Pad padrao){
+        super(etd, donos, trans, desc, mrc, pb, cp);
         this.tamanho = tamanho;
         this.padrao = padrao;
     }
@@ -42,6 +43,11 @@ public class Tshirt extends Artigo{
     /**
      * Getters
      */ 
+
+    public double getDescBase(){
+        return this.descBase;
+    }
+
     public Tam getTamanho(){
         return this.tamanho;
     }
@@ -64,28 +70,10 @@ public class Tshirt extends Artigo{
     /**
      * Método clone.
      */
-    @Override
-    public Tshirt clone() {
-        return new Tshirt(this) ;
-    }
+    public abstract Tshirt clone();
 
     /**
      * Método toString.
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(super.toString());
-        sb.append(" T-Shirt:\n");
-        sb.append(" Tamanho -> " + this.getTamanho() + "\n");
-        sb.append(" Padrão -> " + this.getPadrao() + "\n\n");
-
-        return sb.toString();
-    }
-
-    /**
-     * Método equals.
      */
     @Override
     public boolean equals(Object obj) {
@@ -100,21 +88,14 @@ public class Tshirt extends Artigo{
                 this.getPadrao().equals(t.getPadrao());      
     }
 
-    public double calcularValorArtigo(){
-        double precoBase = super.getPrecoBase();
-        double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();
-        if(padrao.ordinal() != 0){
-            valorFinal = precoBase * descBase;
-        }
-        return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
-    }
-    
-    public double calcularValorArtigoUsado(int anoAtual) {
-        return calcularValorArtigo();
+    public abstract double calcularValorArtigo();
+
+    public double calcularValorArtigoUsado(int anoAtual){
+        return 0.0;
     }
 
-    public double calcularValorArtigoNovo(int anoAtual) {
-        return calcularValorArtigo();
+    public double calcularValorArtigoNovo(int anoAtual){
+        return 0.0;
     }
 
 }

@@ -427,7 +427,9 @@ public class Vintage {
                 utilizadorMaiorFaturamento = utilizador;
             }
         }
-        System.out.println("O utilizador que mais fatorou é o " + utilizadorMaiorFaturamento.getId()+  " com um total de " + maiorFaturamento + "\n");
+
+        double valorFatura = Math.round(maiorFaturamento*100)/100 ;
+        System.out.println("O utilizador que mais fatorou é o " + utilizadorMaiorFaturamento.getId()+  " com um total de " + valorFatura+ "\n");
     }
 
     public void encomendasVendedor(Utilizador vendedor){

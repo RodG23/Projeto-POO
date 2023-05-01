@@ -1,9 +1,11 @@
-public class Sapatilha extends Artigo{
+public abstract class Sapatilha extends Artigo{
 
     private boolean atacadores; //Indica se a sapatilha tem atacadores.
     private String cor; //Guarda a cor da sapatilha.
     private int tamanho; //Guarda o tamanho da sapatilha.
     private int anoLancamento; //Guarda o ano de lançamento da coleção.
+    private boolean isNew;//saber se a mala é nova.
+    private boolean isPremium;//saber se o mala é premium.
     //exemplo de um preco base : precoBase =− (precoBase/numeroDonos ∗ estadoU tilizacao)
     
     /**
@@ -17,8 +19,8 @@ public class Sapatilha extends Artigo{
         this.anoLancamento = -1;
     }
 
-    public Sapatilha(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
-        super(cond,etd, donos, trans, desc, mrc, pb, cp);
+    public Sapatilha(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
+        super(etd, donos, trans, desc, mrc, pb, cp);
         this.tamanho = tamanho;
         this.atacadores = atacadores;
         this.cor = cor;
@@ -74,10 +76,7 @@ public class Sapatilha extends Artigo{
     /**
      * Método clone.
      */
-    @Override
-    public Sapatilha clone() {
-        return new Sapatilha(this) ;
-    }
+    public abstract Sapatilha clone();
 
     /**
      * Método toString.
@@ -87,11 +86,6 @@ public class Sapatilha extends Artigo{
         StringBuilder sb = new StringBuilder();
 
         sb.append(super.toString());
-        sb.append(" Sapatilhas:\n");
-        sb.append(" Atacadores -> " + this.getAtacadores() + "\n");
-        sb.append(" Cor -> " + this.getCor() + "\n");
-        sb.append(" Tamanho -> " + this.getTamanho() + "\n");
-        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n");
 
         return sb.toString();
     }
@@ -113,27 +107,15 @@ public class Sapatilha extends Artigo{
                 this.getCor().equals(s.getCor()) && 
                 this.getAnoLancamento() == s.getAnoLancamento();            
     }
+    
+    public abstract double calcularValorArtigo();
 
-    public double calcularValorArtigo(){
-
-        double precoBase = super.getPrecoBase();
-        double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();
-        if(!super.getCondicao().equals(Artigo.Cond.PREMIUM) && (super.getCondicao().equals(Artigo.Cond.USADO) || this.tamanho > 45)){
-            valorFinal = precoBase - (precoBase/super.getNumDonos()* super.getEstado().ordinal());
-        }
-        return Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+    public double calcularValorArtigoUsado(int anoAtual){
+        return 0.0;
     }
 
-    public double calcularValorArtigoUsado(int anoAtual) {
-        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.10 ; // diminui o valor 10% ao ano
-    }
-
-    public double calcularValorArtigoNovo(int anoAtual) {
-        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.05 ; // diminui o valor 10% ao ano
-    }
-
-    public double calcularValorArtigoPremium(int anoAtual) {
-        return this.calcularValorArtigo() + (anoAtual - this.anoLancamento)*0.10 ; // aumenta o valor 10% ao ano
+    public double calcularValorArtigoNovo(int anoAtual){
+        return 0.0;
     }
 
 }

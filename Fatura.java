@@ -95,7 +95,7 @@ public class Fatura {
         sb.append(" Número de emissão -> " + this.getNumEmissao() + "\n");
         sb.append(" Tipo -> " + this.getTipo().toString() + "\n");
         sb.append(" Encomenda -> \n" +(this.encomenda != null ? this.encomenda.toString() : null) + "\n");
-        sb.append(" ValorTotal -> " + this.getValorTotal() + "€\n");
+        sb.append(" ValorTotal -> " + Math.round(this.getValorTotal()*100)/100 + "€\n");
 
         return sb.toString();
     }

@@ -207,14 +207,12 @@ public class Encomenda {
 
     public double valorEncomenda(int anoAtual, double taxaGSNovo, double taxaGSUsado){
         double x = this.artigos.values().stream().mapToDouble(artigo -> {
-            if (artigo.getCondicao().equals(Artigo.Cond.NOVO)) {
+            if (artigo instanceof ArtigoNovo) {
                 return ((ArtigoNovo) artigo).calcularValorArtigoNovo(anoAtual) - taxaGSNovo; // chama o método correto para ArtigoNovo
 
-            } else if (artigo.getCondicao().equals(Artigo.Cond.USADO)) {
+            } else if (artigo instanceof ArtigoUsado) {
                 return ((ArtigoUsado) artigo).calcularValorArtigoUsado(anoAtual) - taxaGSUsado; // chama o método correto para ArtigoUsado
 
-            } else if (artigo.getCondicao().equals(Artigo.Cond.PREMIUM)) {
-                return ((ArtigoPremium) artigo).calcularValorArtigoPremium(anoAtual); // chama o método correto para ArtigoPremium
             }
             return 0;
         }).sum();

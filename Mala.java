@@ -1,4 +1,4 @@
-public class Mala extends Artigo{
+public abstract class Mala extends Artigo{
     
     enum Dim { //Enum da dimensão da mala.
         PEQUENA,
@@ -9,6 +9,8 @@ public class Mala extends Artigo{
     private Dim dimensao; //Guarda a dimensão da mala.
     private String material; //Guarda o material da mala.
     private int anoLancamento; //Guarda o ano de lançamento da coleção.
+    private boolean isNew;//saber se a mala é nova.
+    private boolean isPremium;//saber se o mala é premium.
 
     /**
      * Construtores
@@ -20,8 +22,8 @@ public class Mala extends Artigo{
         this.anoLancamento = -1;
     }
 
-    public Mala(Cond cond,St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Dim dimensao, String material, int anoLancamento){
-        super(cond,etd, donos, trans, desc, mrc, pb, cp);
+    public Mala(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Dim dimensao, String material, int anoLancamento){
+        super(etd, donos, trans, desc, mrc, pb, cp);
         this.dimensao = dimensao;
         this.material = material;
         this.anoLancamento = anoLancamento;
@@ -67,11 +69,7 @@ public class Mala extends Artigo{
     /**
      * Método clone.
      */
-    @Override
-    public Mala clone(){
-        return new Mala(this);
-    }
-
+    public abstract Mala clone();
     /**
      * Método toString.
      */
@@ -80,10 +78,6 @@ public class Mala extends Artigo{
         StringBuilder sb = new StringBuilder();
 
         sb.append(super.toString());
-        sb.append(" Mala:\n");
-        sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "") + "\n");
-        sb.append(" Tamanho -> " + this.getMaterial() + "\n");
-        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n\n");
 
         return sb.toString();
     }
@@ -91,6 +85,7 @@ public class Mala extends Artigo{
     /**
      * Método equals.
      */
+    @Override
     public boolean equals(Object obj) {
         if(this == obj) 
             return true ;
@@ -104,26 +99,13 @@ public class Mala extends Artigo{
                 this.getAnoLancamento() == m.getAnoLancamento();       
     }
 
-    public double calcularValorArtigo(){
-        double precoBase = super.getPrecoBase();
-        double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();
-        if(!super.getCondicao().equals(Artigo.Cond.PREMIUM)){
-            double dimMala = dimensao.ordinal();
-            double descontoDimensao = precoBase * (dimensao.ordinal()+1) * 0.05; // 5% de desconto por cada ponto de dimensão
-            valorFinal = precoBase - descontoDimensao;
-        }
-        return Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+    public abstract double calcularValorArtigo();
+
+    public double calcularValorArtigoUsado(int anoAtual){
+        return 0.0;
     }
 
-    public double calcularValorArtigoUsado(int anoAtual) {
-        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.10 ; // diminui o valor 10% ao ano
-    }
-
-    public double calcularValorArtigoNovo(int anoAtual) {
-        return this.calcularValorArtigo() - (anoAtual - this.anoLancamento)*0.05 ; // diminui o valor 10% ao ano
-    }
-
-    public double calcularValorArtigoPremium(int anoAtual) {
-        return this.calcularValorArtigo() + this.calcularValorArtigo() * (anoAtual - this.anoLancamento)*0.10 ; // aumenta o valor 10% ao ano
+    public double calcularValorArtigoNovo(int anoAtual){
+        return 0.0;
     }
 }

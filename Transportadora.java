@@ -1,4 +1,4 @@
-public class Transportadora implements TransportadoraPremium{
+public class Transportadora{
     
     private double custoPequena; //Guarda o valor base cobrado pela transportadora numa encomenda pequena.
     private double custoMedia; //Guarda o valor base cobrado pela transportadora numa encomenda media.
@@ -129,17 +129,5 @@ public class Transportadora implements TransportadoraPremium{
                transportadora.getCustoGrande() == this.getCustoGrande() &&
                transportadora.getImposto() == this.getImposto() &&
                transportadora.getTotalAuferido() == this.getTotalAuferido();
-    }
-
-    @Override
-    public void funcao() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'funcao'");
-    }
-
-    @Override
-    public void funcao2() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'funcao2'");
     }
 }

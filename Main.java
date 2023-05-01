@@ -6,8 +6,7 @@ public class Main {
 
     Vintage vinted = new Vintage();
 
-    Mala malaPremium = new Mala(
-        Artigo.Cond.PREMIUM,
+    MalaNova malaNova = new MalaNova(
         Artigo.St.MAU, // estado: excelente
         0, // número de donos anteriores
         null, // transportadora: FedEx
@@ -20,8 +19,7 @@ public class Main {
         2022 // ano de lançamento
     );
     
-    Sapatilha sapatilhaNova = new Sapatilha(
-        Artigo.Cond.NOVO,
+    SapatilhaNova sapatilhaNova = new SapatilhaNova(
         Artigo.St.MEDIO, // estado: excelente
         0, // número de donos anteriores
         null, // transportadora: DHL
@@ -35,8 +33,7 @@ public class Main {
         2021 // ano de lançamento
         );
 
-    Tshirt TshirtUsada = new Tshirt(
-        Artigo.Cond.USADO,
+    TshirtUsada tshirtUsada = new TshirtUsada(
         Artigo.St.MUITO_BOM, // estado: excelente
         0, // número de donos anteriores
         null, // transportadora: DHL
@@ -72,14 +69,14 @@ public class Main {
 
 
     // perfil do utilizador u1 tem um mala e umas sapatilhas à venda
-    u1.aVendaArtigo(vinted, malaPremium, t);
+    u1.aVendaArtigo(vinted, malaNova, t);
     //u1.aVendaArtigo(vinted, sapatilhaNova, t2);
 
     // perfil do utilizador u2 tem um tshirt à venda
-    u2.aVendaArtigo(vinted, TshirtUsada, t);
+    u2.aVendaArtigo(vinted, tshirtUsada, t);
 
     // utilizador u2 encomenda o artigo malaPremium ao utilizador u1
-    u2.colocaEncomenda(vinted, u1, malaPremium);
+    u2.colocaEncomenda(vinted, u1, malaNova);
 
     // utilizador u2 finaliza a sua encomenda
     u2.finalizarEncomenda();
@@ -91,13 +88,13 @@ public class Main {
     //o sistema é atualizado com o avançar dos dias
     vinted.avancaData("30/05/2023");
 
-    vinted.maiorVendedor(inferior, vinted.getDataAtual());
+    /*vinted.maiorVendedor(inferior, vinted.getDataAtual());
     vinted.encomendasVendedor(u1);
     vinted.ordenarUtilizadoresPorFaturamento(inferior, vinted.getDataAtual());
     vinted.ganhosVintage();
-
-    //System.out.println(u1.toString());
-    //System.out.println(u2.toString());
+*/
+    System.out.println(u1.toString());
+    System.out.println(u2.toString());
     //System.out.println(u3.toString());
 
     //neste momento o artigo malaPremium deve sair do stock visto que foi comprado pelo utilizador u2

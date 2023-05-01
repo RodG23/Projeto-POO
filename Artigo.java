@@ -1,12 +1,6 @@
-public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
+public abstract class Artigo{
     
     private static int numArtigos = 0; //Mantém contagem de artigos e é utilizada para o codBarras de um artigo.
-
-    enum Cond { //Enum das condições possíveis de um artigo.
-        NOVO,
-        USADO,
-        PREMIUM,
-    }
 
     enum St { //Enum dos estados possíveis de um artigo.
         MAU,
@@ -17,7 +11,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
     }
 
     private final int codBarras; //Guarda a identificação de um artigo.
-    private Cond condicao; //Guarda a condição de um artigo.
     private St estado; //Guarda o estado de um artigo.
     private int numDonos; //Guarda o número de donos anteriores de um artigo.
     private Transportadora transportadora; //Guarda a transportadora pre-definida de um artigo (alteravel).
@@ -32,7 +25,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
     public Artigo() {
         numArtigos++;
         this.codBarras = numArtigos;
-        this.condicao = null;
         this.estado = null;
         this.numDonos = 0;
         this.transportadora = null;
@@ -45,10 +37,9 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
     /**
      * Construtor parametrizado.
      */
-    public Artigo(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp) {
+    public Artigo(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp) {
         numArtigos++;
         this.codBarras = numArtigos;
-        this.condicao = cond;
         this.estado = etd;
         this.numDonos = donos;
         this.transportadora = trans;
@@ -63,7 +54,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
      */
     public Artigo(Artigo umArtigo) {
         this.codBarras = umArtigo.getCodBarras();
-        this.condicao = umArtigo.getCondicao();
         this.estado = umArtigo.getEstado();
         this.numDonos = umArtigo.getNumDonos();
         this.transportadora = umArtigo.getTransportadora();
@@ -78,10 +68,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
      */
     public int getCodBarras() {
         return this.codBarras;
-    }
-
-    public Cond getCondicao() {
-        return this.condicao;
     }
 
     public St getEstado() {
@@ -116,9 +102,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
     /**
      * Setters das variáveis de intância de um artigo.
      */
-    public void setCondicao(Cond cond) {
-        this.condicao = cond;
-    }
 
     public void setEstado(St etd) {
         this.estado = etd;
@@ -164,7 +147,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
     
         sb.append("     | Artigo |\n");
         sb.append(" Código de barras -> " + this.getCodBarras() + "\n");
-        sb.append(" Condição -> " + (this.getCondicao() != null ? this.getCondicao().toString() : "Não associada") + "\n");
         sb.append(" Estado -> " + (this.getEstado() != null ? this.getEstado().toString() : "Não associado") + "\n");
         sb.append(" Número de Donos -> " + this.getNumDonos() + "\n");
         sb.append(this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada" + "\n");
@@ -188,7 +170,6 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
             return false;
         Artigo artigo = (Artigo) obj;
         return artigo.getCodBarras() == this.getCodBarras() &&
-               artigo.getCondicao().equals(this.getCondicao()) &&
                artigo.getEstado().equals(this.getEstado()) &&
                artigo.getNumDonos() == this.getNumDonos() &&
                artigo.getTransportadora().equals(this.getTransportadora()) &&
@@ -199,19 +180,4 @@ public abstract class Artigo implements ArtigoNovo, ArtigoUsado, ArtigoPremium {
     }
 
     public abstract double calcularValorArtigo();
-
-    @Override
-    public double calcularValorArtigoNovo(int anoAtual) {
-        return calcularValorArtigo();
-    }
-
-    @Override
-    public double calcularValorArtigoUsado(int anoAtual) {
-        return calcularValorArtigo();
-    }
-
-    @Override
-    public double calcularValorArtigoPremium(int anoAtual) {
-        return calcularValorArtigo();
-    }
 }

@@ -1,9 +1,3 @@
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.tree.TreeNode;
-
 public class Fatura {
     
     private static int numFaturas = 0;

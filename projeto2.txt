@@ -1,2 +1,2 @@
-Data; Utilizador; email; cBarras do artigo; Ação(Vender, Encomendar, Finalizar encomenda, Alterar preco base/correcao de preco); preco ou transportadora
+Data; Utilizador; email; cBarras do artigo; Ação(Encomendar, Finalizar encomenda, Alterar preco base/correcao de preco); preco ou transportadora
 Data; Transportadora; nomeTransportadora; Ação(Alterar imposto, Alterar valor encomenda pequena/media/grande)

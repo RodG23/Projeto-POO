@@ -1,9 +1,10 @@
 import java.util.Scanner;
 import java.util.InputMismatchException;
+//import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-public class View {
+public class View{
     private Controller controller;
 
     public View(Controller controller) {
@@ -11,8 +12,9 @@ public class View {
     }
 
 
-    public void run() {
+    public void run(){ //throws InterruptedException, IOException {
         LocalDate dataAtual = LocalDate.now();
+        controller.setDataSistema(dataAtual);
         Scanner scanner = new Scanner(System.in);
         int opcao = 0;
         do {
@@ -28,13 +30,26 @@ public class View {
                         case 1:{
                             try{
                                 admin(scanner);
-                            }catch(ExceptionUser e){
+                            }catch(ExceptionData e){
                                 System.out.println(e.getMessage());
+                            }catch(ExceptionUser e){
+                                System.out.println(e.getMessage());;
                             }
+                            //new ProcessBuilder("clear").inheritIO().start().waitFor();
                             break;
                         }
                         case 2:{
-                            user(scanner, dataAtual);
+                            try{
+                                user(scanner); 
+                            }catch (ExceptionEncomenda e){
+                                System.out.println(e.getMessage());
+                            }
+                            catch (ExceptionTransportadora e){
+                                System.out.println(e.getMessage());
+                            }
+                            catch(ExceptionUser e){
+                                System.out.println(e.getMessage());
+                            }
                             break;
                         }
                         case 3:{
@@ -53,93 +68,43 @@ public class View {
         scanner.close();
     }
 
-    public void admin(Scanner scanner) throws ExceptionUser{
+
+    public void admin(Scanner scanner) throws ExceptionUser, ExceptionData{
         int opcao = 0;
         do{
             System.out.println("\n=== ADMINISTRADOR ===");
             System.out.println("1 - Adicionar transportadora");
             System.out.println("2 - Eliminar utilizador");
             System.out.println("3 - Queries");
-            System.out.println("4 - Avançar data");
-            System.out.println("5 - Terminar sessão e voltar ao menu principal");
+            System.out.println("4 - Ler de um ficheiro");
+            System.out.println("5 - Avançar data");
+            System.out.println("6 - Terminar sessão e voltar ao menu principal");
             System.out.print("Opção: ");
             try {
                 opcao = scanner.nextInt();
                 scanner.nextLine();
                 switch(opcao) {
                     case 1:{
-                        System.out.print("Nome da transportadora: ");
-                        String nome = scanner.nextLine();
-                        nome = nome.substring(0).toUpperCase();
-                        System.out.print("O artigo é premium? (Sim, Nao): ");
-                        String isPremium;
-                        double cp = 0.0;
-                        double cm = 0.0;
-                        double cg = 0.0;
-                        double imposto = 0.0;
-                        double custoAdicional = 0.0;
-                        try {
-                            isPremium = scanner.nextLine();
-                            isPremium = isPremium.substring(0,1).toUpperCase()+ isPremium.substring(1).toLowerCase();
-                            if(!isPremium.equals("Sim") && !isPremium.equals("Nao")){
-                                System.out.println("Insira uma opção válida (Sim, Nao).");
-                                admin(scanner);
-                                return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
-                            }
-                            System.out.print("Custo de ume encomenda pequena: ");
-                            cp = scanner.nextDouble();
-                            scanner.nextLine();
-                            System.out.print("Custo de ume encomenda média: ");
-                            cm = scanner.nextDouble();
-                            scanner.nextLine();
-                            System.out.print("Custo de ume encomenda grande: ");
-                            cg = scanner.nextDouble();
-                            scanner.nextLine();
-                            System.out.print("Imposto da transportadora: ");
-                            imposto = scanner.nextDouble();
-                            scanner.nextLine();
-                            if(isPremium.equals("Sim")){
-                                System.out.print("Custo adicional: ");
-                                custoAdicional = scanner.nextDouble();
-                                scanner.nextLine();
-                            }
-                        } catch (InputMismatchException e) {
-                            System.out.println("Opção inválida. Insira um número com virgula.");
-                            scanner.nextLine(); // consome a entrada inválida
-                            admin(scanner); // chama o método novamente para solicitar uma entrada válida
-                            return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
-                        }
-                        controller.addTranspAdmin(nome, cp, cm, cg, imposto, custoAdicional);
+                        addT(scanner);
                         break;
                     }
                     case 2:{
-                        List<String> usuariosDisponiveis = controller.utilizadoresDisponiveis();
-                        if(usuariosDisponiveis.isEmpty()){
-                            throw new ExceptionUser("Não existe utilizadores disponíveis");
-                        }
-                        System.out.println("Utilizadores disponíveis\n" + controller.utilizadoresDisponiveis());
-                        System.out.print("Email do utilizador que pretende eliminar: ");
-                        String email = scanner.nextLine();
-                        if (!usuariosDisponiveis.contains(email)) {
-                            throw new ExceptionUser("O utilizador escolhido não existe no sistema");
-                        }
-                        controller.eliminaUserAdmin(email);                        
+                        eliminaUser(scanner);
                         break;
                     }
                     case 3:{
-                        try{
-                            queries(scanner);
-                        }catch(ExceptionUser e){
-                            System.out.println(e.getMessage());
-                        }
-                        
+                        queries(scanner);
                         break;
                     }
-                    case 4:{                     
+                    case 4:{                 
+                        ler(scanner);
+                        break;
+                    }
+                    case 5:{                     
                         avanca(scanner);
                         break;
                     }
-                    case 5:{
+                    case 6:{
                         System.out.println("Sessão como administrador terminada.\n");
                         break;
                     }
@@ -151,10 +116,62 @@ public class View {
                 System.out.println("Opção inválida. Tente novamente.");
                 scanner.next(); // consome a entrada inválida
             }
-        } while (opcao != 5);
+        } while (opcao != 6);
     }
 
-    public void queries(Scanner scanner) throws ExceptionUser{
+    public void addT(Scanner scanner){
+        System.out.print("Nome da transportadora: ");
+        String nome = scanner.nextLine();
+        nome = nome.substring(0).toUpperCase();
+        System.out.print("O artigo é premium? (Sim, Nao): ");
+        String isPremium;
+        double cp = 0.0;
+        double cm = 0.0;
+        double cg = 0.0;
+        double imposto = 0.0;
+        double custoAdicional = 0.0;
+        try {
+            isPremium = scanner.nextLine();
+            isPremium = isPremium.substring(0,1).toUpperCase()+ isPremium.substring(1).toLowerCase();
+            if(!isPremium.equals("Sim") && !isPremium.equals("Nao")){
+                System.out.println("Insira uma opção válida (Sim, Nao).");
+                addT(scanner);
+                return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
+            }
+            System.out.print("Custo de ume encomenda pequena: ");
+            cp = scanner.nextDouble();
+            scanner.nextLine();
+            System.out.print("Custo de ume encomenda média: ");
+            cm = scanner.nextDouble();
+            scanner.nextLine();
+            System.out.print("Custo de ume encomenda grande: ");
+            cg = scanner.nextDouble();
+            scanner.nextLine();
+            System.out.print("Imposto da transportadora: ");
+            imposto = scanner.nextDouble();
+            scanner.nextLine();
+            if(isPremium.equals("Sim")){
+                System.out.print("Custo adicional: ");
+                custoAdicional = scanner.nextDouble();
+                scanner.nextLine();
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Opção inválida. Insira um número com virgula.");
+            scanner.nextLine(); // consome a entrada inválida
+            addT(scanner); // chama o método novamente para solicitar uma entrada válida
+            return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
+        }
+        controller.addTranspAdmin(nome, cp, cm, cg, imposto, custoAdicional);
+    }
+
+    public void eliminaUser(Scanner scanner) throws ExceptionUser{
+        System.out.println("Utilizadores disponíveis\n" + controller.utilizadoresDisponiveis());
+        System.out.print("Email do utilizador que pretende eliminar: ");
+        String email = scanner.nextLine();
+        controller.removeUser(email);    
+    }
+
+    public void queries(Scanner scanner) throws ExceptionUser, ExceptionData{
         int opcao = 0;
         do{
             System.out.println("\n=== QUERIES ===");
@@ -174,8 +191,9 @@ public class View {
                         System.out.print("Limite inferir da data: ");
                         String dateInferior = scanner.nextLine();
                         System.out.print("Limite superir da data: ");
-                        String dateSuperior = scanner.nextLine();
-                        controller.maiorVendedorAdmin(dateInferior, dateSuperior);
+                        String dateSuperior = scanner.nextLine();   
+                                        
+                        controller.maiorVendedorAdmin(dateInferior, dateSuperior);   
                         break;
                     }
                     case 2:{
@@ -183,12 +201,9 @@ public class View {
                         break;
                     }
                     case 3:{
-                        List<String> usuariosDisponiveis = controller.utilizadoresDisponiveis();
                         System.out.print("Email do vendedor que pretende analisar as encomendas: ");
                         String emailVendedor = scanner.nextLine();
-                        if (!usuariosDisponiveis.contains(emailVendedor)) {
-                            throw new ExceptionUser("O vendedor "+ emailVendedor + " nao existe.");
-                        }
+
                         controller.encomendasVendedorAdmin(emailVendedor);
                         break;
                     }
@@ -198,6 +213,7 @@ public class View {
                         String dateInferior = scanner.nextLine();
                         System.out.print("Limite superir da data: ");
                         String dateSuperior = scanner.nextLine();
+
                         controller.ordenarUtilizadoresPorFaturamento(dateInferior, dateSuperior);
                         break;
                     }
@@ -216,13 +232,19 @@ public class View {
         } while (opcao != 6);
     }
 
+    public void ler(Scanner scanner) throws ExceptionData, ExceptionUser{
+        System.out.println("Insira o caminho correto para o ficheiro que pretende que seja lido:");
+        String caminho = scanner.nextLine();
+        controller.lerSistema(caminho);
+    }
+
     public void avanca(Scanner scanner){
         System.out.println("Insira a nova data atual do sistema:");
         String dataAtual = scanner.nextLine();
         controller.avancaDataSistema(dataAtual);
     }
 
-    public void user(Scanner scanner, LocalDate dataAtual){
+    public void user(Scanner scanner) throws ExceptionEncomenda, ExceptionTransportadora, ExceptionUser{
         int opcao = 0;
         do{
             System.out.println("\n=== UTILIZADOR ===");
@@ -239,11 +261,7 @@ public class View {
                         break;
                     }
                     case 2:{
-                        try{
-                            loggin(scanner, dataAtual);
-                        }catch(ExceptionUser e){
-                            System.out.println(e.getMessage());
-                        }
+                        loggin(scanner);
                         break;
                     }
                     case 3:{
@@ -259,7 +277,7 @@ public class View {
         }while(opcao != 3);
     }
     
-    public void criarUtilizador(Scanner scanner, int tentativas) {
+    public void criarUtilizador(Scanner scanner, int tentativas) throws ExceptionEncomenda{
         if (tentativas == 0) {
             System.out.println("Limite de tentativas atingido. Encerrando a criação do utilizador.");
             return;
@@ -285,11 +303,11 @@ public class View {
         controller.registaUser(user, nome, morada, nif);
     }
 
-    public void loggin(Scanner scanner, LocalDate dataAtual) throws ExceptionUser{
+    public void loggin(Scanner scanner) throws ExceptionUser, ExceptionEncomenda, ExceptionTransportadora{
         System.out.println("\n=== Iniciar sessão ===");
         List<String> usuariosDisponiveis = controller.utilizadoresDisponiveis();
         if (usuariosDisponiveis == null || usuariosDisponiveis.isEmpty()) {
-            throw new ExceptionUser("Não é possível iniciar sessão, não há usuários disponíveis");
+            throw new ExceptionUser("Não há usuários disponíveis");
         }
         System.out.println("Usuários disponíveis:\n " + usuariosDisponiveis);
         System.out.print("Digite o email do usuário para iniciar sessão: ");
@@ -298,10 +316,10 @@ public class View {
             throw new ExceptionUser("Não é possível iniciar sessão com o usuário " + email);
         }
         System.out.println("Sessão iniciada com " + email);
-        interativo2(scanner, email, dataAtual);
+        interativo2(scanner, email);
     }
 
-    public void interativo2(Scanner scanner, String email, LocalDate dataAtual){
+    public void interativo2(Scanner scanner, String email) throws ExceptionEncomenda, ExceptionTransportadora{
         Utilizador user = this.controller.retornarLoggedUser(email);
         int opcao = 0;
         do {
@@ -320,21 +338,11 @@ public class View {
                 scanner.nextLine();
                 switch(opcao) {
                     case 1:{
-                        //só pode vender artigos se houver transportadoras disponíveis
-                        if(!controller.transportadorasDisp().isEmpty() || controller.transportadorasDisp() == null){
-                            criarArtigo(scanner, user);
-                        }
-                        else{
-                            System.out.println("Opção inválida. Não é possivel colocar à venda um artigo porque não existem transportadoras disponíveis\n");
-                        }
+                        criarArtigo(scanner, user);
                         break;
                     } 
                     case 2:{
-                        try{
-                            encomendarArtigo(scanner, user, dataAtual);
-                        }catch (ExceptionEncomendar e){
-                            System.out.println(e.getMessage());
-                        }
+                        encomendarArtigo(scanner, user);
                         break;
                     } 
                     case 3:{
@@ -368,7 +376,7 @@ public class View {
         } while (opcao != 8);
     }
 
-    public void criarArtigo(Scanner scanner, Utilizador user){
+    public void criarArtigo(Scanner scanner, Utilizador user) throws ExceptionTransportadora{
         System.out.println("\n=== A CRIAR ARTIGO ===");
         System.out.print("Escolha o tipo de artigo (Mala, Sapatilha, Tshirt): ");
         String tipoArtigo = scanner.nextLine();
@@ -394,7 +402,7 @@ public class View {
         System.out.println("\n=== ESPECIFICAÇÔES DO ARTIGO ===");
 
         String transportadora = transportadoraArtigo(scanner);
-        
+
         System.out.print("Descrição: ");
         String descricao = scanner.nextLine();
         
@@ -615,7 +623,10 @@ public class View {
         controller.colocaAVendaUser(user, tipoArtigo, classeArtigo, estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, dimensao, material, anoLancamento,atacadores, cor, tamanho, tamTshirt, padTshirt);          
     }
 
-    public String transportadoraArtigo(Scanner scanner){
+    public String transportadoraArtigo(Scanner scanner) throws ExceptionTransportadora{
+        if(controller.transportadorasDisp().isEmpty()){
+            throw new ExceptionTransportadora("Não há transportadoras disponíveis.\n");
+        }
         System.out.println("\nTransportadoras disponíveis" + "\n" + controller.transportadorasDisp() + "\n");
         System.out.println("Escolha a transportadora mais conveniente para o artigo que está a vender");
         String transportadora = scanner.nextLine();
@@ -623,9 +634,9 @@ public class View {
         return transportadora;
     }
 
-    public void encomendarArtigo(Scanner scanner, Utilizador user, LocalDate dataAtual) throws ExceptionEncomendar{
+    public void encomendarArtigo(Scanner scanner, Utilizador user) throws ExceptionEncomenda{
         if(controller.artigosDisponiveis(user).isEmpty()){
-            throw new ExceptionEncomendar("Não há artigos para encomendar");
+            throw new ExceptionEncomenda("Não há artigos para encomendar");
         }
         else{
             System.out.println("--------- Artigos disponiveis para comprar -----------" + "\n" + controller.artigosDisponiveis(user)+ "\n");
@@ -636,9 +647,9 @@ public class View {
                 scanner.nextLine(); // consome o quebra de linha
             } catch(InputMismatchException e){
                 System.out.println("Opção inválida. Insira um número inteiro.");
-                encomendarArtigo(scanner, user, dataAtual); // chama o método novamente para solicitar uma entrada válida
+                encomendarArtigo(scanner, user); // chama o método novamente para solicitar uma entrada válida
             }
-            controller.encomendarArtigoUser(user, codBarras, dataAtual);
+            controller.encomendarArtigoUser(user, codBarras);
         }
     }
 

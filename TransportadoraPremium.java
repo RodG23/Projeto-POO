@@ -29,7 +29,7 @@ public class TransportadoraPremium extends Transportadora implements TPremium {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
         sb.append(" Custo adicional por artigo premium -> " + this.getCustoAdicional() + "€\n");
-        return sb.toString() + " Tipo de Transportadora: Premium\n";
+        return sb.toString() + " Tipo de Transportadora: Premium\n -------------------------- \n";
     }
 
     @Override

@@ -306,7 +306,12 @@ public class Utilizador {
 
     // add um artigo para venda no sistema
     public void aVendaArtigo(Vintage vinted, Artigo artigo, Transportadora transportadora){
-        artigo.setTransportadora(transportadora.clone());
+        try{
+            artigo.setTransportadora(transportadora.clone());
+        }catch(NullPointerException e){
+            System.out.println("A transportador escolhida não está registada no sistema.");
+        }
+        
         this.addArtigoAVenda(artigo.clone());
         vinted.addStock(artigo.clone());
         vinted.addTransportadora(transportadora.clone());

@@ -3,11 +3,11 @@ public abstract class Artigo{
     private static int numArtigos = 0; //Mantém contagem de artigos e é utilizada para o codBarras de um artigo.
 
     enum St { //Enum dos estados possíveis de um artigo.
-        MAU,
-        MEDIO,
-        BOM,
+        EXCELENTE,
         MUITO_BOM,
-        EXCELENTE
+        BOM,
+        MEDIO,
+        MAU  
     }
 
     private final int codBarras; //Guarda a identificação de um artigo.
@@ -149,7 +149,7 @@ public abstract class Artigo{
         sb.append(" Código de barras -> " + this.getCodBarras() + "\n");
         sb.append(" Estado -> " + (this.getEstado() != null ? this.getEstado().toString() : "Não associado") + "\n");
         sb.append(" Número de Donos -> " + this.getNumDonos() + "\n");
-        //sb.append(this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada" + "\n");
+        sb.append(this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada" + "\n");
         sb.append(" Descrição -> " + this.getDescricao() + "\n");
         sb.append(" Marca -> " + this.getMarca() + "\n");
         sb.append(" Preço Base -> " + this.getPrecoBase() + "€\n");

@@ -1,5 +1,6 @@
-public class Transportadora{
+public abstract class Transportadora{
     
+    private String nome; //nome da transportadora
     private double custoPequena; //Guarda o valor base cobrado pela transportadora numa encomenda pequena.
     private double custoMedia; //Guarda o valor base cobrado pela transportadora numa encomenda media.
     private double custoGrande; //Guarda o valor base cobrado pela transportadora numa encomenda grande.
@@ -10,6 +11,7 @@ public class Transportadora{
      * Construtor vazio.
      */
     public Transportadora() {
+        this.nome = null;
         this.custoPequena = 0;
         this.custoMedia = 0;
         this.custoGrande = 0;
@@ -20,7 +22,8 @@ public class Transportadora{
     /**
      * Construtor parametrizado. Total auferido não é parâmetro pois numa transportadora nova é 0.
      */
-    public Transportadora(double cp, double cm, double cg, double imp) {
+    public Transportadora(String nome, double cp, double cm, double cg, double imp) {
+        this.nome = nome;
         this.custoPequena = cp;
         this.custoMedia = cm;
         this.custoGrande = cg;
@@ -32,6 +35,7 @@ public class Transportadora{
      * Construtor de cópia.
      */
     public Transportadora(Transportadora umaTransportadora) {
+        this.nome = umaTransportadora.getNome();
         this.custoPequena = umaTransportadora.getCustoPequena();
         this.custoMedia = umaTransportadora.getCustoMedia();
         this.custoGrande = umaTransportadora.getCustoGrande();
@@ -42,6 +46,11 @@ public class Transportadora{
     /**
      * Getters das variáveis de instância de uma transportadora.
      */
+
+    public String getNome(){
+        return this.nome;
+    }
+
     public double getCustoPequena() {
         return this.custoPequena;
     }
@@ -66,6 +75,11 @@ public class Transportadora{
      * Setters das variáveis de instância de uma transportadora.
      * Os de custo e imposto servirão para alterar a fórmula de cálculo de transporte.
      */
+
+    public void setNome(String nome){
+        this.nome = nome;
+    }
+
     public void setCustoPequena(double cp) {
         this.custoPequena = cp;
     }
@@ -82,21 +96,14 @@ public class Transportadora{
         this.imposto = imp;
     }
 
-    /**
-     * Adiciona ao total auferido o valor que irá cobrar ao comprador.
-     */
-    public void addTotalAuferido(double income) {
-        this.totalAuferido += income;
+    public void setTotalAuferido(double totalAuferido) {
+        this.totalAuferido = totalAuferido;
     }
 
     /**
      * Método clone.
      */
-    @Override
-    public Transportadora clone() {
-        return new Transportadora(this);
-    }
-
+    public abstract Transportadora clone();
     /**
      * Método toString.
      */
@@ -105,6 +112,7 @@ public class Transportadora{
         StringBuilder sb = new StringBuilder();
 
         sb.append("\n     | Transportadora |\n");
+        sb.append(" Nome da transportadora -> " + this.getNome() + "\n");
         sb.append(" Custo base por encomenda pequena -> " + this.getCustoPequena() + "€\n");
         sb.append(" Custo base por encomenda media -> " + this.getCustoMedia() + "€\n");
         sb.append(" Custo base por encomenda grande -> " + this.getCustoGrande() + "€\n");
@@ -124,27 +132,17 @@ public class Transportadora{
         if(obj==null || obj.getClass() != this.getClass()) 
             return false;
         Transportadora transportadora = (Transportadora) obj;
-        return transportadora.getCustoPequena() == this.getCustoPequena() &&
+        return transportadora.getNome().equals(this.getNome()) &&
+               transportadora.getCustoPequena() == this.getCustoPequena() &&
                transportadora.getCustoMedia() == this.getCustoMedia() &&
                transportadora.getCustoGrande() == this.getCustoGrande() &&
                transportadora.getImposto() == this.getImposto() &&
                transportadora.getTotalAuferido() == this.getTotalAuferido();
     }
 
-    public double calcularValorExpedicaoPequeno(){
-        double precoBase = this.getCustoGrande();
-        double valorFinal = (precoBase * 0.50 * (1 + imposto))*0.5;
-        return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
-    }
+    public abstract double calcularValorExpedicaoPequeno();
 
-    public double calcularValorExpedicaoMedio(){
-        double precoBase = this.getCustoGrande();
-        double valorFinal = (precoBase * 0.50 * (1 + imposto))*0.6;
-        return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
-    }
-    public double calcularValorExpedicaoGrande(){
-        double precoBase = this.getCustoGrande();
-        double valorFinal = (precoBase * 0.50 * (1 + imposto))*0.9;
-        return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
-    }
+    public abstract double calcularValorExpedicaoMedio();
+
+    public abstract double calcularValorExpedicaoGrande();
 }

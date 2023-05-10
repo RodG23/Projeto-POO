@@ -1,10 +1,10 @@
-public class SapatilhaPremium extends Mala implements ArtigoPremium  {
+public class SapatilhaPremium extends Sapatilha implements ArtigoPremium  {
     public SapatilhaPremium(){
         super();
     }
 
-    public SapatilhaPremium(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Dim dimensao, String material, int anoLancamento){
-        super(etd, donos, trans, desc, mrc, pb, cp, dimensao, material, anoLancamento);
+    public SapatilhaPremium(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
+        super(etd, donos, trans, desc, mrc, pb, cp, tamanho, atacadores, cor, anoLancamento);
     }
 
     public SapatilhaPremium(SapatilhaPremium m){
@@ -25,7 +25,7 @@ public class SapatilhaPremium extends Mala implements ArtigoPremium  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append(" SapatilhaPremium:\n");
+        sb.append(" Sapatilha premium:\n");
         sb.append(super.toString());
 
         return sb.toString();
@@ -39,10 +39,8 @@ public class SapatilhaPremium extends Mala implements ArtigoPremium  {
             return true ;
         if(( obj == null ) || ( this.getClass () != obj.getClass ()))  
             return false ;
-        if(!super.equals(obj)) 
-            return false;
         SapatilhaPremium m = (SapatilhaPremium) obj ;
-        return  true;       
+        return  super.equals(m);       
     }
 
     @Override
@@ -54,6 +52,6 @@ public class SapatilhaPremium extends Mala implements ArtigoPremium  {
 
     @Override
     public double calcularValorArtigoPremium(int anoAtual) {
-        return calcularValorArtigo() * (anoAtual - super.getAnoLancamento() + 0.10); //valoriza 10% a cada ano que passa
+        return calcularValorArtigo() * (1 + (anoAtual - super.getAnoLancamento()) * 0.10); //valoriza 10% a cada ano que passa
     }
 }

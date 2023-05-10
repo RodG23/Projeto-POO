@@ -1,8 +1,5 @@
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.plaf.metal.MetalBorders.TableHeaderBorder;
 
 public class Utilizador {
     private static int numUsers = 0; //Mantém contagem de users e é utilizada para o id de um user.
@@ -43,7 +40,7 @@ public class Utilizador {
         this.morada = morada;
         this.nif = nif;
 
-        this.aVenda= new HashMap<Integer,Artigo>();
+        this.aVenda = new HashMap<Integer,Artigo>();
         for(Map.Entry<Integer,Artigo> e : aVenda.entrySet())
         {
             this.aVenda.put(e.getKey(), e.getValue().clone());
@@ -301,34 +298,44 @@ public class Utilizador {
                 this.getFaturas().equals(user.getFaturas());
     }
 
+// ------------------------- FUNÇÔES PARA O MODO INTERATIVO ----------------------------------
+
+
+ // ---------------------------------------------------------------------------------------------
+
+
     // add um artigo para venda no sistema
-    public void aVendaArtigo(Vintage vintage, Artigo artigo, Transportadora transportadora){
-            artigo.setTransportadora(transportadora);
-            this.addArtigoAVenda(artigo);
-            vintage.addStock(artigo);
+    public void aVendaArtigo(Vintage vinted, Artigo artigo, Transportadora transportadora){
+        artigo.setTransportadora(transportadora.clone());
+        this.addArtigoAVenda(artigo.clone());
+        vinted.addStock(artigo.clone());
+        vinted.addTransportadora(transportadora.clone());
     } 
 
     public Encomenda encontrarEncomendaPendente(Map<Integer,Encomenda> encomendas) {
         for (Encomenda enc : encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
-                return enc;
+                return enc.clone();
             }
         }
         return null;
     }
 
     // atualiza informações da encomenda do usuário em todas as instâncias relevantes, incluindo a classe Vintage
-    public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
-    Encomenda aux = encontrarEncomendaPendente(this.encomendas);
+    public void colocaEncomenda(Vintage vinted, Artigo artigo) {
+    Encomenda aux = encontrarEncomendaPendente(this.getEncomendas());
     //Caso onde se add o primeiro artigo à encomenda
         if (aux == null) {
             aux = new Encomenda();
         }
         try{
-            Artigo a = vinted.getStock().get(artigo.getCodBarras());
-            aux.addArtigoEncomenda(a.clone());
+            aux.addArtigoEncomenda(artigo.clone());
+            aux.alteraDimensao();
+            //valor da encomenda sem qualquer custo extra
+
+            aux.valorEncomenda(vinted.getDataAtual().getYear(), 0.0, 0.0, 0.0, 0.0);
             this.addEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
-            vinted.remStock(a.clone());
+            vinted.remStock(artigo.clone());
 
         }catch(NullPointerException e){
             System.out.println("Artigo "+ artigo.getCodBarras() + " fora de stock\n");
@@ -336,15 +343,19 @@ public class Utilizador {
     }  
 
     public void finalizarEncomenda(Vintage vinted){
-        LocalDate aux = LocalDate.now();
-        for (Encomenda enc : this.encomendas.values()) {
+        for (Encomenda enc : this.getEncomendas().values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
+                // Atualiza os status da encomenda
+                enc.alteraDimensao();
                 enc.setEstado(Encomenda.St.FINALIZADA);
-                enc.setDataCriacao(aux);
+                enc.setDataCriacao(vinted.getDataAtual());
+
+                //calcula o valor da encomenda
+                double taxaExpedicao = vinted.precoTransportadora(enc.getArtigos());   
+                enc.valorEncomenda(vinted.getDataAtual().getYear(), vinted.getTaxaGSNovo(), vinted.getTaxaGSUsado(), taxaExpedicao, 0);
+                this.encomendas.put(enc.getId(), enc.clone());
+                vinted.enviarEncomenda(this);
             }
-            double valorEncomenda = enc.valorEncomenda(vinted.getDataAtual().getYear(), vinted.getTaxaGSNovo(), vinted.getTaxaGSUsado());
-            //calcula o valor da encomenda
-            enc.setPrecoFinal(valorEncomenda);
         }
     }
 
@@ -386,14 +397,5 @@ public class Utilizador {
 
     public void removeFatura(Fatura fatura){
         this.faturas.remove(fatura.getNumEmissao());
-    }
-
-    //calcula o valor das faturas para o utilizador
-    public void valorFatura(int chave, int anoAtual, double taxaGSNovo, double taxaGSUsado, double taxaServiço){
-        this.faturas.forEach((chave1,valor)-> {
-            if(chave1 == chave){
-                valor.calculaFatura(anoAtual, taxaGSNovo, taxaGSUsado, taxaServiço);
-            }
-        });
     }
 }

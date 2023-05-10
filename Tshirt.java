@@ -1,6 +1,5 @@
 public abstract class Tshirt extends Artigo{
     private static final double descBase = 0.5; //Guarda o desconto que se aplica às tshirts.
-    private boolean isNew;//saber se a mala é nova.
     
     enum Tam { //Enum do tamanho da tshirt;
         S,
@@ -90,11 +89,7 @@ public abstract class Tshirt extends Artigo{
 
     public abstract double calcularValorArtigo();
 
-    public double calcularValorArtigoUsado(int anoAtual){
-        return 0.0;
-    }
-
-    public double calcularValorArtigoNovo(int anoAtual){
+    public double calcularValorArtigoNU(int anoAtual){
         return 0.0;
     }
 

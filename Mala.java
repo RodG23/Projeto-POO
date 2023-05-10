@@ -1,9 +1,9 @@
 public abstract class Mala extends Artigo{
     
     enum Dim { //Enum da dimensão da mala.
-        PEQUENA,
+        GRANDE,
         MEDIA,
-        GRANDE
+        PEQUENA
     }
 
     private Dim dimensao; //Guarda a dimensão da mala.
@@ -99,11 +99,7 @@ public abstract class Mala extends Artigo{
 
     public abstract double calcularValorArtigo();
 
-    public double calcularValorArtigoUsado(int anoAtual){
-        return 0.0;
-    }
-
-    public double calcularValorArtigoNovo(int anoAtual){
+    public double calcularValorArtigoNU(int anoAtual){
         return 0.0;
     }
 

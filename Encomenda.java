@@ -210,44 +210,34 @@ public class Encomenda {
         this.artigos.remove(codBarras);
     }
 
-    public double precoTransportadora(Map<Integer, Artigo> artigos){
-        double valorFinal = 0.0;
-        Map<Transportadora, Long> transportadoras = artigos.values().stream()
-        .collect(Collectors.groupingBy(Artigo::getTransportadora, Collectors.counting()));
-
-        for (Map.Entry<Transportadora, Long> transportadora : transportadoras.entrySet()) {
-            if(transportadora.getValue() == 1){
-                valorFinal += transportadora.getKey().calcularValorExpedicaoPequeno();
-            }
-            else if(transportadora.getValue() > 1 && transportadora.getValue()<=5){
-                valorFinal += transportadora.getKey().calcularValorExpedicaoMedio();
-            }
-            else if(transportadora.getValue() > 5){
-                valorFinal += transportadora.getKey().calcularValorExpedicaoGrande();
-            } 
-        }
-        return valorFinal;
-
-    }
-
-    //Calculo do valor da encomenda do COMPRADOR
-    public double valorEncomenda(int anoAtual, double taxaGSNovo, double taxaGSUsado){
+    //Calculo do valor da encomenda
+    public void valorEncomenda(int anoAtual, double taxaGSNovo, double taxaGSUsado, double taxaExpedicao, double taxaServiço){
         double x = this.artigos.values().stream().mapToDouble(artigo -> {
-            if (artigo instanceof ArtigoNovo) {
-                return ((ArtigoNovo) artigo).calcularValorArtigoNovo(anoAtual) - taxaGSNovo; // chama o método correto para ArtigoNovo
-
-            } else if (artigo instanceof ArtigoUsado) {
-                return ((ArtigoUsado) artigo).calcularValorArtigoUsado(anoAtual) - taxaGSUsado; // chama o método correto para ArtigoUsado
-
-            } else if(artigo instanceof ArtigoPremium){
+            if (artigo instanceof ArtigoNU && artigo.getNumDonos() > 0) {
+                return (((ArtigoNU) artigo).calcularValorArtigoNU(anoAtual) + taxaGSUsado); // chama o método correto para ArtigoNU
+            } 
+            else if (artigo instanceof ArtigoNU && artigo.getNumDonos() == 0) {
+                return (((ArtigoNU) artigo).calcularValorArtigoNU(anoAtual) + taxaGSNovo); // chama o método correto para ArtigoNU
+            } 
+            else if(artigo instanceof ArtigoPremium){
                 return ((ArtigoPremium) artigo).calcularValorArtigoPremium(anoAtual); // chama o método correto para ArtigoPremium
             } else{
                 return 0;
             }
         }).sum();
-        double precoTotalTransportadoras = this.precoTransportadora(this.artigos);
-        this.precoFinal = x + precoTotalTransportadoras;
-        return precoFinal;
+        this.precoFinal = Math.round((x + taxaExpedicao + (x * taxaServiço))*100)/100;
+    }
+
+    public void alteraDimensao(){
+        if(this.artigos.size() == 1){
+            this.setDimesao(Dim.PEQUENA);
+        }
+        else if(this.artigos.size() > 1 && this.artigos.size() <=5 ){
+            this.setDimesao(Dim.MEDIA);
+        }
+        else if(this.artigos.size() > 5){
+            this.setDimesao(Dim.GRANDE);
+        }
     }
 }
 

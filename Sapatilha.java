@@ -4,8 +4,6 @@ public abstract class Sapatilha extends Artigo{
     private String cor; //Guarda a cor da sapatilha.
     private int tamanho; //Guarda o tamanho da sapatilha.
     private int anoLancamento; //Guarda o ano de lançamento da coleção.
-    private boolean isNew;//saber se a mala é nova.
-    private boolean isPremium;//saber se o mala é premium.
     //exemplo de um preco base : precoBase =− (precoBase/numeroDonos ∗ estadoU tilizacao)
     
     /**
@@ -18,7 +16,7 @@ public abstract class Sapatilha extends Artigo{
         this.cor = "";
         this.anoLancamento = -1;
     }
-
+                                             
     public Sapatilha(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
         super(etd, donos, trans, desc, mrc, pb, cp);
         this.tamanho = tamanho;
@@ -110,11 +108,7 @@ public abstract class Sapatilha extends Artigo{
     
     public abstract double calcularValorArtigo();
 
-    public double calcularValorArtigoUsado(int anoAtual){
-        return 0.0;
-    }
-
-    public double calcularValorArtigoNovo(int anoAtual){
+    public double calcularValorArtigoNU(int anoAtual){
         return 0.0;
     }
 

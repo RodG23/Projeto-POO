@@ -1,14 +1,14 @@
-import java.time.LocalDate;
+//import java.io.IOException;
+
 public class Main{
 
-    public static void main(String[] args){
+    public static void main(String[] args){// throws IOException, InterruptedException{
 
     Vintage model = new Vintage();
     Controller controller = new Controller(model);
     View view = new View(controller);
 
     view.run();
-    
 /*
     Vintage vinted = new Vintage();
     MalaPremium malaPremium = new MalaPremium(
@@ -71,18 +71,22 @@ public class Main{
     vinted.setDataAtual(LocalDate.now());
 
     //regista utilizadores
-    vinted.registaUtilizador("jonas.com", u1);
-    vinted.registaUtilizador("guga.com", u2);
-
-   //vinted.leitura("projeto.txt");
+    vinted.registaUtilizador("guga.com", u1);
+    vinted.registaUtilizador("jonas.com", u2);
+    
 
     // perfil do utilizador u1 tem um mala e umas sapatilhas à venda
     u1.aVendaArtigo(vinted, malaPremium, tp);
     u1.aVendaArtigo(vinted, sapatilhaNova, tn);
 
     // perfil do utilizador u2 tem um tshirt à venda
-    u2.aVendaArtigo(vinted, tshirtUsada, tn);
+    u2.aVendaArtigo(vinted, tshirtUsada, tp);
 
+    vinted.leitura("projeto.txt");
+
+    vinted.getTranspDisponiveis();
+
+    /*
     // utilizador u2 encomenda o artigo malaPremium e a sapatilhaNova ao utilizador u1
     u2.colocaEncomenda(vinted, malaPremium);
     u2.colocaEncomenda(vinted, sapatilhaNova);

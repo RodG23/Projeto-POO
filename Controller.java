@@ -9,7 +9,11 @@ public class Controller{
         this.model = model;
     }
 
-    public void maiorVendedorAdmin(String dataInferior, String dataSuperior){
+    public void setDataSistema(LocalDate dataAtual){
+        model.setDataAtual(dataAtual);
+    }
+
+    public void maiorVendedorAdmin(String dataInferior, String dataSuperior) throws ExceptionData{
         model.maiorVendedorInterativo(dataInferior, dataSuperior);
     }
 
@@ -17,11 +21,11 @@ public class Controller{
         model.maiorTransportadora();
     }
 
-    public void encomendasVendedorAdmin(String emailVendedor){
+    public void encomendasVendedorAdmin(String emailVendedor) throws ExceptionUser{
         model.encomendasVendedorInterativo(emailVendedor);
     }
 
-    public void ordenarUtilizadoresPorFaturamento(String dataInferior, String dataSuperior){
+    public void ordenarUtilizadoresPorFaturamento(String dataInferior, String dataSuperior) throws ExceptionData{
     model.ordenarUtilizadoresPorFaturamentoInterativo(dataInferior, dataSuperior);
     }
 
@@ -33,7 +37,7 @@ public class Controller{
         model.registaUtilizadorInterativo(email, nome, morada, nif);
     }
 
-    public void removeUser(String emailUser) {
+    public void removeUser(String emailUser)throws ExceptionUser {
         model.removeUtilizadorInterativo(emailUser);
     }
 
@@ -47,12 +51,12 @@ public class Controller{
         model.addTransportadoraInterativo(nome, cp, cm, cg, imposto, custoAdicional);
     }
 
-    public void eliminaUserAdmin(String email){
-        model.removeUtilizadorInterativo(email);
-    }
-
     public Utilizador retornarLoggedUser(String email){
        return model.getCreds().get(email);
+    }
+
+    public void lerSistema(String caminho) throws ExceptionData, ExceptionUser{
+        model.leituraInterativo(caminho);
     }
 
     public void avancaDataSistema(String dataAtual){
@@ -63,8 +67,8 @@ public class Controller{
         model.colocaAvendaUserInterativo(user, tipoArtigo, classeArtigo, estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, dimensao, material, anoLancamento, atacadores, cor, tamanho, tamTshirt, padTshirt);
     }
 
-    public void encomendarArtigoUser(Utilizador user, int codBarras, LocalDate dataAtual){
-        model.encomendarArtigoUserInterativo(user, codBarras, dataAtual);
+    public void encomendarArtigoUser(Utilizador user, int codBarras){
+        model.encomendarArtigoUserInterativo(user, codBarras);
     }
 
     //mostra a encomenda do utilizador

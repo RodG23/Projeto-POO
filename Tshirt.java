@@ -44,7 +44,7 @@ public abstract class Tshirt extends Artigo{
      */ 
 
     public double getDescBase(){
-        return this.descBase;
+        return Tshirt.descBase;
     }
 
     public Tam getTamanho(){

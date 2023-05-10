@@ -1,4 +1,3 @@
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public class Utilizador {
         this.morada = morada;
         this.nif = nif;
 
-        this.aVenda= new HashMap<Integer,Artigo>();
+        this.aVenda = new HashMap<Integer,Artigo>();
         for(Map.Entry<Integer,Artigo> e : aVenda.entrySet())
         {
             this.aVenda.put(e.getKey(), e.getValue().clone());
@@ -299,57 +298,68 @@ public class Utilizador {
                 this.getFaturas().equals(user.getFaturas());
     }
 
-    // Adiciona um artigo para venda no sistema
-    public void aVendaArtigo(Vintage vintage, Artigo artigo, Transportadora transportadora){
-            artigo.setTransportadora(transportadora);
-            this.adicionaArtigoAVenda(artigo);
-            vintage.addStock(artigo);
+// ------------------------- FUNÇÔES PARA O MODO INTERATIVO ----------------------------------
+
+
+ // ---------------------------------------------------------------------------------------------
+
+
+    // add um artigo para venda no sistema
+    public void aVendaArtigo(Vintage vinted, Artigo artigo, Transportadora transportadora){
+        artigo.setTransportadora(transportadora.clone());
+        this.addArtigoAVenda(artigo.clone());
+        vinted.addStock(artigo.clone());
+        vinted.addTransportadora(transportadora.clone());
     } 
 
     public Encomenda encontrarEncomendaPendente(Map<Integer,Encomenda> encomendas) {
         for (Encomenda enc : encomendas.values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
-                return enc;
+                return enc.clone();
             }
         }
         return null;
     }
 
     // atualiza informações da encomenda do usuário em todas as instâncias relevantes, incluindo a classe Vintage
-    public void colocaEncomenda(Vintage vinted, Utilizador vendedor, Artigo artigo) {
-    Encomenda aux = encontrarEncomendaPendente(this.encomendas);
-    //Caso onde se adiciona o primeiro artigo à encomenda
+    public void colocaEncomenda(Vintage vinted, Artigo artigo) {
+    Encomenda aux = encontrarEncomendaPendente(this.getEncomendas());
+    //Caso onde se add o primeiro artigo à encomenda
         if (aux == null) {
             aux = new Encomenda();
         }
         try{
-            Artigo a = vinted.getStock().get(artigo.getCodBarras());
-            aux.addArtigo(a.clone());
-            this.adicionaEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
-            vinted.remStock(a.clone());
+            aux.addArtigoEncomenda(artigo.clone());
+            aux.alteraDimensao();
+            //valor da encomenda sem qualquer custo extra
+
+            aux.valorEncomenda(vinted.getDataAtual().getYear(), 0.0, 0.0, 0.0, 0.0);
+            this.addEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
+            vinted.remStock(artigo.clone());
+
         }catch(NullPointerException e){
             System.out.println("Artigo "+ artigo.getCodBarras() + " fora de stock\n");
         }
-     /*  
-        if(vinted.getStock().containsKey(artigo.getCodBarras())){
-            aux.addArtigo(artigo.clone());
-            this.adicionaEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
-            vinted.remStock(artigo.clone());
-        }
-    */
     }  
 
-    public void finalizarEncomenda(){
-        LocalDate aux = LocalDate.now();
-        for (Encomenda enc : this.encomendas.values()) {
+    public void finalizarEncomenda(Vintage vinted){
+        for (Encomenda enc : this.getEncomendas().values()) {
             if (enc.getEstado().equals(Encomenda.St.PENDENTE)) {
+                // Atualiza os status da encomenda
+                enc.alteraDimensao();
                 enc.setEstado(Encomenda.St.FINALIZADA);
-                enc.setDataEntrega(aux);
+                enc.setDataCriacao(vinted.getDataAtual());
+
+                //calcula o valor da encomenda
+                double taxaExpedicao = vinted.precoTransportadora(enc.getArtigos());   
+                enc.valorEncomenda(vinted.getDataAtual().getYear(), vinted.getTaxaGSNovo(), vinted.getTaxaGSUsado(), taxaExpedicao, 0);
+                this.encomendas.put(enc.getId(), enc.clone());
+                vinted.enviarEncomenda(this);
             }
         }
     }
 
-    public void adicionaArtigoVendas(Artigo a){
+    public void addArtigoVendas(Artigo a){
        this.vendeu.put(a.getCodBarras(), a.clone());
     }
 
@@ -357,7 +367,7 @@ public class Utilizador {
         this.vendeu.remove(a.getCodBarras());
     }
 
-    public void adicionaArtigoCompras(Artigo a){
+    public void addArtigoCompras(Artigo a){
         this.comprou.put(a.getCodBarras(), a.clone());
     }
 
@@ -365,7 +375,7 @@ public class Utilizador {
         this.comprou.remove(a.getCodBarras());
     }
 
-    public void adicionaArtigoAVenda(Artigo a){
+    public void addArtigoAVenda(Artigo a){
         this.aVenda.put(a.getCodBarras(), a.clone());
     }
 
@@ -373,11 +383,19 @@ public class Utilizador {
         this.aVenda.remove(a.getCodBarras());
     }
 
-    public void adicionaEncEncomendas(Encomenda enc){
+    public void addEncEncomendas(Encomenda enc){
         this.encomendas.put(enc.getId(), enc.clone());
     }
 
     public void removeEncEncomenda(Encomenda enc){
         this.encomendas.remove(enc.getId());
+    }
+
+    public void addFatura(Fatura fatura){
+        this.faturas.put(fatura.getNumEmissao(), fatura.clone());
+    }
+
+    public void removeFatura(Fatura fatura){
+        this.faturas.remove(fatura.getNumEmissao());
     }
 }

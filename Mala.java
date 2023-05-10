@@ -1,9 +1,9 @@
-public class Mala extends Artigo{
+public abstract class Mala extends Artigo{
     
     enum Dim { //Enum da dimensão da mala.
-        PEQUENA,
+        GRANDE,
         MEDIA,
-        GRANDE
+        PEQUENA
     }
 
     private Dim dimensao; //Guarda a dimensão da mala.
@@ -20,8 +20,8 @@ public class Mala extends Artigo{
         this.anoLancamento = -1;
     }
 
-    public Mala(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Dim dimensao, String material, int anoLancamento){
-        super(cond, etd, donos, trans, desc, mrc, pb, cp);
+    public Mala(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, Dim dimensao, String material, int anoLancamento){
+        super(etd, donos, trans, desc, mrc, pb, cp);
         this.dimensao = dimensao;
         this.material = material;
         this.anoLancamento = anoLancamento;
@@ -67,11 +67,7 @@ public class Mala extends Artigo{
     /**
      * Método clone.
      */
-    @Override
-    public Mala clone(){
-        return new Mala(this);
-    }
-
+    public abstract Mala clone();
     /**
      * Método toString.
      */
@@ -80,10 +76,6 @@ public class Mala extends Artigo{
         StringBuilder sb = new StringBuilder();
 
         sb.append(super.toString());
-        sb.append(" Mala:\n");
-        sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "") + "\n");
-        sb.append(" Tamanho -> " + this.getMaterial() + "\n");
-        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n\n");
 
         return sb.toString();
     }
@@ -91,6 +83,7 @@ public class Mala extends Artigo{
     /**
      * Método equals.
      */
+    @Override
     public boolean equals(Object obj) {
         if(this == obj) 
             return true ;
@@ -102,5 +95,15 @@ public class Mala extends Artigo{
         return  this.getDimensao().equals(m.getDimensao()) &&
                 this.getMaterial().equals(m.getMaterial()) &&
                 this.getAnoLancamento() == m.getAnoLancamento();       
+    }
+
+    public abstract double calcularValorArtigo();
+
+    public double calcularValorArtigoNU(int anoAtual){
+        return 0.0;
+    }
+
+    public double calcularValorArtigoPremium(int anoAtual) {
+        return 0.0;
     }
 }

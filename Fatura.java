@@ -1,6 +1,3 @@
-import java.util.Map;
-import java.util.HashMap;
-
 public class Fatura {
     
     private static int numFaturas = 0;
@@ -12,7 +9,7 @@ public class Fatura {
 
     private final int numEmissao;
     private Tp tipo;
-    private Map<Integer,Artigo> artigos;
+    private Encomenda encomenda;
     private double valorTotal;
 
     /**
@@ -22,26 +19,22 @@ public class Fatura {
         numFaturas++;
         this.numEmissao = numFaturas;
         this.tipo = null;
-        this.artigos = new HashMap<>();
+        this.encomenda = null;
         this.valorTotal = 0;
     }
 
-    public Fatura(Tp tipo, Map<Integer,Artigo> art, double valorTotal) {
+    public Fatura(Tp tipo, Encomenda encomenda, Artigo artigo, double valorTotal) {
         numFaturas++;
         this.numEmissao = numFaturas;
         this.tipo = tipo;
-        this.artigos = new HashMap<Integer,Artigo>();
-        for(Map.Entry<Integer,Artigo> e : art.entrySet())
-        {
-            this.artigos.put(e.getKey(), e.getValue().clone());
-        }
+        this.encomenda = encomenda;
         this.valorTotal = valorTotal;
     }
 
     public Fatura(Fatura f) {
         this.numEmissao = f.getNumEmissao();
         this.tipo = f.getTipo();
-        this.artigos = f.getArtigos();
+        this.encomenda = f.getEncomenda();
         this.valorTotal = f.getValorTotal();
     }
 
@@ -56,14 +49,9 @@ public class Fatura {
         return this.tipo;
     }
 
-    public Map<Integer,Artigo> getArtigos() {
-        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
-        for (Map.Entry<Integer,Artigo> e : this.artigos.entrySet())
-        {
-            map.put(e.getKey(),e.getValue().clone());
-        }
-        return map;
-    } 
+    public Encomenda getEncomenda(){
+        return (this.encomenda != null ? this.encomenda.clone() : null);
+    }
 
     public double getValorTotal() {
         return this.valorTotal;
@@ -72,13 +60,9 @@ public class Fatura {
     /**
      * Setters.
      */
-    public void setArtigos(Map<Integer,Artigo> art) {
-        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
-        for (Map.Entry<Integer,Artigo> e : art.entrySet())
-        {
-            map.put(e.getKey(),e.getValue().clone());
-        }
-        this.artigos = map;
+
+    public void setEncomenda(Encomenda encomenda) {
+        this.encomenda = encomenda.clone();
     }
 
     public void setValorTotal(double valor) {
@@ -107,12 +91,8 @@ public class Fatura {
         sb.append("     | Fatura |\n");
         sb.append(" Número de emissão -> " + this.getNumEmissao() + "\n");
         sb.append(" Tipo -> " + this.getTipo().toString() + "\n");
-        sb.append(" Artigos:\n");
-        for(Artigo a : this.getArtigos().values())
-        {
-            sb.append(a.toString());
-        }
-        sb.append(" ValorTotal -> " + this.getValorTotal() + "\n");
+        sb.append(" Encomenda -> \n" +(this.encomenda != null ? this.encomenda.toString() : null) + "\n");
+        sb.append(" ValorTotal -> " + Math.round(this.getValorTotal()*100)/100 + "€\n");
 
         return sb.toString();
     }
@@ -127,9 +107,23 @@ public class Fatura {
         if(( obj == null ) || ( this.getClass () != obj.getClass ()))  
             return false;
         Fatura f = (Fatura) obj;
+
         return  this.getNumEmissao() == f.getNumEmissao() && 
+                this.getEncomenda() == f.getEncomenda() &&
                 this.getTipo().equals(f.getTipo()) && 
-                this.getArtigos().equals(f.getArtigos()) &&
                 this.getValorTotal() == f.getValorTotal();
     }
+
+    //Encomenda feita pelo comprador
+    public void addEncFatura(Encomenda encomenda){
+        this.encomenda = encomenda.clone();
+    }
+    public void removeEncFatura(Encomenda encomenda){
+        this.encomenda = null;
+    }
+
+    public void calculaValorFatura() {
+        this.valorTotal = this.encomenda.getPrecoFinal();
+    }
+
 }

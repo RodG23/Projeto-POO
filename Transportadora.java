@@ -1,5 +1,6 @@
-public class Transportadora implements TransportadoraPremium{
+public abstract class Transportadora{
     
+    private String nome; //nome da transportadora
     private double custoPequena; //Guarda o valor base cobrado pela transportadora numa encomenda pequena.
     private double custoMedia; //Guarda o valor base cobrado pela transportadora numa encomenda media.
     private double custoGrande; //Guarda o valor base cobrado pela transportadora numa encomenda grande.
@@ -10,6 +11,7 @@ public class Transportadora implements TransportadoraPremium{
      * Construtor vazio.
      */
     public Transportadora() {
+        this.nome = null;
         this.custoPequena = 0;
         this.custoMedia = 0;
         this.custoGrande = 0;
@@ -20,7 +22,8 @@ public class Transportadora implements TransportadoraPremium{
     /**
      * Construtor parametrizado. Total auferido não é parâmetro pois numa transportadora nova é 0.
      */
-    public Transportadora(double cp, double cm, double cg, double imp) {
+    public Transportadora(String nome, double cp, double cm, double cg, double imp) {
+        this.nome = nome;
         this.custoPequena = cp;
         this.custoMedia = cm;
         this.custoGrande = cg;
@@ -32,6 +35,7 @@ public class Transportadora implements TransportadoraPremium{
      * Construtor de cópia.
      */
     public Transportadora(Transportadora umaTransportadora) {
+        this.nome = umaTransportadora.getNome();
         this.custoPequena = umaTransportadora.getCustoPequena();
         this.custoMedia = umaTransportadora.getCustoMedia();
         this.custoGrande = umaTransportadora.getCustoGrande();
@@ -42,6 +46,11 @@ public class Transportadora implements TransportadoraPremium{
     /**
      * Getters das variáveis de instância de uma transportadora.
      */
+
+    public String getNome(){
+        return this.nome;
+    }
+
     public double getCustoPequena() {
         return this.custoPequena;
     }
@@ -66,6 +75,11 @@ public class Transportadora implements TransportadoraPremium{
      * Setters das variáveis de instância de uma transportadora.
      * Os de custo e imposto servirão para alterar a fórmula de cálculo de transporte.
      */
+
+    public void setNome(String nome){
+        this.nome = nome;
+    }
+
     public void setCustoPequena(double cp) {
         this.custoPequena = cp;
     }
@@ -82,21 +96,14 @@ public class Transportadora implements TransportadoraPremium{
         this.imposto = imp;
     }
 
-    /**
-     * Adiciona ao total auferido o valor que irá cobrar ao comprador.
-     */
-    public void addTotalAuferido(double income) {
-        this.totalAuferido += income;
+    public void setTotalAuferido(double totalAuferido) {
+        this.totalAuferido = totalAuferido;
     }
 
     /**
      * Método clone.
      */
-    @Override
-    public Transportadora clone() {
-        return new Transportadora(this);
-    }
-
+    public abstract Transportadora clone();
     /**
      * Método toString.
      */
@@ -105,6 +112,7 @@ public class Transportadora implements TransportadoraPremium{
         StringBuilder sb = new StringBuilder();
 
         sb.append("\n     | Transportadora |\n");
+        sb.append(" Nome da transportadora -> " + this.getNome() + "\n");
         sb.append(" Custo base por encomenda pequena -> " + this.getCustoPequena() + "€\n");
         sb.append(" Custo base por encomenda media -> " + this.getCustoMedia() + "€\n");
         sb.append(" Custo base por encomenda grande -> " + this.getCustoGrande() + "€\n");
@@ -124,22 +132,17 @@ public class Transportadora implements TransportadoraPremium{
         if(obj==null || obj.getClass() != this.getClass()) 
             return false;
         Transportadora transportadora = (Transportadora) obj;
-        return transportadora.getCustoPequena() == this.getCustoPequena() &&
+        return transportadora.getNome().equals(this.getNome()) &&
+               transportadora.getCustoPequena() == this.getCustoPequena() &&
                transportadora.getCustoMedia() == this.getCustoMedia() &&
                transportadora.getCustoGrande() == this.getCustoGrande() &&
                transportadora.getImposto() == this.getImposto() &&
                transportadora.getTotalAuferido() == this.getTotalAuferido();
     }
 
-    @Override
-    public void funcao() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'funcao'");
-    }
+    public abstract double calcularValorExpedicaoPequeno();
 
-    @Override
-    public void funcao2() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'funcao2'");
-    }
+    public abstract double calcularValorExpedicaoMedio();
+
+    public abstract double calcularValorExpedicaoGrande();
 }

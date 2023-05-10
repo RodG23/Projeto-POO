@@ -1,20 +1,28 @@
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.tree.ExpandVetoException;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Vintage {
-    private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo.
-    private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado.
+    private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo(centimos).
+    private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado(centimos).
+    private static double taxaServiço = 0.05; //Guardada a taxa de serviço por artigo usado(percentagem).
 
     private Map<Integer, Artigo> stock; //Guardado o stock de artigos para venda (CodBarras,Artigo).
     private Map<Integer, Map<Integer,Encomenda>> encomendas; //Guardadas encomendas feitas por um user (Id do comprador,conjunto de encomendas).
     private Map<Integer, Map<Integer,Artigo>> vendas; //Guardadas as vendas feitas por user (Id do vendedor, conjunto de artigos vendidos). 
-    private Map<Credenciais, Utilizador> creds; //Guardadas as credenciais de acesso à Vintage por users (credenciais,utilizador).
+    private Map<String, Utilizador> creds; //Guardadas o email de acesso à Vintage por users (String,utilizador).
+    private Map<String, Transportadora> transpDisponiveis; //transportadoras disponíveis no sistema.
     private double totalAuferido; //Guardado o total auferido pela Vintage no seu funcionamento.
     private LocalDate dataAtual;//Data atual do sistema.
 
@@ -25,16 +33,18 @@ public class Vintage {
         this.stock = new HashMap<Integer,Artigo>();
         this.encomendas = new HashMap<Integer,Map<Integer,Encomenda>>();
         this.vendas = new HashMap<Integer,Map<Integer,Artigo>>();
-        this.creds = new HashMap<Credenciais, Utilizador>();
+        this.creds = new HashMap<String, Utilizador>();
+        this.transpDisponiveis = new HashMap<String, Transportadora>();
         this.totalAuferido = 0;
         this.dataAtual = null;
     }
 
-    public Vintage(Map<Integer, Artigo> stock, Map<Integer, Map<Integer,Encomenda>> encomendas, Map<Integer, Map<Integer,Artigo>> vendas, Map<Credenciais, Utilizador> creds, double totalAuferido, LocalDate dataAtual) {
+    public Vintage(Map<Integer, Artigo> stock, Map<Integer, Map<Integer,Encomenda>> encomendas, Map<Integer, Map<Integer,Artigo>> vendas, Map<String, Utilizador> creds,HashMap<String, Transportadora> transpDisponiveis, double totalAuferido, LocalDate dataAtual) {
         this.stock = new HashMap<Integer,Artigo>(stock);
         this.encomendas = new HashMap<Integer,Map<Integer,Encomenda>>(encomendas);
         this.vendas = new HashMap<Integer,Map<Integer,Artigo>>(vendas);
-        this.creds = new HashMap<Credenciais, Utilizador>(creds);
+        this.creds = new HashMap<String, Utilizador>(creds);
+        this.transpDisponiveis = new HashMap<String, Transportadora>(transpDisponiveis);
         this.totalAuferido = totalAuferido;
         this.dataAtual = dataAtual;
     }
@@ -45,6 +55,7 @@ public class Vintage {
         this.encomendas = v.getEncomendas();
         this.vendas = v.getVendas();
         this.creds = v.getCreds();
+        this.transpDisponiveis = v.getTranspDisponiveis();
         this.totalAuferido = v.getTotalAuferido();
         this.dataAtual = v.getDataAtual();
     }
@@ -89,9 +100,18 @@ public class Vintage {
         return map;
     }
 
-    public Map<Credenciais, Utilizador> getCreds(){
-        Map<Credenciais, Utilizador> map = new HashMap<Credenciais, Utilizador>();
-        for (Map.Entry<Credenciais, Utilizador> e : this.creds.entrySet())
+    public Map<String, Utilizador> getCreds(){
+        Map<String, Utilizador> map = new HashMap<String, Utilizador>();
+        for (Map.Entry<String, Utilizador> e : this.creds.entrySet())
+        {
+            map.put(e.getKey(),e.getValue());
+        }
+        return map;
+    }
+
+    public Map<String, Transportadora> getTranspDisponiveis(){
+        Map<String, Transportadora> map = new HashMap<String, Transportadora>();
+        for (Map.Entry<String, Transportadora> e : this.transpDisponiveis.entrySet())
         {
             map.put(e.getKey(),e.getValue());
         }
@@ -108,6 +128,10 @@ public class Vintage {
 
     public double getTaxaGSUsado(){
         return Vintage.taxaGSUsado;
+    }
+
+    public double getTaxaSeriço(){
+        return Vintage.taxaServiço;
     }
 
     public LocalDate getDataAtual(){
@@ -154,13 +178,22 @@ public class Vintage {
         this.vendas = map;
     }
 
-    public void setCreds(HashMap<Credenciais, Utilizador>novasCreds){
-        Map<Credenciais, Utilizador> map = new HashMap<Credenciais, Utilizador>();
-        for (Map.Entry<Credenciais, Utilizador> e : novasCreds.entrySet())
+    public void setCreds(HashMap<String, Utilizador>novasCreds){
+        Map<String, Utilizador> map = new HashMap<String, Utilizador>();
+        for (Map.Entry<String, Utilizador> e : novasCreds.entrySet())
         {
             map.put(e.getKey(),e.getValue());
         }
         this.creds = map;
+    }
+
+    public void setTransp(HashMap<String, Transportadora> novasTransp){
+        Map<String, Transportadora> map = new HashMap<String, Transportadora>();
+        for (Map.Entry<String, Transportadora> e : novasTransp.entrySet())
+        {
+            map.put(e.getKey(),e.getValue());
+        }
+        this.transpDisponiveis = map;
     }
 
 
@@ -219,11 +252,11 @@ public class Vintage {
             }
         }
         sb.append(" Credênciais de login:\n");
-        for(Map.Entry<Credenciais, Utilizador> a : this.getCreds().entrySet())
+        for(Map.Entry<String, Utilizador> a : this.getCreds().entrySet())
         {
-            sb.append("     Utilizador " + a.getValue().getId() + "\n" + a.getKey().toString());
+            sb.append("     Utilizador " + a.getValue().getId() + "->" + a.getKey().toString() + "\n");
         }
-        sb.append(" Total Auferido -> " + this.getTotalAuferido() + "\n\n");
+        sb.append(" Total Auferido -> " + Math.round(this.getTotalAuferido()*100)/100 + "\n\n");
 
         sb.append(" ----- FIM DO STOCK -----\n");
 
@@ -244,11 +277,171 @@ public class Vintage {
         return  this.getStock().equals(v.getStock()) && 
                 this.getEncomendas().equals(v.getEncomendas()) &&
                 this.getVendas().equals(v.getVendas())&& 
+                this.getCreds().equals(v.getCreds()) &&
+                this.getTranspDisponiveis().equals(v.getTranspDisponiveis()) &&
                 this.getTotalAuferido() == v.getTotalAuferido() && 
                 this.getTaxaGSNovo() == v.getTaxaGSNovo() && 
                 this.getTaxaGSUsado() == v.getTaxaGSUsado() &&
                 this.getDataAtual().equals(v.getDataAtual());
     }
+
+    // ------------------------- FUNÇÔES PARA O MODO INTERATIVO ----------------------------------
+
+    public void registaUtilizadorInterativo(String email, String nome, String morada, int nif){
+        Map<Integer, Artigo> aVenda = new HashMap<Integer,Artigo>();
+        Map<Integer, Artigo> vendeu = new HashMap<Integer,Artigo>();
+        Map<Integer, Artigo> comprou = new HashMap<Integer,Artigo>();
+        Map<Integer, Encomenda> encomendas = new HashMap<Integer,Encomenda>();
+        Map<Integer, Fatura> faturas = new HashMap<Integer,Fatura>();
+        Utilizador user = new Utilizador(email, nome, morada, nif, aVenda, vendeu, comprou, encomendas, faturas);
+        this.creds.put(email, user);
+    }
+
+    public void removeUtilizadorInterativo(String email){
+        this.creds.remove(email);
+    }
+
+    public void addTransportadoraInterativo(String nome, double cp, double cm, double cg, double imposto, double custoAdicional){
+        if(custoAdicional>0){
+            TransportadoraPremium tp = new TransportadoraPremium(
+                nome,
+                cp, //custo de uma encomenda pequena
+                cm, //custo de uma encomenda media
+                cg, //custo de uma encomenda grande
+                imposto, //imposto
+                custoAdicional // custo adicional
+            );
+            this.addTransportadora(tp.clone());
+        }
+        else{
+            TransportadoraNormal tn = new TransportadoraNormal(
+                nome,
+                cp, //custo de uma encomenda pequena
+                cm, //custo de uma encomenda media
+                cg, //custo de uma encomenda grande
+                imposto //imposto
+            );
+            this.addTransportadora(tn.clone());
+        }
+        System.out.println("Transportadora criada com sucesso\n");
+    }
+
+    public Utilizador encontraUserInterativo(String email){
+        return this.creds.get(email);
+    }
+
+    public void colocaAvendaUserInterativo(Utilizador user, String tipoArtigo, String classeArtigo, Artigo.St estado, int numDonos, String nomeTransp, String descricao, String marca, double precoBase, double correcaoPreco, Mala.Dim dimensao, String material, int anoLancamento, Boolean atacadores, String cor, int tamanho, Tshirt.Tam tamTshirt, Tshirt.Pad padTshirt){
+        Transportadora transportadora = this.getTranspDisponiveis().get(nomeTransp);
+        if(tipoArtigo.equals("Mala")){
+            if(classeArtigo.equals("Nao")){
+                MalaNU malaNU = new MalaNU(estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, dimensao, material, anoLancamento);
+                user.aVendaArtigo(this, malaNU, transportadora);
+            }
+            else{
+                MalaPremium malaPremium = new MalaPremium(estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, dimensao, material, anoLancamento);
+                user.aVendaArtigo(this, malaPremium, transportadora);
+            }
+        }
+        else if(tipoArtigo.equals("Sapatilha")){
+            if(classeArtigo.equals("Nao")){
+                Sapatilha sapatilhaNU = new SapatilhaNU(estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, tamanho, atacadores, cor, anoLancamento);
+                user.aVendaArtigo(this, sapatilhaNU, transportadora);
+            }
+            else{
+                SapatilhaPremium sapatilhaPremium = new SapatilhaPremium(estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, tamanho, atacadores, cor, anoLancamento);
+                user.aVendaArtigo(this, sapatilhaPremium, transportadora);
+            }
+        }
+        else {
+            TshirtNU tshirt = new TshirtNU(estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, tamTshirt, padTshirt);
+            user.aVendaArtigo(this, tshirt, transportadora); 
+        }
+    }
+
+    public void encomendarArtigoUserInterativo(Utilizador user, int codBarras, LocalDate dataAtual){
+        //Criar uma lista de vendedores que já apareceram(Para quando um comprador compra mais que um artigo a um vendedor)
+        Map<Integer, Utilizador> vendedoresProcessados = new HashMap<>();
+        Utilizador vendedor = obterVendedorDoArtigo(vendedoresProcessados);
+        if (vendedor == null) {
+            for (Utilizador vendedorAUX : this.getCreds().values()) {
+                if (vendedorAUX.getAVenda().containsKey(codBarras)) {
+                    vendedor = vendedorAUX;
+                    vendedoresProcessados.put(vendedor.getId(), vendedor.clone());
+                    break;
+                }
+            }
+        }
+        this.setDataAtual(dataAtual);
+        user.colocaEncomenda(this, vendedor.getAVenda().get(codBarras).clone());
+        System.out.print("Artigo encomendado com sucesso\n");
+    }
+
+    public void initDataInterativo(){
+        this.setDataAtual(LocalDate.now());
+    }
+
+    //printar as encomendas do utilizador no modo view
+    public Map<Integer, Encomenda> encomendaUserInterativo(Utilizador user){
+        return user.getEncomendas();
+    }
+
+    public void finalizaEncomendaUserInterativo(Utilizador user){
+        user.finalizarEncomenda(this);
+        System.out.print("Encomenda finalizada com sucesso\n");
+    }
+
+    //printar os artigos à venda do utilizador no modo view
+    public Map<Integer, Artigo> artigosAVendaUserInterativo(Utilizador user){
+        return user.getAVenda();
+    }
+
+    public void devolveEncomendaInterativo(Utilizador user){
+        this.devolveEncomenda(user);
+        System.out.print("Encomenda devolvida com sucesso\n");  
+    }
+    
+
+    public Map<Integer, Artigo> getStockInterativo(Utilizador user){
+        Map<Integer,Artigo> map = new HashMap<Integer,Artigo>();
+        for (Map.Entry<Integer,Artigo> e : this.getStock().entrySet())
+        {
+            //só guarda os artigos que não estiverem a ser vendidos pelo utilizador
+            if(!user.getAVenda().containsKey(e.getKey())){
+                map.put(e.getKey(),e.getValue().clone());
+            }    
+        }
+        return map;
+    }
+
+
+    public void maiorVendedorInterativo(String inferior, String superior){
+        LocalDate inf = formataData(inferior);
+        LocalDate sup = formataData(superior);
+        maiorVendedor(inf, sup);
+    }
+
+    public void encomendasVendedorInterativo(String emailVendedor){
+        Utilizador vendedor = this.getCreds().get(emailVendedor);
+        for (Fatura fatura : vendedor.getFaturas().values()) {
+            if(fatura.getTipo().equals(Fatura.Tp.VENDA)){
+                try{
+                    System.out.println("As encomendas emitidas pelo vendedor " + vendedor.getId() + " são as seguintes \n" + fatura.getEncomenda().toString());
+                }
+                catch(NullPointerException e){
+                    System.out.println("O utilizador não apresenta encomenda emitidas\n");
+                }
+            }
+        }
+    }
+
+    public void ordenarUtilizadoresPorFaturamentoInterativo(String inferior, String superior){
+        LocalDate inf = formataData(inferior);
+        LocalDate sup = formataData(superior);
+        ordenarUtilizadoresPorFaturamento(inf, sup);
+    }
+
+ // ---------------------------------------------------------------------------------------------
+
 
     public Encomenda encontrarEncomendaFinalizada(Utilizador utilizador) {
         for (Encomenda enc : utilizador.getEncomendas().values()) {
@@ -259,96 +452,196 @@ public class Vintage {
         return null;
     }
 
+    public void addTransportadora(Transportadora t){
+        this.transpDisponiveis.put(t.getNome(), t.clone());
+    }
+
     public void enviarEncomenda(Utilizador utilizador){
         Encomenda enc = encontrarEncomendaFinalizada(utilizador);
+
         try{
             enc.setEstado(Encomenda.St.EXPEDIDA);
             LocalDate aux = this.getDataAtual();
 
             // definir o dia de entrega da encomenda (passado DOIS dias da sua finalização, enc.getTempEntrega() = 2)
             aux = aux.plusDays(enc.getTempEntrega());
-    
             enc.setDataEntrega(aux); // avança os dias necessários
-            utilizador.adicionaEncEncomendas(enc);
-            this.encomendas.put(utilizador.getId(), utilizador.getEncomendas());
+
+            //atualiza a encomenda
+            utilizador.addEncEncomendas(enc.clone());
+
+            //coloca a encomenda na lista das encomendas do sistema
+            this.encomendas.put(utilizador.getId(), utilizador.getEncomendas());    
         }
         catch(NullPointerException e){
             System.out.println("A encomenda do Utilizador " + utilizador.getId() + " não existe\n");
         }
     }
 
-    public void atualizaEncomendas() {
+    public double precoTransportadora(Map<Integer, Artigo> artigos) {
+        Map<Transportadora, Long> transportadoras = artigos.values().stream()
+            .collect(Collectors.groupingBy(Artigo::getTransportadora, Collectors.counting()));
+    
+        double valorFinal = transportadoras.entrySet().stream().mapToDouble(transportadora -> {
+            if (transportadora.getKey() instanceof TPremium) {
+                return ((TPremium) transportadora.getKey()).calculaExpedicaoPremium(transportadora.getValue());
+            } else if (transportadora.getKey() instanceof TNormal) {
+                return ((TNormal) transportadora.getKey()).calculaExpedicaoNormal(transportadora.getValue());
+            } else {
+                return 0.0; // ou um valor padrão, caso seja apropriado
+            }
+        }).sum();
+
+        return Math.round(valorFinal * 100) / 100.0;
+    }
+    
+
+    public void atualizaVendedor(Encomenda encomenda, Fatura vendfat, Utilizador vendedor, Artigo artigo) {
+
+        Map<Integer, Map<Integer,Artigo>> vendasSistemaCopia = this.getVendas();
+        Encomenda encVendedor;
+        
+        // Verifica se a fatura já tem uma encomenda
+        if (vendfat.getEncomenda() == null) {
+            // Se não tiver, cria uma nova encomenda com as informações da encomenda original
+            encVendedor = new Encomenda();
+            encVendedor.setEstado(Encomenda.St.ENTREGUE);
+            encVendedor.setDataCriacao(encomenda.getDataCriacao());
+            encVendedor.setDataEntrega(encomenda.getDataEntrega());
+            
+            // Adiciona o artigo à nova encomenda
+            encVendedor.addArtigoEncomenda(artigo.clone()); 
+            
+            // Atualiza a dimensão da encomenda 
+            encVendedor.alteraDimensao();
+            encVendedor.valorEncomenda(this.dataAtual.getYear(), 0, 0, 0, taxaServiço);
+            vendfat.addEncFatura(encVendedor);
+            
+        } else {
+            // Se já tiver uma encomenda, adiciona o artigo à encomenda existente
+            encVendedor = vendfat.getEncomenda();
+            encVendedor.addArtigoEncomenda(artigo.clone());
+
+            // Atualiza a dimensão da encomenda 
+            encVendedor.alteraDimensao();
+            encVendedor.valorEncomenda(this.dataAtual.getYear(), 0, 0, 0, taxaServiço);
+            vendfat.setEncomenda(encVendedor);
+        }
+
+        vendfat.calculaValorFatura();
+        vendedor.addFatura(vendfat);
+        
+        // Vende o artigo
+        vendedor.addArtigoVendas(artigo.clone());
+        vendedor.removeArtigoAVenda(artigo.clone());
+        
+        // Adiciona o artigo aos artigos vendidos do sistema
+        vendasSistemaCopia.put(vendedor.getId(), vendedor.getVendeu());
+        this.vendas.clear();
+        this.vendas.putAll(vendasSistemaCopia);
+        
+    }
+    
+
+    public void atualizaComprador(int numArtigos, Encomenda encomenda, Fatura compfat, Utilizador comprador){
+        
+        Map<Integer, Map<Integer, Encomenda>> encomendasSistemaCopia = this.getEncomendas();
+        // Atualiza a dimensão da encomenda 
+        encomenda.alteraDimensao();
+
+        //adiciona a fatura ao comprador
+        encomenda.setEstado(Encomenda.St.ENTREGUE);
+
+        compfat.addEncFatura(encomenda);
+        compfat.calculaValorFatura();
+        comprador.addFatura(compfat);
+
+        //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
+        comprador.removeEncEncomenda(encomenda);
+
+        // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
+        if(!comprador.getEncomendas().isEmpty()){
+            encomendasSistemaCopia.put(comprador.getId(), comprador.getEncomendas());
+        }
+        else {
+            encomendasSistemaCopia.remove(comprador.getId());
+        }
+        this.encomendas.clear();
+        this.encomendas.putAll(encomendasSistemaCopia);
+    }
+
+    private Utilizador obterVendedorDoArtigo(Map<Integer, Utilizador> vendedoresProcessados) {
+        for (Utilizador vendedor : this.getCreds().values()) {
+            if (vendedoresProcessados.containsValue(vendedor)) {
+                return vendedor;
+            }
+        }
+        return null;
+    }
+
+    public void atualiza() {
         // Percorre todas as encomendas
-        for (Map<Integer, Encomenda> encomendasUtilizadores : this.encomendas.values()) {
+        for (Map<Integer, Encomenda> encomendasUtilizadores : this.getEncomendas().values()) {
+            Fatura compfat = new Fatura();
+            compfat.setTipo(Fatura.Tp.COMPRA);
+            Fatura vendfat = new Fatura();
+            vendfat.setTipo(Fatura.Tp.VENDA);
 
             Utilizador comprador = null;
             for (Encomenda encomenda : encomendasUtilizadores.values()) {
-
+    
                 //verificar se o dia da entrega da encomenda chegou
-                if (encomenda.getDataEntrega().isBefore(this.getDataAtual()) || encomenda.getDataEntrega().isEqual(this.getDataAtual())) {
+                if (encomenda.getDataEntrega().isEqual(this.getDataAtual())) {
 
-                    for (Utilizador compradorAUX : this.creds.values()) {
-                        if (this.encomendas.containsKey(compradorAUX.getId())){
+                    for (Utilizador compradorAUX : this.getCreds().values()) {
+                        if (this.getEncomendas().containsKey(compradorAUX.getId())){
                             comprador = compradorAUX;
                             break;
                         }
                     }
+                    int numArtigos = 0;
                     try{
                         // Obter a lista de artigos da encomenda
                         Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
 
-                        for(Artigo artigo : artigosEncomenda.values()){
+                        //Criar uma lista de vendedores que já apareceram(Para quando um comprador compra mais que um artigo a um vendedor)
+                        Map<Integer, Utilizador> vendedoresProcessados = new HashMap<>();
 
-                            // Encontrar o utilizador vendedor do artigo
-                            Utilizador vendedor = null;
-                            for (Utilizador vendedorAUX : this.creds.values()) {
-                                if (vendedorAUX.getAVenda().containsKey(artigo.getCodBarras())) {
-                                    vendedor = vendedorAUX;
-                                    break;
+                        //numero de artigos para saber o tamanho da encomenda;
+                        for(Artigo artigo : artigosEncomenda.values()){
+                           
+                            Utilizador vendedor = obterVendedorDoArtigo(vendedoresProcessados);
+                            if (vendedor == null) {
+                                for (Utilizador vendedorAUX : this.getCreds().values()) {
+                                    if (vendedorAUX.getAVenda().containsKey(artigo.getCodBarras())) {
+                                        vendedor = vendedorAUX;
+                                        vendedoresProcessados.put(vendedor.getId(), vendedor.clone());
+                                        break;
+                                    }
                                 }
                             }
-                            try{
-                                // Adicionar cada artigo à hashMap de vendas do vendedor respetivo
-                                vendedor.adicionaArtigoVendas(artigo);
+                            try {
+                                this.atualizaVendedor(encomenda, vendfat, vendedor, artigo);
+                                // Compra o artigo
+                                comprador.addArtigoCompras(artigo.clone());
 
-                                // Remover o artigo da lista de artigos à venda do vendedor
-                                vendedor.removeArtigoAVenda(artigo);
-
-                                // Adicionar cada artigo à hashMap de compras do comprador
-                                comprador.adicionaArtigoCompras(artigo);
-
-                                // Adicionar o artigo na lista de vendidos do sistema
-                                this.vendas.put(vendedor.getId(), vendedor.getVendeu());
-
-                            } 
-                            catch(NullPointerException e)  {
+                            } catch (NullPointerException e) {
                                 System.out.println("Artigo não encontrado\n");
                             }
-
-                            catch(Exception e){
-                                System.out.println("Nenhum vendedor foi encontrado para concluir a encomenda\n");
-                            } 
-
-
-                        //Remover a encomenda que foi entregue da hashMap, encomendas, do comprador
-                        comprador.removeEncEncomenda(encomenda);
+                            numArtigos++;
                         }
-
-                    } catch(Exception e){
+                    } 
+                    catch(Exception e){
                         System.out.println("Nenhum comprador encontrado para concluir a encomenda");
                     }
-                    
-                    // Verificar se o comprador tem mais encomendas na hashMap, se sim atualiza caso contrário remove a chave da mesma
-                    if(!comprador.getEncomendas().isEmpty()){
-                        this.encomendas.replace(comprador.getId(), comprador.getEncomendas());
-                    }
-                    else {
-                        this.encomendas.remove(comprador.getId());
-                    }
+                    this.atualizaComprador(numArtigos, encomenda, compfat, comprador);
+
+                    //lucro da vintage
+                    this.totalAuferido += encomenda.getPrecoFinal()*taxaServiço;
                 }
             }
         }
-    } 
+    }
 
     public void addStock(Artigo a){
         this.stock.put(a.getCodBarras(), a.clone());
@@ -358,20 +651,314 @@ public class Vintage {
         this.stock.remove(a.getCodBarras());
     }
 
-    //avança a data atual em x dias
+    public LocalDate formataData(String data){
+        DateTimeFormatter formatter = null;
+        try{
+            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return LocalDate.parse(data, formatter);
+        }catch(DateTimeParseException e){
+            System.out.println("Formato da data " + data + " invalido.");
+        }
+        return null;
+    }
+
+    //avança a data atual
     public void avancaData(String data){
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate dataFutura = LocalDate.parse(data, formatter);
+            LocalDate dataFutura = formataData(data);
             long dias = ChronoUnit.DAYS.between(this.dataAtual, dataFutura);
-            this.setDataAtual(this.getDataAtual().plusDays(dias));
-            this.atualizaEncomendas();
+            int i = 0;
+            while(i < dias){
+                this.setDataAtual(this.getDataAtual().plusDays(1));
+                this.atualiza();
+                i++;
+            }
         } catch (DateTimeParseException e) {
             System.out.println("Formato de data inválido. Por favor, informe uma data no formato 'dd/MM/yyyy'.");
         }
     }
 
-    public void registaUtilizador(Credenciais cred, Utilizador utilizador){
-        this.creds.put(cred, utilizador);
+    public void registaUtilizador(String email, Utilizador utilizador){
+        this.creds.put(email, utilizador);
+        utilizador.setEmail(email);
     }
-} 
+
+    //nao se adiciona aos vendidos do utilizador porque nunca se chegou a remover até que a entrega seja concluida
+    public void devolveEncomenda(Utilizador utilizador){
+        if(utilizador.getEncomendas().values().size()==0){
+            System.out.println("O utilizador nao tem encomendas para devolver\n");
+        }
+        for (Encomenda encomenda : utilizador.getEncomendas().values()) {
+
+            try{
+                //verificar se o dia da entrega da encomenda ainda não chegou
+                if (encomenda.getDataEntrega().isAfter(this.getDataAtual())) {
+                    
+                    try{
+                        // Obter a lista de artigos da encomenda
+                        Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
+
+                        //numero de artigos para saber o tamanho da encomenda;
+                        for(Artigo artigo : artigosEncomenda.values()){
+
+                            // adiciona cada artigo de novo ao stock da vintage ficando assim disponivel para venda no utilizador que o estava a vender(nunca se chegou a remover da hashMap AVenda do vendedor)
+                            try{
+                                this.addStock(artigo.clone()); 
+                            } 
+                            catch(NullPointerException e)  {
+                                System.out.println("Artigo não encontrado\n");
+                            }
+                        }
+                    } 
+                    catch(Exception e){
+                        System.out.println("Nenhum encomenda encontrado para devolver do utilizador");
+                    }
+
+                    //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
+                    utilizador.removeEncEncomenda(encomenda.clone());
+
+                    // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
+                    if(!utilizador.getEncomendas().isEmpty()){
+                        this.encomendas.replace(utilizador.getId(), utilizador.getEncomendas());
+                    }
+                    else {
+                        this.encomendas.remove(utilizador.getId());
+                    }
+                }
+                else{
+                    System.out.println("Data de entrega da encomenda ultrapassada.\n");
+                }
+            }catch(NullPointerException e){
+                System.out.println("A encomenda ainda nao foi finalizada. Data de entrega null");
+            }
+        }
+    }
+
+    public void maiorVendedor(LocalDate inferior, LocalDate superior){
+        double maiorFaturamento = 0.0;
+        Utilizador utilizadorMaiorFaturamento = null;
+        
+        for (Utilizador utilizador : this.creds.values()) {
+            double faturamento = 0.0;
+            
+            for (Fatura fatura : utilizador.getFaturas().values()) {
+                if(fatura.getTipo().equals(Fatura.Tp.VENDA)){
+                    if(fatura.getEncomenda().getDataEntrega().isAfter(inferior) && fatura.getEncomenda().getDataEntrega().isBefore(superior)){
+                        faturamento += fatura.getValorTotal();
+                    }
+                }
+            }
+            if (faturamento >= maiorFaturamento) {
+                maiorFaturamento = faturamento;
+                utilizadorMaiorFaturamento = utilizador;
+            }
+        }
+        try{
+            double valorFatura = Math.round(maiorFaturamento*100)/100 ;
+            System.out.println("O utilizador que mais fatorou é o " + utilizadorMaiorFaturamento.getId()+  " com um total de " + valorFatura+ " euros\n");
+        }catch(NullPointerException e){
+            System.out.println("Não há utilizadores registados no sistema");
+        }
+
+    }
+
+    public void maiorTransportadora(){
+        double maiorFaturamento = 0.0;
+        Transportadora transportadoraMaiorFaturamento = null;
+        for (Transportadora transportadora : this.getTranspDisponiveis().values()) {
+            System.out.println(transportadora.getNome());
+            double faturamento = transportadora.getTotalAuferido();
+            if(faturamento>=maiorFaturamento){
+                transportadoraMaiorFaturamento = transportadora;
+                maiorFaturamento = faturamento;
+            } 
+        }
+        try{
+        System.out.println("A transportadora que mais fatorou foi a " + transportadoraMaiorFaturamento.getNome() + " com um total de " + transportadoraMaiorFaturamento.getTotalAuferido());
+        }catch(NullPointerException e){
+        System.out.println("Não há transportadoras registadas no sistema");
+        }
+    }
+
+    public void encomendasVendedor(Utilizador vendedor){
+        for (Fatura fatura : vendedor.getFaturas().values()) {
+            if(fatura.getTipo().equals(Fatura.Tp.VENDA))
+                try{
+                    System.out.println("As encomendas emitidas pelo vendedor " + vendedor.getEmail() + " são as seguintes \n" + fatura.getEncomenda().toString());
+                }
+                catch(NullPointerException e){
+                    System.out.println("O utilizador não apresenta faturas emitidas\n");
+                }
+        }
+    }
+
+
+    public void maiorFaturador(LocalDate inferior, LocalDate superior){
+        double maiorFaturamento = 0.0;
+        Utilizador utilizadorMaiorFaturamento = null;
+        
+        for (Utilizador utilizador : this.creds.values()) {
+            double faturamento = 0.0;
+            
+            for (Fatura fatura : utilizador.getFaturas().values()) {
+                    if(fatura.getEncomenda().getDataEntrega().isAfter(inferior) && fatura.getEncomenda().getDataEntrega().isBefore(superior)){
+                        faturamento += fatura.getValorTotal();
+                    }
+            }
+            if (faturamento > maiorFaturamento) {
+                maiorFaturamento = faturamento;
+                utilizadorMaiorFaturamento = utilizador;
+            }
+        }
+        try{
+            System.out.println("O utilizador que mais fatorou foi o " + utilizadorMaiorFaturamento.getId());
+        }catch(NullPointerException e){
+            System.out.println("Não há utilizadores registados no sistema");
+        }
+    }
+
+    public void ordenarUtilizadoresPorFaturamento(LocalDate inferior, LocalDate superior){
+        List<Utilizador> utilizadores = new ArrayList<>(this.creds.values());
+
+        //compara os fatoramentos
+        Comparator<Utilizador> comp = Comparator.comparingDouble(utilizador -> {
+            double faturamento = 0.0;
+                for (Fatura fatura : utilizador.getFaturas().values()) {
+                    //só por na lista quem tem faturas;
+                    if (fatura.getEncomenda().getDataEntrega().isAfter(inferior) && fatura.getEncomenda().getDataEntrega().isBefore(superior)) {
+                        faturamento += fatura.getValorTotal();
+                    }
+                }
+            return faturamento;
+        });
+        try{
+            System.out.println("Lista dos id's dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getId).collect(Collectors.toList()));
+        }catch(NullPointerException e){
+            System.out.println("Não existe utilizadores registados no sistema");
+        }
+    }
+
+    public void leitura(String nomeFicheiro){
+        String fileName = nomeFicheiro; // Nome do arquivo de dados
+    
+        // Tentar ler eventos do arquivo e armazená-los na lista
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                String[] campos = linha.split("; ");
+                
+                LocalDate datacomando = formataData(campos[0]);
+    
+                if (datacomando.isBefore(this.dataAtual)) {
+                    System.out.println("Data do comando ultrapassada");
+                    break;
+                } 
+                else if(datacomando.isAfter(this.dataAtual)){
+                    this.avancaData(campos[0]);
+                }
+                else{;}
+
+                try {
+                    switch (campos[1]) {
+                        case "Utilizador": {
+                            Utilizador utilizador = this.creds.get(campos[2]);
+                            switch (campos[4]) {
+                                case "Comprar": {
+                                    utilizador.addArtigoCompras((this.stock.get(Integer.parseInt(campos[3]))));
+                                    break;
+                                }
+                                case "Vender": {
+                                    utilizador.aVendaArtigo(this, (this.stock.get(Integer.parseInt(campos[3]))), this.transpDisponiveis.get(campos[5]));
+                                    break;
+                                }
+                                case "Encomendar": {
+                                    Utilizador vendedor = null;
+                                    for (Utilizador vendedorAUX : this.creds.values()) {
+                                        if (vendedorAUX.getAVenda().containsKey(Integer.parseInt(campos[3]))) {
+                                            vendedor = vendedorAUX;
+                                            break;
+                                        }
+                                    }
+                                    if (vendedor != null) {
+                                        utilizador.colocaEncomenda(this, this.stock.get(Integer.parseInt(campos[3])));
+                                    } else {
+                                        System.out.println("Nenhum vendedor está a vender esse artigo!");
+                                    }
+                                    break;
+                                }
+                                case "Finalizar encomenda": {
+                                    utilizador.finalizarEncomenda(this);
+                                    break;
+                                }
+                                case "Alterar preco base":
+                                case "Alterar correcao preco":
+                                case "Alterar transportadora": {
+                                    if (this.stock.containsKey(Integer.parseInt(campos[3]))) {
+                                        switch (campos[4]) {
+                                            case "Alterar preco base": {
+                                                Artigo artigoAux = utilizador.getAVenda().get(Integer.parseInt(campos[3]));
+                                                artigoAux.setPrecoBase(Double.parseDouble(campos[5]));
+                                                utilizador.addArtigoAVenda(artigoAux.clone());
+                                                break;
+                                            }
+                                            case "Alterar correcao preco": {
+                                                Artigo artigoAux = utilizador.getAVenda().get(Integer.parseInt(campos[3]));
+                                                artigoAux.setPrecoBase(Double.parseDouble(campos[5]));
+                                                utilizador.addArtigoAVenda(artigoAux.clone());
+                                                break;
+                                            }
+                                            case "Alterar transportadora": {
+                                                Transportadora nova = this.getTranspDisponiveis().get(campos[5]);
+                                                Artigo artigoAux = utilizador.getAVenda().get(Integer.parseInt(campos[3]));
+                                                artigoAux.setTransportadora(nova.clone());
+                                                utilizador.addArtigoAVenda(artigoAux.clone());
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        System.out.println("Não é possível alterar a informação do artigo.");
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        }               
+                        case "Transportadora": {
+                            switch (campos[3]) {
+                                case "Alterar imposto": {
+                                    this.transpDisponiveis.get(campos[2]).setImposto(Double.parseDouble(campos[4]));
+                                    break;
+                                }
+                                case "Alterar valor encomenda pequena": {
+                                    this.transpDisponiveis.get(campos[2]).setCustoPequena(Double.parseDouble(campos[4]));
+                                    break;
+                                }
+                                case "Alterar valor encomenda media": {
+                                    this.transpDisponiveis.get(campos[2]).setCustoMedia(Double.parseDouble(campos[4]));
+                                    break;
+                                }
+                                case "Alterar valor encomenda grande": {
+                                    this.transpDisponiveis.get(campos[2]).setCustoGrande(Double.parseDouble(campos[4]));
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        default: {
+                            System.out.println("Ação inválida: " + campos[1] + " na linha " + linha);
+                            break;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Erro na conversão de tipo na linha " + linha);
+                    continue;
+                } catch (NullPointerException e) {
+                    System.out.println("Referência nula na linha " + linha);
+                    continue;
+                }
+            }
+        }catch (IOException e) {
+            System.out.println("Erro ao ler arquivo: " + e.getMessage());
+        }
+    }    
+}

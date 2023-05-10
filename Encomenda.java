@@ -134,30 +134,16 @@ public class Encomenda {
         this.artigos = map;
     }
 
+    public void setDataCriacao(LocalDate dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
     public void setDataEntrega(LocalDate dataEntrega) {
         this.dataEntrega = dataEntrega;
     }
 
-    /**
-     * Adiciona ao custo da encomenda o valor do artigo adicionado.
-     */
-    public void addPrecoFinal(double cost) {
-        this.precoFinal += cost;
-    }
-
-        /**
-     * Adiciona um artigo a uma encomenda.
-     */
-    public void addArtigo(Artigo a) {
-        this.artigos.put(a.getCodBarras(), a.clone());
-    }
-
-    /**
-     * Remove um artigo de uma encomenda, dado o seu código de barras.
-     * @param id
-     */
-    public void removeArtigo(Integer codBarras) {
-        this.artigos.remove(codBarras);
+    public void setPrecoFinal(double precoFinal) {
+        this.precoFinal = precoFinal;
     }
 
     /**
@@ -182,7 +168,7 @@ public class Encomenda {
         sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "Não associada") + "\n");
         sb.append("\n Artigos na encomenda:\n");
         this.getArtigos().forEach((chave,valor) -> sb.append( " Chave: " + chave.toString() + "\n"));
-        sb.append(" Preço final -> " + this.getPrecoFinal() + "€\n");
+        sb.append(" Preço final -> " + Math.round(this.getPrecoFinal()*100)/100 + "€\n");
         sb.append(" Data de entrega -> " + this.getDataEntrega() + "\n");
         sb.append(" Tempo para entrega -> " + this.getTempEntrega() + "\n\n");
         sb.append(" ----- FIM DA ENCOMENDA ----- \n");
@@ -206,6 +192,51 @@ public class Encomenda {
                encomenda.getArtigos().equals(this.getArtigos()) &&
                encomenda.getPrecoFinal() == this.getPrecoFinal() &&
                encomenda.dataEntrega.equals(this.getDataEntrega());
+    }
+
+    /**
+     * Adiciona um artigo a uma encomenda.
+     */
+    public void addArtigoEncomenda(Artigo a) {
+        this.artigos.put(a.getCodBarras(), a.clone());
+    }
+
+    /**
+     * Remove um artigo de uma encomenda, dado o seu código de barras.
+     * @param id
+     */
+    public void removeArtigo(Integer codBarras) {
+        this.artigos.remove(codBarras);
+    }
+
+    //Calculo do valor da encomenda
+    public void valorEncomenda(int anoAtual, double taxaGSNovo, double taxaGSUsado, double taxaExpedicao, double taxaServiço){
+        double x = this.artigos.values().stream().mapToDouble(artigo -> {
+            if (artigo instanceof ArtigoNU && artigo.getNumDonos() > 0) {
+                return (((ArtigoNU) artigo).calcularValorArtigoNU(anoAtual) + taxaGSUsado); // chama o método correto para ArtigoNU
+            } 
+            else if (artigo instanceof ArtigoNU && artigo.getNumDonos() == 0) {
+                return (((ArtigoNU) artigo).calcularValorArtigoNU(anoAtual) + taxaGSNovo); // chama o método correto para ArtigoNU
+            } 
+            else if(artigo instanceof ArtigoPremium){
+                return ((ArtigoPremium) artigo).calcularValorArtigoPremium(anoAtual); // chama o método correto para ArtigoPremium
+            } else{
+                return 0;
+            }
+        }).sum();
+        this.precoFinal = Math.round((x + taxaExpedicao + (x * taxaServiço))*100)/100;
+    }
+
+    public void alteraDimensao(){
+        if(this.artigos.size() == 1){
+            this.setDimesao(Dim.PEQUENA);
+        }
+        else if(this.artigos.size() > 1 && this.artigos.size() <=5 ){
+            this.setDimesao(Dim.MEDIA);
+        }
+        else if(this.artigos.size() > 5){
+            this.setDimesao(Dim.GRANDE);
+        }
     }
 }
 

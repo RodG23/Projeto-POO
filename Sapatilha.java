@@ -1,4 +1,4 @@
-public class Sapatilha extends Artigo{
+public abstract class Sapatilha extends Artigo{
 
     private boolean atacadores; //Indica se a sapatilha tem atacadores.
     private String cor; //Guarda a cor da sapatilha.
@@ -16,9 +16,9 @@ public class Sapatilha extends Artigo{
         this.cor = "";
         this.anoLancamento = -1;
     }
-
-    public Sapatilha(Cond cond, St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
-        super(cond, etd, donos, trans, desc, mrc, pb, cp);
+                                             
+    public Sapatilha(St etd, int donos, Transportadora trans, String desc, String mrc, double pb, double cp, int tamanho, boolean atacadores, String cor, int anoLancamento){
+        super(etd, donos, trans, desc, mrc, pb, cp);
         this.tamanho = tamanho;
         this.atacadores = atacadores;
         this.cor = cor;
@@ -74,10 +74,7 @@ public class Sapatilha extends Artigo{
     /**
      * Método clone.
      */
-    @Override
-    public Sapatilha clone() {
-        return new Sapatilha(this) ;
-    }
+    public abstract Sapatilha clone();
 
     /**
      * Método toString.
@@ -87,11 +84,6 @@ public class Sapatilha extends Artigo{
         StringBuilder sb = new StringBuilder();
 
         sb.append(super.toString());
-        sb.append(" Sapatilhas:\n");
-        sb.append(" Atacadores -> " + this.getAtacadores() + "\n");
-        sb.append(" Cor -> " + this.getCor() + "\n");
-        sb.append(" Tamanho -> " + this.getTamanho() + "\n");
-        sb.append(" Ano de lançamento -> " + this.getAnoLancamento() + "\n\n");
 
         return sb.toString();
     }
@@ -112,6 +104,12 @@ public class Sapatilha extends Artigo{
                 this.getAtacadores().equals(s.getAtacadores()) &&
                 this.getCor().equals(s.getCor()) && 
                 this.getAnoLancamento() == s.getAnoLancamento();            
+    }
+    
+    public abstract double calcularValorArtigo();
+
+    public double calcularValorArtigoNU(int anoAtual){
+        return 0.0;
     }
 
 }

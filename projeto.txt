@@ -1,0 +1,10 @@
+06/05/2023; Utilizador; guga.com; 2; Vender; CTT
+06/05/2023; Utilizador; guga.com; 3; Vender; CTT
+06/05/2023; Utilizador; jonas.com; 1; Vender; CTT
+06/05/2023; Utilizador; jonas.com; 2; Encomendar; null
+06/05/2023; Transportadora; CTT; Alterar imposto; 0.05; null; null
+06/05/2023; Utilizador; jonas.com; 3; Encomendar; null
+06/05/2023; Utilizador; jonas.com; null; Finalizar encomenda; null
+09/05/2023; Transportadora; CTT; Alterar valor encomenda pequena; 15; null; null;
+09/05/2023; Utilizador; jonas.com; 1; Alterar preco base; 150
+09/05/2023; Utilizador; jonas.com; 1; Alterar transportadora; BOLT

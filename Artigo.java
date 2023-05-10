@@ -143,22 +143,25 @@ public abstract class Artigo{
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        String header = "┌────────────────── Artigo ──────────────────\n";
+        String footer = "└─────────────────────────────────────────────\n";
     
-        sb.append("     | Artigo |\n");
-        sb.append(" Código de barras -> " + this.getCodBarras() + "\n");
-        sb.append(" Estado -> " + (this.getEstado() != null ? this.getEstado().toString() : "Não associado") + "\n");
-        sb.append(" Número de Donos -> " + this.getNumDonos() + "\n");
-        sb.append(this.getTransportadora() != null ? this.getTransportadora().toString() : "Não associada" + "\n");
-        sb.append(" Descrição -> " + this.getDescricao() + "\n");
-        sb.append(" Marca -> " + this.getMarca() + "\n");
-        sb.append(" Preço Base -> " + this.getPrecoBase() + "€\n");
-        sb.append(" Correção de preço -> " + this.getCorrecaoPreco() + "%\n");
+        String codigoBarras = String.format("│ Código de barras:   %d \n", this.getCodBarras());
+        String estado = String.format("│ Estado:   %s \n", (this.getEstado() != null ? this.getEstado().toString() : "Não associado"));
+        String numDonos = String.format("│ Número de Donos:   %d \n", this.getNumDonos());
+        String descricao = String.format("│ Descrição:   %s\n", this.getDescricao());
+        String marca = String.format("│ Marca:   %s\n", this.getMarca());
+        String precoBase = String.format("│ Preço Base:   %.2f€\n", this.getPrecoBase());
+        String correcaoPreco = String.format("│ Correção de preço:   %.2f%%\n", this.getCorrecaoPreco());
+        String transportadora = "";
+        if (this.getTransportadora() != null) {
+            transportadora = String.format("│ Transportadora: \n", this.getTransportadora().toString());
+        } else {
+            transportadora = "│ Transportadora: Não associada\n";
+        }
     
-        return sb.toString();
-    }
-    
-
+    return header + codigoBarras + estado + numDonos + descricao + marca + precoBase + correcaoPreco + transportadora + footer;
+}
     /**
      * Método equals.
      */

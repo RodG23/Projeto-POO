@@ -159,21 +159,22 @@ public class Encomenda {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(" ----- ENCOMENDA ----- \n");
-        sb.append(" Id -> " + this.getId() + "\n");
-        sb.append(" Data de criação -> " + (this.getDataCriacao() != null ? this.getDataCriacao().toString() : "Não associada") + "\n");
-        sb.append(" Estado -> " + this.getEstado().toString() + "\n");
-        sb.append(" Dimensão -> " + (this.getDimensao() != null ? this.getDimensao().toString() : "Não associada") + "\n");
-        sb.append("\n Artigos na encomenda:\n");
-        this.getArtigos().forEach((chave,valor) -> sb.append( " Chave: " + chave.toString() + "\n"));
-        sb.append(" Preço final -> " + Math.round(this.getPrecoFinal()*100)/100 + "€\n");
-        sb.append(" Data de entrega -> " + this.getDataEntrega() + "\n");
-        sb.append(" Tempo para entrega -> " + this.getTempEntrega() + "\n\n");
-        sb.append(" ----- FIM DA ENCOMENDA ----- \n");
-        return sb.toString();
+        String header = "┌──────────────────── Encomenda ────────────────────\n";
+        String footer = "└─────────────────────────────────────────────────────\n";
+    
+        String id = String.format("│ Id:   %d \n", this.getId());
+        String dataCriacao = String.format("│ Data de criação:   %s\n", (this.getDataCriacao() != null ? this.getDataCriacao().toString() : "Não associada"));
+        String estado = String.format("│ Estado:   %s\n", this.getEstado().toString());
+        String dimensao = String.format("│ Dimensão:   %s\n", (this.getDimensao() != null ? this.getDimensao().toString() : "Não associada"));
+        String artigosHeader = "│ Artigos na encomenda:\n";
+        StringBuilder artigos = new StringBuilder();
+        this.getArtigos().forEach((chave,valor) ->  artigos.append(String.format("│    - IdArtigo:   %d\n", chave)));
+        String precoFinal = String.format("│ Preço final:   %.2f€\n", this.getPrecoFinal());
+        String dataEntrega = String.format("│ Data de entrega:   %s\n", (this.getDataEntrega() != null ? this.getDataEntrega().toString() : "Não definida"));
+    
+        return header + id + dataCriacao + estado + dimensao + artigosHeader + artigos.toString() + precoFinal + dataEntrega + footer;
     }
+    
 
     /**
      * Método equals.

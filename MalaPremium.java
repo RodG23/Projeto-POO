@@ -25,7 +25,7 @@ public class MalaPremium extends Mala implements ArtigoPremium {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append(" Mala premium:\n");
+        sb.append(" Mala premium ──┐\n");
         sb.append(super.toString());
 
         return sb.toString();

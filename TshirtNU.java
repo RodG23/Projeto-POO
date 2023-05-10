@@ -30,7 +30,7 @@ public class TshirtNU extends Tshirt implements ArtigoNU {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(" TShirt:\n");
+        sb.append(" TShirt ──┐\n");
         sb.append(super.toString());
 
         return sb.toString();

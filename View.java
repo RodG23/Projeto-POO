@@ -50,18 +50,21 @@ public class View{
                             catch(ExceptionUser e){
                                 System.out.println(e.getMessage());
                             }
+                            catch(ExceptionArtigo e){
+                                System.out.println(e.getMessage());
+                            }
                             break;
                         }
                         case 3:{
-                            System.out.println("O programa será encerrado.");
+                            System.out.println("O programa será encerrado.\n");
                             break;
                         }
                         default:
-                            System.out.println("Opção inválida. Tente novamente.");
+                            System.out.println("Opção inválida. Escolha um numero de 1 a 3.\n");
                             break;
                     }
             } catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Tente novamente.");
+                System.out.println("Opção inválida. Tente novamente.\n");
                 scanner.next(); // consome a entrada inválida
             }
         } while (opcao != 5);
@@ -109,18 +112,18 @@ public class View{
                         break;
                     }
                     default:
-                        System.out.println("Opção inválida. Tente novamente.");
+                        System.out.println("Opção inválida. Escolha um numero de 1 a 6.\n");
                         break;
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Tente novamente.");
+                System.out.println("Opção inválida. Tente novamente.\n");
                 scanner.next(); // consome a entrada inválida
             }
         } while (opcao != 6);
     }
 
     public void addT(Scanner scanner){
-        System.out.print("Nome da transportadora: ");
+        System.out.print("\nNome da transportadora: ");
         String nome = scanner.nextLine();
         nome = nome.substring(0).toUpperCase();
         System.out.print("O artigo é premium? (Sim, Nao): ");
@@ -134,8 +137,7 @@ public class View{
             isPremium = scanner.nextLine();
             isPremium = isPremium.substring(0,1).toUpperCase()+ isPremium.substring(1).toLowerCase();
             if(!isPremium.equals("Sim") && !isPremium.equals("Nao")){
-                System.out.println("Insira uma opção válida (Sim, Nao).");
-                addT(scanner);
+                System.out.println("Insira uma opção válida (Sim, Nao).\n");
                 return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
             }
             System.out.print("Custo de ume encomenda pequena: ");
@@ -156,15 +158,17 @@ public class View{
                 scanner.nextLine();
             }
         } catch (InputMismatchException e) {
-            System.out.println("Opção inválida. Insira um número com virgula.");
+            System.out.println("Opção inválida. Insira um número.\n");
             scanner.nextLine(); // consome a entrada inválida
-            addT(scanner); // chama o método novamente para solicitar uma entrada válida
             return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
         }
         controller.addTranspAdmin(nome, cp, cm, cg, imposto, custoAdicional);
     }
 
     public void eliminaUser(Scanner scanner) throws ExceptionUser{
+        if(controller.utilizadoresDisponiveis().isEmpty()){
+            throw new ExceptionUser("Não há utilizadores disponíveis para remover.\n");
+        }
         System.out.println("Utilizadores disponíveis\n" + controller.utilizadoresDisponiveis());
         System.out.print("Email do utilizador que pretende eliminar: ");
         String email = scanner.nextLine();
@@ -222,11 +226,11 @@ public class View{
                         break;
                     }
                     default:
-                        System.out.println("Opção inválida. Tente novamente.");
+                        System.out.println("Opção inválida. Escolha um numero de 1 a 6.\n");
                         break;
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Tente novamente.");
+                System.out.println("Opção inválida. Tente novamente.\n");
                 scanner.next(); // consome a entrada inválida
             }
         } while (opcao != 6);
@@ -238,13 +242,13 @@ public class View{
         controller.lerSistema(caminho);
     }
 
-    public void avanca(Scanner scanner){
+    public void avanca(Scanner scanner) throws ExceptionData{
         System.out.println("Insira a nova data atual do sistema:");
         String dataAtual = scanner.nextLine();
         controller.avancaDataSistema(dataAtual);
     }
 
-    public void user(Scanner scanner) throws ExceptionEncomenda, ExceptionTransportadora, ExceptionUser{
+    public void user(Scanner scanner) throws ExceptionEncomenda, ExceptionTransportadora, ExceptionUser, ExceptionArtigo{
         int opcao = 0;
         do{
             System.out.println("\n=== UTILIZADOR ===");
@@ -257,7 +261,7 @@ public class View{
                 scanner.nextLine();
                 switch(opcao){
                     case 1:{
-                        criarUtilizador(scanner, 5);
+                        criarUtilizador(scanner);
                         break;
                     }
                     case 2:{
@@ -271,20 +275,17 @@ public class View{
                 }
 
             }catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Tente novamente.");
+                System.out.println("Opção inválida. Escolha um numero de 1 a 3.\n");
                 scanner.next(); // consome a entrada inválida
             }
         }while(opcao != 3);
     }
     
-    public void criarUtilizador(Scanner scanner, int tentativas) throws ExceptionEncomenda{
-        if (tentativas == 0) {
-            System.out.println("Limite de tentativas atingido. Encerrando a criação do utilizador.");
-            return;
-        }
+    public void criarUtilizador(Scanner scanner) throws ExceptionEncomenda, ExceptionUser{
+        List<String> usuariosDisponiveis = controller.utilizadoresDisponiveis();
         System.out.println("\n=== CRIAR UTILIZADOR ===");
         System.out.print("E-mail: ");
-        String user = scanner.nextLine();
+        String email = scanner.nextLine();
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
         System.out.print("Morada: ");
@@ -295,35 +296,37 @@ public class View{
             nif = scanner.nextInt();
             scanner.nextLine(); // consome a quebra de linha
         } catch (InputMismatchException e) {
-            System.out.println("Opção inválida. Insira um número inteiro.");
+            System.out.println("Opção inválida. Insira um número inteiro.\n");
             scanner.nextLine(); // consome a entrada inválida
-            criarUtilizador(scanner, tentativas - 1); // chama o método novamente com um número menor de tentativas
             return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
         }
-        controller.registaUser(user, nome, morada, nif);
+        if(usuariosDisponiveis.contains(email)){
+            throw new ExceptionUser("O email do utilizador está indisponível.\n");
+        }
+        controller.registaUser(email, nome, morada, nif);
     }
 
-    public void loggin(Scanner scanner) throws ExceptionUser, ExceptionEncomenda, ExceptionTransportadora{
+    public void loggin(Scanner scanner) throws ExceptionUser, ExceptionEncomenda, ExceptionTransportadora, ExceptionArtigo{
         System.out.println("\n=== Iniciar sessão ===");
         List<String> usuariosDisponiveis = controller.utilizadoresDisponiveis();
         if (usuariosDisponiveis == null || usuariosDisponiveis.isEmpty()) {
-            throw new ExceptionUser("Não há usuários disponíveis");
+            throw new ExceptionUser("Não há usuários disponíveis.\n");
         }
         System.out.println("Usuários disponíveis:\n " + usuariosDisponiveis);
         System.out.print("Digite o email do usuário para iniciar sessão: ");
         String email = scanner.nextLine();
         if (!usuariosDisponiveis.contains(email)) {
-            throw new ExceptionUser("Não é possível iniciar sessão com o usuário " + email);
+            throw new ExceptionUser("Não é possível iniciar sessão com o usuário " + email + "\n");
         }
-        System.out.println("Sessão iniciada com " + email);
+        System.out.println("Sessão iniciada com " + email + "\n");
         interativo2(scanner, email);
     }
 
-    public void interativo2(Scanner scanner, String email) throws ExceptionEncomenda, ExceptionTransportadora{
+    public void interativo2(Scanner scanner, String email) throws ExceptionEncomenda, ExceptionTransportadora, ExceptionArtigo{
         Utilizador user = this.controller.retornarLoggedUser(email);
         int opcao = 0;
         do {
-            System.out.println("\n=== OPÇÕES ===");
+            System.out.println("=== OPÇÕES ===");
             System.out.println("1 - Colocar à venda um artigo");
             System.out.println("2 - Encomendar um artigo");
             System.out.println("3 - Finalizar encomenda");
@@ -370,21 +373,20 @@ public class View{
                     }
                 }
             } catch (InputMismatchException e) {
-                    System.out.println("Opção inválida. Tente novamente.");
+                    System.out.println("Opção inválida. Escolha um numero de 1 a 8.");
                     scanner.next(); // consome a entrada inválida
             }
         } while (opcao != 8);
     }
 
-    public void criarArtigo(Scanner scanner, Utilizador user) throws ExceptionTransportadora{
+    public void criarArtigo(Scanner scanner, Utilizador user) throws ExceptionTransportadora, ExceptionArtigo{
         System.out.println("\n=== A CRIAR ARTIGO ===");
         System.out.print("Escolha o tipo de artigo (Mala, Sapatilha, Tshirt): ");
         String tipoArtigo = scanner.nextLine();
 
         tipoArtigo = tipoArtigo.substring(0,1).toUpperCase() + tipoArtigo.substring(1).toLowerCase();
         if(!tipoArtigo.equals("Mala") && !tipoArtigo.equals("Sapatilha") && !tipoArtigo.equals("Tshirt")){
-            System.out.println("Opção inválida. Insira uma opção válida (Mala, Sapatilha, Tshirt).");
-            return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
+            throw new ExceptionArtigo("Opção inválida. Insira uma opção válida (Mala, Sapatilha, Tshirt).\n");
         }
         
         System.out.println("\n=== Classe ===");
@@ -394,14 +396,13 @@ public class View{
             classeArtigo = scanner.nextLine();
             classeArtigo = classeArtigo.substring(0,1).toUpperCase() + classeArtigo.substring(1).toLowerCase();
             if(!classeArtigo.equals("Sim") && !classeArtigo.equals("Nao")){
-                System.out.println("Opção inválida. Insira uma opção válida (Sim, Nao).");
-                return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
+                throw new ExceptionArtigo("Opção inválida. Insira uma opção válida (Sim, Nao).\n");
             }
         }
         
-        System.out.println("\n=== ESPECIFICAÇÔES DO ARTIGO ===");
+        System.out.println("\n=== ESPECIFICAÇÔES DO ARTIGO ===\n");
 
-        String transportadora = transportadoraArtigo(scanner);
+        String transportadora = transportadoraArtigo(scanner, classeArtigo);
 
         System.out.print("Descrição: ");
         String descricao = scanner.nextLine();
@@ -421,7 +422,7 @@ public class View{
             scanner.nextLine(); // consome a quebra de linha
 
         }catch(InputMismatchException e){
-            System.out.println("Opção inválida. Insira um número com virgula.");
+            System.out.println("Opção inválida. Insira um número.\n");
             scanner.nextLine(); // consome a entrada inválida
             return;
         }
@@ -454,7 +455,7 @@ public class View{
                     estado = Artigo.St.EXCELENTE;
                     break;
                 default:
-                    System.out.println("Opção inválida");
+                    System.out.println("Opção inválida. Escolha um numero de 1 a 5.");
                     return;
             }
         }catch(InputMismatchException e){
@@ -470,7 +471,7 @@ public class View{
             numDonos = scanner.nextInt();
             scanner.nextLine(); // consome a quebra de linha
         }catch(InputMismatchException e){
-            System.out.println("Opção inválida. Insira um número inteiro.");
+            System.out.println("Opção inválida. Insira um número inteiro.\n");
             scanner.nextLine(); // descarta a entrada inválida
             return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
         }
@@ -505,11 +506,11 @@ public class View{
                             dimensao = Mala.Dim.GRANDE;
                             break;
                         default:
-                            System.out.println("Opção inválida");
+                            System.out.println("Opção inválida. Escolha um numero de 1 a 3.");
                             return;
                     }
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.");
+                    System.out.println("Opção inválida. Insira um número inteiro.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -520,7 +521,7 @@ public class View{
                 try{
                     anoLancamento = scanner.nextInt();
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.");
+                    System.out.println("Opção inválida. Insira um número inteiro.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -532,7 +533,7 @@ public class View{
                     atacadores = scanner.nextBoolean();
                     scanner.nextLine();
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira 'true' ou 'false'.");
+                    System.out.println("Opção inválida. Insira 'true' ou 'false'.\n");
                     scanner.nextLine();
                     return;
                 }
@@ -550,7 +551,7 @@ public class View{
                     scanner.nextLine(); // consome a quebra de linha
         
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.");
+                    System.out.println("Opção inválida. Insira um número inteiro.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -566,7 +567,7 @@ public class View{
                 try{
                     tamanho = scanner.nextInt();
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.");
+                    System.out.println("Opção inválida. Insira um número inteiro.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -584,7 +585,7 @@ public class View{
                         tamTshirt = Tshirt.Tam.XL;
                         break;
                     default:
-                        System.out.println("Opção inválida");
+                        System.out.println("Opção inválida. Escolha um numero de 1 a 4.");
                         scanner.nextLine(); // consome a entrada inválida
                         return;
                 }
@@ -597,7 +598,7 @@ public class View{
                     padrao = scanner.nextInt();
                     scanner.nextLine(); // consome o quebra de linha
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.");
+                    System.out.println("Opção inválida. Escolha um numero de 1 a 3.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -623,30 +624,33 @@ public class View{
         controller.colocaAVendaUser(user, tipoArtigo, classeArtigo, estado, numDonos, transportadora, descricao, marca, precoBase, correcaoPreco, dimensao, material, anoLancamento,atacadores, cor, tamanho, tamTshirt, padTshirt);          
     }
 
-    public String transportadoraArtigo(Scanner scanner) throws ExceptionTransportadora{
+    public String transportadoraArtigo(Scanner scanner, String classeArtigo) throws ExceptionTransportadora{
         if(controller.transportadorasDisp().isEmpty()){
             throw new ExceptionTransportadora("Não há transportadoras disponíveis.\n");
         }
-        System.out.println("\nTransportadoras disponíveis" + "\n" + controller.transportadorasDisp() + "\n");
-        System.out.println("Escolha a transportadora mais conveniente para o artigo que está a vender");
+        System.out.println("\nTransportadoras disponíveis" + "\n" + controller.transportadorasDisp().toString() + "\n");
+        System.out.print("Escolha a transportadora mais conveniente para o artigo que está a vender: ");
         String transportadora = scanner.nextLine();
+        if(!controller.transportadorasDisp().containsKey(transportadora)){
+            throw new ExceptionTransportadora("A transportadora escolida não está registada no sistema.\n");
+        }
         transportadora = transportadora.substring(0).toUpperCase();
         return transportadora;
     }
 
     public void encomendarArtigo(Scanner scanner, Utilizador user) throws ExceptionEncomenda{
         if(controller.artigosDisponiveis(user).isEmpty()){
-            throw new ExceptionEncomenda("Não há artigos para encomendar");
+            throw new ExceptionEncomenda("Não há artigos para encomendar.\n");
         }
         else{
             System.out.println("--------- Artigos disponiveis para comprar -----------" + "\n" + controller.artigosDisponiveis(user)+ "\n");
-            System.out.println("Seleciona o código de barras do artigo que pretende encomendar:");
+            System.out.print("Seleciona o código de barras do artigo que pretende encomendar: ");
             int codBarras = 0;
             try{
                 codBarras = scanner.nextInt();
                 scanner.nextLine(); // consome o quebra de linha
             } catch(InputMismatchException e){
-                System.out.println("Opção inválida. Insira um número inteiro.");
+                System.out.println("Opção inválida. Insira um número inteiro.\n");
                 encomendarArtigo(scanner, user); // chama o método novamente para solicitar uma entrada válida
             }
             controller.encomendarArtigoUser(user, codBarras);
@@ -654,7 +658,7 @@ public class View{
     }
 
     public void verEncomenda(Scanner scanner, Utilizador user){
-        System.out.println("--------- Encomenda -----------" + "\n" + controller.encomendaUser(user) + "\n");
+        System.out.println("--------- Encomenda -----------" + "\n" + controller.encomendaUser(user).toString() + "\n");
     }
 
     public void finalizaEncomenda(Scanner scanner, Utilizador user){
@@ -662,11 +666,11 @@ public class View{
     }
 
     public void verArtigosComprados(Scanner scanner, Utilizador user){
-        System.out.println("--------- Artigos comprados -----------" + "\n" +controller.artigosCompradosUser(user)+ "\n");
+        System.out.println("--------- Artigos comprados -----------" + "\n" +controller.artigosCompradosUser(user).toString() + "\n");
     }
 
     public void verArtigosVendidos(Scanner scanner, Utilizador user){
-        System.out.println("--------- Artigos à venda -----------" + "\n" + controller.artigosAvendaUser(user) + "\n");
+        System.out.println("--------- Artigos à venda -----------" + "\n" + controller.artigosAvendaUser(user).toString() + "\n");
     }
 
     public void devolverEncomenda(Scanner scanner, Utilizador user){

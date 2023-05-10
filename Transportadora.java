@@ -96,8 +96,8 @@ public abstract class Transportadora{
         this.imposto = imp;
     }
 
-    public void setTotalAuferido(double totalAuferido) {
-        this.totalAuferido = totalAuferido;
+    public void setTotalAuferido(double preco) {
+        this.totalAuferido = preco;
     }
 
     /**
@@ -112,12 +112,12 @@ public abstract class Transportadora{
         StringBuilder sb = new StringBuilder();
 
         sb.append("\n     | Transportadora |\n");
-        sb.append(" Nome da transportadora -> " + this.getNome() + "\n");
-        sb.append(" Custo base por encomenda pequena -> " + this.getCustoPequena() + "€\n");
-        sb.append(" Custo base por encomenda media -> " + this.getCustoMedia() + "€\n");
-        sb.append(" Custo base por encomenda grande -> " + this.getCustoGrande() + "€\n");
-        sb.append(" Valor de imposto -> " + this.getImposto() + "%\n");
-        sb.append(" Total auferido -> " + this.getTotalAuferido() + "€\n");
+        sb.append(" Nome da transportadora: " + this.getNome() + "\n");
+        sb.append(" Custo base por encomenda pequena: " + this.getCustoPequena() + "€\n");
+        sb.append(" Custo base por encomenda media: " + this.getCustoMedia() + "€\n");
+        sb.append(" Custo base por encomenda grande: " + this.getCustoGrande() + "€\n");
+        sb.append(" Imposto: " + this.getImposto() + "%\n");
+        sb.append(" Total auferido: " + this.getTotalAuferido() + "€\n");
 
         return sb.toString();
     }

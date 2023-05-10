@@ -34,7 +34,7 @@ public class TransportadoraNormal extends Transportadora implements TNormal {
          */
         @Override
         public String toString() {
-            return super.toString() + " Tipo de Transportadora: Normal\n -------------------------- \n";
+            return super.toString() + " └── Tipo de Transportadora: Normal \n";
         }
 
         @Override

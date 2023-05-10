@@ -26,7 +26,7 @@ public class MalaNU extends Mala implements ArtigoNU {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append(" Mala:\n");
+        sb.append(" Mala ──┐\n");
         sb.append(super.toString());
 
         return sb.toString();

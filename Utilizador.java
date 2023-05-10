@@ -227,22 +227,25 @@ public class Utilizador {
     public String toString() {
         StringBuilder sb = new StringBuilder();
     
-        sb.append("\n ----- Perfil do Utilizador " + this.getId() + " -----\n");
-        sb.append(" Id: " + this.getId() + "\n");
-        sb.append(" Nome: " + this.getNome() + "\n");
-        sb.append(" Email: " + this.getEmail() + "\n");
-        sb.append(" Morada: " + this.getMorada() + "\n");
-        sb.append(" NIF: " + this.getNif() + "\n\n");
+        sb.append("\n┌────────────────────────────────────\n");
+        sb.append("│ Perfil do Utilizador " + this.getId() + "\n");
+        sb.append("├────────────────────────────────────\n");
+        sb.append("│ Id: " + this.getId() + "\n");
+        sb.append("│ Nome: " + this.getNome() + "\n");
+        sb.append("│ Email: " + this.getEmail() + "\n");
+        sb.append("│ Morada: " + this.getMorada() + "\n");
+        sb.append("│ Nif: " + this.getNif() + "\n");
+        sb.append("└────────────────────────────────────\n\n");
         
-        sb.append(" A Venda:\n");
+        sb.append("│ A Venda:\n");
         for(Artigo a : this.getAVenda().values())
         {
             sb.append("\n");
             sb.append(a.toString());
         }
         sb.append("\n");
-    
-        sb.append(" Vendeu:\n");
+
+        sb.append("│ Vendeu:\n");
         for(Artigo a : this.getVendeu().values())
         {
             sb.append("\n");
@@ -250,7 +253,7 @@ public class Utilizador {
         }
         sb.append("\n");
     
-        sb.append(" Comprou:\n");
+        sb.append("│ Comprou:\n");
         for(Artigo a : this.getComprou().values())
         {
             sb.append("\n");
@@ -258,7 +261,7 @@ public class Utilizador {
         }
         sb.append("\n");
     
-        sb.append(" Encomendas:\n");
+        sb.append("│ Encomendas:\n");
         for(Encomenda e : this.getEncomendas().values())
         {
             sb.append("\n");
@@ -266,7 +269,7 @@ public class Utilizador {
         }
         sb.append("\n");
     
-        sb.append(" Faturas:\n");
+        sb.append("│ Faturas:\n");
         for(Fatura e : this.getFaturas().values())
         {
             sb.append("\n");
@@ -297,12 +300,6 @@ public class Utilizador {
                 this.getEncomendas().equals(user.getEncomendas()) &&
                 this.getFaturas().equals(user.getFaturas());
     }
-
-// ------------------------- FUNÇÔES PARA O MODO INTERATIVO ----------------------------------
-
-
- // ---------------------------------------------------------------------------------------------
-
 
     // add um artigo para venda no sistema
     public void aVendaArtigo(Vintage vinted, Artigo artigo, Transportadora transportadora){

@@ -2,14 +2,14 @@
 
 public class Main{
 
-    public static void main(String[] args){// throws IOException, InterruptedException{
+    public static void main(String[] args) throws ExceptionData{// throws IOException, InterruptedException{
 
     Vintage model = new Vintage();
     Controller controller = new Controller(model);
     View view = new View(controller);
 
     view.run();
-/*
+    /*
     Vintage vinted = new Vintage();
     MalaPremium malaPremium = new MalaPremium(
         null, // estado: excelente
@@ -82,11 +82,8 @@ public class Main{
     // perfil do utilizador u2 tem um tshirt à venda
     u2.aVendaArtigo(vinted, tshirtUsada, tp);
 
-    vinted.leitura("projeto.txt");
+    //vinted.leitura("projeto.txt");
 
-    vinted.getTranspDisponiveis();
-
-    /*
     // utilizador u2 encomenda o artigo malaPremium e a sapatilhaNova ao utilizador u1
     u2.colocaEncomenda(vinted, malaPremium);
     u2.colocaEncomenda(vinted, sapatilhaNova);
@@ -96,11 +93,13 @@ public class Main{
 
     //o sistema é atualizado com o avançar dos dias
     vinted.avancaData("30/05/2023");
+    String inferior = "10/05/2023";
+    LocalDate inf = vinted.formataData(inferior);
 
     vinted.maiorTransportadora();
-    vinted.maiorVendedor(inferior, vinted.getDataAtual());
+    vinted.maiorVendedor(inf, vinted.getDataAtual());
     vinted.encomendasVendedor(u1);
-    vinted.ordenarUtilizadoresPorFaturamento(inferior, vinted.getDataAtual());
+    vinted.ordenarUtilizadoresPorFaturamento(inf, vinted.getDataAtual());
     System.out.println(u1.toString());
     System.out.println(u2.toString());
     System.out.println(vinted.toString());

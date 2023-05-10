@@ -27,7 +27,7 @@ public class SapatilhaNU extends Sapatilha implements ArtigoNU {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(" Sapatilha:\n");
+        sb.append(" Sapatilha ──┐\n");
         sb.append(super.toString());
 
         return sb.toString();

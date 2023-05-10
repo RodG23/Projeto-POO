@@ -228,42 +228,41 @@ public class Vintage {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(" ----- STOCK VINTAGE -----\n");
+        sb.append(" ----- STOCK VINTAGE -----\n\n");
         for(Artigo a : this.getStock().values())
         {
-            sb.append(a.toString());
+            sb.append(a.toString()+ "\n");
         }
-        sb.append(" Encomendas em processo:\n");
+        sb.append("│ Encomendas em processo:\n\n");
         for(Map.Entry<Integer, Map<Integer,Encomenda>> e : this.getEncomendas().entrySet())
         {
-            sb.append("     Utilizador " +e.getKey().toString() + ":\n");
+            sb.append("    > Utilizador " +e.getKey().toString() + "\n");
             for (Map.Entry<Integer,Encomenda> e2 : e.getValue().entrySet())
             {
-                sb.append(e2.getValue().toString());
+                sb.append(e2.getValue().toString() + "\n");
             }
         }
-        sb.append(" \nVendas efetuadas:\n");
+        sb.append("│ Vendas efetuadas:\n\n");
         for(Map.Entry<Integer, Map<Integer,Artigo>> e : this.getVendas().entrySet())
         {
-            sb.append("     Utilizador " +e.getKey().toString() + ":\n");
+            sb.append("    > Utilizador " +e.getKey().toString() + "\n");
             for (Map.Entry<Integer,Artigo> e2 : e.getValue().entrySet())
             {
-                sb.append(e2.getValue().toString());
+                sb.append(e2.getValue().toString()+ "\n");
             }
         }
-        sb.append(" Credênciais de login:\n");
+        sb.append("│ Credênciais de login:\n");
         for(Map.Entry<String, Utilizador> a : this.getCreds().entrySet())
         {
-            sb.append("     Utilizador " + a.getValue().getId() + "->" + a.getKey().toString() + "\n");
+            sb.append("   > Utilizador " + a.getValue().getId() + " : " + a.getKey().toString() + "\n");
         }
-        sb.append(" Total Auferido -> " + Math.round(this.getTotalAuferido()*100)/100 + "\n\n");
+        sb.append("│ Total Auferido -> " + Math.round(this.getTotalAuferido()*100)/100 + "\n\n");
 
         sb.append(" ----- FIM DO STOCK -----\n");
 
         return sb.toString();
         }
         
-    
     /**
      * Método equals.
      */
@@ -287,25 +286,8 @@ public class Vintage {
 
     // ------------------------- FUNÇÔES PARA O MODO INTERATIVO ----------------------------------
 
-    public void registaUtilizadorInterativo(String email, String nome, String morada, int nif){
-        Map<Integer, Artigo> aVenda = new HashMap<Integer,Artigo>();
-        Map<Integer, Artigo> vendeu = new HashMap<Integer,Artigo>();
-        Map<Integer, Artigo> comprou = new HashMap<Integer,Artigo>();
-        Map<Integer, Encomenda> encomendas = new HashMap<Integer,Encomenda>();
-        Map<Integer, Fatura> faturas = new HashMap<Integer,Fatura>();
-        Utilizador user = new Utilizador(email, nome, morada, nif, aVenda, vendeu, comprou, encomendas, faturas);
-        this.creds.put(email, user);
-    }
-
-    public void removeUtilizadorInterativo(String email) throws ExceptionUser{
-        if(this.creds.get(email) == null){
-            throw new ExceptionUser("Não existe utilizadores disponíveis");
-        }
-        this.creds.remove(email);
-    }
-
-    public void leituraInterativo(String caminho) throws ExceptionData, ExceptionUser{
-        this.leitura(caminho);
+    public void initDataInterativo(){
+        this.setDataAtual(LocalDate.now());
     }
 
     public void addTransportadoraInterativo(String nome, double cp, double cm, double cg, double imposto, double custoAdicional){
@@ -333,8 +315,29 @@ public class Vintage {
         System.out.println("Transportadora criada com sucesso\n");
     }
 
+    public void registaUtilizadorInterativo(String email, String nome, String morada, int nif){
+        Map<Integer, Artigo> aVenda = new HashMap<Integer,Artigo>();
+        Map<Integer, Artigo> vendeu = new HashMap<Integer,Artigo>();
+        Map<Integer, Artigo> comprou = new HashMap<Integer,Artigo>();
+        Map<Integer, Encomenda> encomendas = new HashMap<Integer,Encomenda>();
+        Map<Integer, Fatura> faturas = new HashMap<Integer,Fatura>();
+        Utilizador user = new Utilizador(email, nome, morada, nif, aVenda, vendeu, comprou, encomendas, faturas);
+        this.creds.put(email, user);
+    }
+
+    public void removeUtilizadorInterativo(String email) throws ExceptionUser{
+        if(this.creds.get(email) == null){
+            throw new ExceptionUser("Não existe utilizadores disponíveis");
+        }
+        this.creds.remove(email);
+    }
+
     public Utilizador encontraUserInterativo(String email){
         return this.creds.get(email);
+    }
+
+    public void leituraInterativo(String caminho) throws ExceptionData, ExceptionUser{
+        this.leitura(caminho);
     }
 
     public void colocaAvendaUserInterativo(Utilizador user, String tipoArtigo, String classeArtigo, Artigo.St estado, int numDonos, String nomeTransp, String descricao, String marca, double precoBase, double correcaoPreco, Mala.Dim dimensao, String material, int anoLancamento, Boolean atacadores, String cor, int tamanho, Tshirt.Tam tamTshirt, Tshirt.Pad padTshirt){
@@ -382,28 +385,22 @@ public class Vintage {
         System.out.print("Artigo encomendado com sucesso\n");
     }
 
-    public void initDataInterativo(){
-        this.setDataAtual(LocalDate.now());
-    }
-
-    //printar as encomendas do utilizador no modo view
     public Map<Integer, Encomenda> encomendaUserInterativo(Utilizador user){
         return user.getEncomendas();
     }
 
     public void finalizaEncomendaUserInterativo(Utilizador user){
         user.finalizarEncomenda(this);
-        System.out.print("Encomenda finalizada com sucesso\n");
+        System.out.print("Encomenda finalizada com sucesso.\n");
     }
 
-    //printar os artigos à venda do utilizador no modo view
     public Map<Integer, Artigo> artigosAVendaUserInterativo(Utilizador user){
         return user.getAVenda();
     }
 
     public void devolveEncomendaInterativo(Utilizador user){
         this.devolveEncomenda(user);
-        System.out.print("Encomenda devolvida com sucesso\n");  
+        System.out.print("Encomenda devolvida com sucesso.\n");  
     }
     
 
@@ -419,21 +416,17 @@ public class Vintage {
         return map;
     }
 
-
     public void maiorVendedorInterativo(String inferior, String superior) throws ExceptionData{
         LocalDate inf = formataData(inferior);
         LocalDate sup = formataData(superior);
-        try{
-            maiorVendedor(inf, sup);
-        }catch(ExceptionData e){
-            System.out.println(e.getMessage());
-        }
+        
+        maiorVendedor(inf, sup);
     }
 
     public void encomendasVendedorInterativo(String emailVendedor) throws ExceptionUser{
         Utilizador vendedor = this.getCreds().get(emailVendedor);
         if(vendedor == null){
-            throw new ExceptionUser("O vendedor "+ emailVendedor + " nao existe.");
+            throw new ExceptionUser("O vendedor "+ emailVendedor + " nao existe.\n");
         }
         for (Fatura fatura : vendedor.getFaturas().values()) {
             if(fatura.getTipo().equals(Fatura.Tp.VENDA)){
@@ -441,7 +434,7 @@ public class Vintage {
                     System.out.println("As encomendas emitidas pelo vendedor " + vendedor.getId() + " são as seguintes \n" + fatura.getEncomenda().toString());
                 }
                 catch(NullPointerException e){
-                    System.out.println("O utilizador não apresenta encomenda emitidas\n");
+                    System.out.println("O utilizador não apresenta encomenda emitidas.\n");
                 }
             }
         }
@@ -450,24 +443,11 @@ public class Vintage {
     public void ordenarUtilizadoresPorFaturamentoInterativo(String inferior, String superior) throws ExceptionData{
         LocalDate inf = formataData(inferior);
         LocalDate sup = formataData(superior);
-        try{
-            ordenarUtilizadoresPorFaturamento(inf, sup);
-        }catch(ExceptionData e){
-            System.out.println(e.getMessage());
-        }
+            
+        ordenarUtilizadoresPorFaturamento(inf, sup);
     }
 
  // ---------------------------------------------------------------------------------------------
-
-
-    public Encomenda encontrarEncomendaFinalizada(Utilizador utilizador) {
-        for (Encomenda enc : utilizador.getEncomendas().values()) {
-            if (enc.getEstado().equals(Encomenda.St.FINALIZADA)) {
-                return enc;
-            }
-        }
-        return null;
-    }
 
     public void addTransportadora(Transportadora t){
         this.transpDisponiveis.put(t.getNome(), t.clone());
@@ -495,21 +475,55 @@ public class Vintage {
         }
     }
 
-    public double precoTransportadora(Map<Integer, Artigo> artigos) {
-        Map<Transportadora, Long> transportadoras = artigos.values().stream()
+    public Encomenda encontrarEncomendaFinalizada(Utilizador utilizador) {
+        for (Encomenda enc : utilizador.getEncomendas().values()) {
+            if (enc.getEstado().equals(Encomenda.St.FINALIZADA)) {
+                return enc;
+            }
+        }
+        return null;
+    }
+
+    public double precoTransportadora(Map<Integer, Artigo> encomenda) {
+        Map<Transportadora, Long> transportadoras = encomenda.values().stream()
             .collect(Collectors.groupingBy(Artigo::getTransportadora, Collectors.counting()));
+        int sizeEncomenda = encomenda.values().size();
     
         double valorFinal = transportadoras.entrySet().stream().mapToDouble(transportadora -> {
             if (transportadora.getKey() instanceof TPremium) {
-                return ((TPremium) transportadora.getKey()).calculaExpedicaoPremium(transportadora.getValue());
+                TransportadoraPremium tp = (TransportadoraPremium) transportadora.getKey();
+                double custoB = this.precoBaseT(tp.clone(), sizeEncomenda);
+                tp.setTotalAuferido(tp.calculaExpedicaoPremium(transportadora.getValue()) + custoB);
+                this.transpDisponiveis.put(tp.getNome(), tp.clone());
+                return tp.getTotalAuferido();
+
             } else if (transportadora.getKey() instanceof TNormal) {
-                return ((TNormal) transportadora.getKey()).calculaExpedicaoNormal(transportadora.getValue());
+                TransportadoraNormal tn = (TransportadoraNormal) transportadora.getKey();
+                double custoB = this.precoBaseT(tn.clone(), sizeEncomenda);
+                tn.setTotalAuferido(tn.calculaExpedicaoNormal(transportadora.getValue()) + custoB);
+                this.transpDisponiveis.put(tn.getNome(), tn.clone());
+                return tn.getTotalAuferido();
+
             } else {
                 return 0.0; // ou um valor padrão, caso seja apropriado
             }
-        }).sum();
 
+        }).sum();
         return Math.round(valorFinal * 100) / 100.0;
+    }
+
+    public double precoBaseT(Transportadora t, int sizeEncomenda){
+        double custoB = 0.0;
+        if(sizeEncomenda == 1){
+            custoB = t.getCustoPequena();
+        }
+        else if(sizeEncomenda >1 && sizeEncomenda <=5){
+            custoB = t.getCustoMedia();
+        }
+        else{
+            custoB = t.getCustoGrande();
+        }
+        return custoB;
     }
     
 
@@ -526,26 +540,21 @@ public class Vintage {
             encVendedor.setDataCriacao(encomenda.getDataCriacao());
             encVendedor.setDataEntrega(encomenda.getDataEntrega());
             
-            // Adiciona o artigo à nova encomenda
-            encVendedor.addArtigoEncomenda(artigo.clone()); 
-            
-            // Atualiza a dimensão da encomenda 
-            encVendedor.alteraDimensao();
-            encVendedor.valorEncomenda(this.dataAtual.getYear(), 0, 0, 0, taxaServiço);
-            vendfat.addEncFatura(encVendedor);
-            
         } else {
-            // Se já tiver uma encomenda, adiciona o artigo à encomenda existente
+            // Se já tiver uma encomenda
             encVendedor = vendfat.getEncomenda();
-            encVendedor.addArtigoEncomenda(artigo.clone());
-
-            // Atualiza a dimensão da encomenda 
-            encVendedor.alteraDimensao();
-            encVendedor.valorEncomenda(this.dataAtual.getYear(), 0, 0, 0, taxaServiço);
-            vendfat.setEncomenda(encVendedor);
         }
 
+        // Adiciona o artigo à nova encomenda
+        encVendedor.addArtigoEncomenda(artigo.clone()); 
+
+        // Atualiza a dimensão da encomenda 
+        encVendedor.alteraDimensao();
+        encVendedor.valorEncomenda(this.dataAtual.getYear(), 0, 0, 0, taxaServiço);
+
+        vendfat.addEncFatura(encVendedor);
         vendfat.calculaValorFatura();
+
         vendedor.addFatura(vendfat);
         
         // Vende o artigo
@@ -555,10 +564,8 @@ public class Vintage {
         // Adiciona o artigo aos artigos vendidos do sistema
         vendasSistemaCopia.put(vendedor.getId(), vendedor.getVendeu());
         this.vendas.clear();
-        this.vendas.putAll(vendasSistemaCopia);
-        
+        this.vendas.putAll(vendasSistemaCopia);      
     }
-    
 
     public void atualizaComprador(int numArtigos, Encomenda encomenda, Fatura compfat, Utilizador comprador){
         
@@ -648,7 +655,7 @@ public class Vintage {
                             numArtigos++;
                         }
                     } 
-                    catch(Exception e){
+                    catch(NullPointerException e){
                         System.out.println("Nenhum comprador encontrado para concluir a encomenda");
                     }
                     this.atualizaComprador(numArtigos, encomenda, compfat, comprador);
@@ -668,19 +675,17 @@ public class Vintage {
         this.stock.remove(a.getCodBarras());
     }
 
-    public LocalDate formataData(String data){
-        DateTimeFormatter formatter = null;
+    public LocalDate formataData(String data) throws ExceptionData{
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
         try{
-            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return LocalDate.parse(data, formatter);
         }catch(DateTimeParseException e){
-            System.out.println("Formato da data " + data + " invalido.");
+            throw new ExceptionData("Formato da data inválida.\n" + data);
         }
-        return null;
     }
 
     //avança a data atual
-    public void avancaData(String data){
+    public void avancaData(String data)throws ExceptionData{
         LocalDate dataFutura = formataData(data);
         long dias = 0;
         try{
@@ -788,7 +793,6 @@ public class Vintage {
         double maiorFaturamento = 0.0;
         Transportadora transportadoraMaiorFaturamento = null;
         for (Transportadora transportadora : this.getTranspDisponiveis().values()) {
-            System.out.println(transportadora.getNome());
             double faturamento = transportadora.getTotalAuferido();
             if(faturamento>=maiorFaturamento){
                 transportadoraMaiorFaturamento = transportadora;
@@ -832,7 +836,7 @@ public class Vintage {
             return faturamento;
         });
         try{
-            System.out.println("Lista dos id's dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getId).collect(Collectors.toList()));
+            System.out.println("Lista dos id's dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getEmail).collect(Collectors.toList()));
         }catch(NullPointerException e){
             System.out.println("Não existe utilizadores registados no sistema");
         }

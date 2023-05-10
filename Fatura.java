@@ -86,16 +86,17 @@ public class Fatura {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("     | Fatura |\n");
-        sb.append(" Número de emissão -> " + this.getNumEmissao() + "\n");
-        sb.append(" Tipo -> " + this.getTipo().toString() + "\n");
-        sb.append(" Encomenda -> \n" +(this.encomenda != null ? this.encomenda.toString() : null) + "\n");
-        sb.append(" ValorTotal -> " + Math.round(this.getValorTotal()*100)/100 + "€\n");
-
-        return sb.toString();
+        String header = "┌──────────────────── Fatura ───────────────────\n";
+        String footer = "└────────────────────────────────────────────────\n";
+        
+        String numEmissao = String.format("│ Número de emissão: %d\n", this.getNumEmissao());
+        String tipo = String.format("│ Tipo:   %s\n", this.getTipo().toString());
+        String encomenda = String.format("│ Id da encomenda:   %d\n", (this.encomenda != null ? this.encomenda.getId() : "Não associada"));
+        String valorTotal = String.format("│ Valor Total:     %.2f€\n", this.getValorTotal());
+        
+        return header + numEmissao + tipo + encomenda + valorTotal + footer;
     }
+    
 
     /**
      * Método equals.

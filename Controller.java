@@ -59,7 +59,7 @@ public class Controller{
         model.leituraInterativo(caminho);
     }
 
-    public void avancaDataSistema(String dataAtual){
+    public void avancaDataSistema(String dataAtual) throws ExceptionData{
         model.avancaData(dataAtual);
     }
 

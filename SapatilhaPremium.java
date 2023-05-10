@@ -25,7 +25,7 @@ public class SapatilhaPremium extends Sapatilha implements ArtigoPremium  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append(" Sapatilha premium:\n");
+        sb.append(" Sapatilha premium ──┐\n");
         sb.append(super.toString());
 
         return sb.toString();

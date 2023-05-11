@@ -1,7 +1,13 @@
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -13,7 +19,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class Vintage {
+public class Vintage implements Serializable {
     private static double taxaGSNovo = 0.5; //Guardada a taxa de serviço por artigo novo(centimos).
     private static double taxaGSUsado = 0.25; //Guardada a taxa de serviço por artigo usado(centimos).
     private static double taxaServiço = 0.05; //Guardada a taxa de serviço por artigo usado(percentagem).
@@ -382,7 +388,7 @@ public class Vintage {
             }
         }
         user.colocaEncomenda(this, vendedor.getAVenda().get(codBarras).clone());
-        System.out.print("Artigo encomendado com sucesso\n");
+        System.out.print("Artigo encomendado com sucesso.\n\n");
     }
 
     public Map<Integer, Encomenda> encomendaUserInterativo(Utilizador user){
@@ -391,7 +397,7 @@ public class Vintage {
 
     public void finalizaEncomendaUserInterativo(Utilizador user){
         user.finalizarEncomenda(this);
-        System.out.print("Encomenda finalizada com sucesso.\n");
+        System.out.print("Encomenda finalizada com sucesso.\n\n");
     }
 
     public Map<Integer, Artigo> artigosAVendaUserInterativo(Utilizador user){
@@ -448,6 +454,7 @@ public class Vintage {
     }
 
  // ---------------------------------------------------------------------------------------------
+
 
     public void addTransportadora(Transportadora t){
         this.transpDisponiveis.put(t.getNome(), t.clone());
@@ -915,66 +922,33 @@ public class Vintage {
                             }
                         }             
                         case "Transportadora": {
-                            try{
-                                switch (campos[3]) {
-                                    
-                                    case "Alterar imposto": {                
-                                        if(transpDisponiveis.get(campos[2]) instanceof TransportadoraPremium){
-                                            TransportadoraPremium transPremium = (TransportadoraPremium)this.transpDisponiveis.get(campos[2]);
-                                            transPremium.setImposto(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transPremium);
-                                        }
-                                        else if(transpDisponiveis.get(campos[2]) instanceof TransportadoraNormal){
-                                            TransportadoraNormal transNormal = (TransportadoraNormal) this.transpDisponiveis.get(campos[2]);
-                                            transNormal.setImposto(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transNormal);
-                                        }
-                                        break;                       
-                                    }
-                                    case "Alterar valor encomenda pequena": {  
-                                        if(transpDisponiveis.get(campos[2]) instanceof TransportadoraPremium){
-                                            TransportadoraPremium transPremium = (TransportadoraPremium)this.transpDisponiveis.get(campos[2]);
-                                            transPremium.setCustoPequena(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transPremium);
-                                        }
-                                        else if(transpDisponiveis.get(campos[2]) instanceof TransportadoraNormal){
-                                            TransportadoraNormal transNormal = (TransportadoraNormal) this.transpDisponiveis.get(campos[2]);
-                                            transNormal.setCustoPequena(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transNormal);
-                                        }
-                                        break;                         
-                                    }
-                                    case "Alterar valor encomenda media": {
-                                        if(transpDisponiveis.get(campos[2]) instanceof TransportadoraPremium){
-                                            TransportadoraPremium transPremium = (TransportadoraPremium)this.transpDisponiveis.get(campos[2]);
-                                            transPremium.setCustoMedia(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transPremium);
-                                        }
-                                        else if(transpDisponiveis.get(campos[2]) instanceof TransportadoraNormal){
-                                            TransportadoraNormal transNormal = (TransportadoraNormal) this.transpDisponiveis.get(campos[2]);
-                                            transNormal.setCustoMedia(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transNormal);
-                                        }
-                                        break;                                 
-                                    }
-                                    case "Alterar valor encomenda grande": {
-                                        if(transpDisponiveis.get(campos[2]) instanceof TransportadoraPremium){
-                                            TransportadoraPremium transPremium = (TransportadoraPremium)this.transpDisponiveis.get(campos[2]);
-                                            transPremium.setCustoGrande(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transPremium);
-                                        }
-                                        else if(transpDisponiveis.get(campos[2]) instanceof TransportadoraNormal){
-                                            TransportadoraNormal transNormal = (TransportadoraNormal) this.transpDisponiveis.get(campos[2]);
-                                            transNormal.setCustoGrande(Double.parseDouble(campos[4]));
-                                            this.transpDisponiveis.replace(campos[2], transNormal);
-                                        }
-                                        break; 
-                                    }
+                            try {
+                                Transportadora transp = transpDisponiveis.get(campos[2]);
+                                if (transp == null) {
+                                    System.out.println("A transportadora que pretende alterar não existe no sistema.");
+                                    break;
                                 }
-                                break;
-                            }catch(NullPointerException e){
-                                        System.out.println("A transportadora que pretende alterar nao existe no sistema.");
-                            } 
+                                switch (campos[3]) {
+                                    case "Alterar imposto":
+                                        atualizarImposto(transp, Double.parseDouble(campos[4]));
+                                        break;
+                                    case "Alterar valor encomenda pequena":
+                                        atualizarCustoPequena(transp, Double.parseDouble(campos[4]));
+                                        break;
+                                    case "Alterar valor encomenda media":
+                                        atualizarCustoMedia(transp, Double.parseDouble(campos[4]));
+                                        break;
+                                    case "Alterar valor encomenda grande":
+                                        atualizarCustoGrande(transp, Double.parseDouble(campos[4]));
+                                        break;
+                                    default:
+                                        System.out.println("Opção inválida.");
+                                        break;
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Valor inválido.");
+                            }
+                            break;
                         }
                         default: {
                             System.out.println("Ação inválida: " + campos[1] + " na linha " + linha);
@@ -996,4 +970,75 @@ public class Vintage {
             System.out.println("Caminho para o ficheiro errado." + e.getMessage());
         }
     }    
+
+    // Métodos auxiliares para atualizar valores das transportadoras
+    private void atualizarImposto(Transportadora transp, double imposto) {
+        if (transp instanceof TransportadoraPremium) {
+            ((TransportadoraPremium) transp).setImposto(imposto);
+        } else if (transp instanceof TransportadoraNormal) {
+            ((TransportadoraNormal) transp).setImposto(imposto);
+        }
+        transpDisponiveis.replace(transp.getNome(), transp);
+    }
+
+    private void atualizarCustoPequena(Transportadora transp, double custo) {
+        if (transp instanceof TransportadoraPremium) {
+            ((TransportadoraPremium) transp).setCustoPequena(custo);
+        } else if (transp instanceof TransportadoraNormal) {
+            ((TransportadoraNormal) transp).setCustoPequena(custo);
+        }
+        transpDisponiveis.replace(transp.getNome(), transp);
+    }
+
+    private void atualizarCustoMedia(Transportadora transp, double custo) {
+        if (transp instanceof TransportadoraPremium) {
+            ((TransportadoraPremium) transp).setCustoMedia(custo);
+        } else if (transp instanceof TransportadoraNormal) {
+            ((TransportadoraNormal) transp).setCustoMedia(custo);
+        }
+        transpDisponiveis.replace(transp.getNome(), transp);
+    }
+
+    private void atualizarCustoGrande(Transportadora transp, double custo) {
+        if (transp instanceof TransportadoraPremium) {
+            ((TransportadoraPremium) transp).setCustoGrande(custo);
+        } else if (transp instanceof TransportadoraNormal) {
+            ((TransportadoraNormal) transp).setCustoGrande(custo);
+        }
+        transpDisponiveis.replace(transp.getNome(), transp);
+    }
+
+    //carregar de ficheiro objeto
+    public void loadEstadoObj(String file) throws IOException, ClassNotFoundException {
+        Vintage e = loadAux(file);
+        this.stock = e.stock;
+        this.encomendas = e.encomendas;
+        this.vendas = e.vendas;
+        this.creds = e.creds;
+        this.transpDisponiveis = e.transpDisponiveis;
+        this.totalAuferido = e.totalAuferido;
+        this.dataAtual = e.dataAtual;
+    }
+
+    public Vintage loadAux(String file) throws IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        Vintage e = (Vintage) ois.readObject();
+        ois.close();
+        return e;
+    }
+
+    public void saveEstado() throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Estado.obj"));
+        oos.writeObject(this);
+        oos.flush();
+        oos.close();
+    }
+
+    public void salvaEstadoObj() throws IOException {
+        this.saveEstado();
+    }
+
+    public Vintage reiniciarSistemaInterativo(){
+        return new Vintage();
+    }
 }

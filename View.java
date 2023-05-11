@@ -1,10 +1,13 @@
 import java.util.Scanner;
 import java.util.InputMismatchException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
 //import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-public class View{
+public class View implements Serializable{
     private Controller controller;
 
     public View(Controller controller) {
@@ -21,7 +24,9 @@ public class View{
             System.out.println("=== MENU INTERATIVO ===");
             System.out.println("1 - Admin");
             System.out.println("2 - User");
-            System.out.println("3 - Sair");
+            System.out.println("3 - Salvar informações");
+            System.out.println("4 - Carregar informações");
+            System.out.println("5 - Sair");
             System.out.print("Opção: ");
             try {
                     opcao = scanner.nextInt();
@@ -56,6 +61,35 @@ public class View{
                             break;
                         }
                         case 3:{
+                            try{
+                                controller.salvaEstadoObjSistema();
+                                System.out.println("Ficheiros salvos com sucesso!!!\n");
+                                controller.reiniciarSistema();
+                            }catch (FileNotFoundException e) {
+                                System.out.println("O ficheiro que tentou guardar ainda nao existe.");
+                            }
+                            catch (IOException e) {
+                                System.out.println("Não foi possível guardar os ficheiros.");
+                            }
+                            break;
+                        }
+                        case 4:{
+                            try {
+                                controller.carregaEstadoObjSistema("Estado.obj");
+                                System.out.println("Ficheiros carregados com sucesso!!!\n");
+                            }
+                            catch (FileNotFoundException e) {
+                                System.out.println("O ficheiro que tentou guardar ainda nao existe.");
+                            }
+                            catch (IOException e) {
+                                System.out.println("Não foi possível carregar os ficheiros.");
+                            }
+                            catch (ClassNotFoundException e) {
+                                System.out.println("Não foi possível encontrar a classe do ficheiro guardado.");
+                            }
+                            break;
+                        }
+                        case 5:{
                             System.out.println("O programa será encerrado.\n");
                             break;
                         }
@@ -631,8 +665,9 @@ public class View{
         System.out.println("\nTransportadoras disponíveis" + "\n" + controller.transportadorasDisp().toString() + "\n");
         System.out.print("Escolha a transportadora mais conveniente para o artigo que está a vender: ");
         String transportadora = scanner.nextLine();
+        transportadora = transportadora.substring(0).toUpperCase();
         if(!controller.transportadorasDisp().containsKey(transportadora)){
-            throw new ExceptionTransportadora("A transportadora escolida não está registada no sistema.\n");
+            throw new ExceptionTransportadora("A transportadora escolhida não está registada no sistema.\n");
         }
         transportadora = transportadora.substring(0).toUpperCase();
         return transportadora;
@@ -658,7 +693,7 @@ public class View{
     }
 
     public void verEncomenda(Scanner scanner, Utilizador user){
-        System.out.println("--------- Encomenda -----------" + "\n" + controller.encomendaUser(user).toString() + "\n");
+        System.out.println(controller.encomendaUser(user).toString() + "\n");
     }
 
     public void finalizaEncomenda(Scanner scanner, Utilizador user){

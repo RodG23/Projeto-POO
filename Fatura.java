@@ -1,4 +1,6 @@
-public class Fatura {
+import java.io.Serializable;
+
+public class Fatura implements Serializable{
     
     private static int numFaturas = 0;
 

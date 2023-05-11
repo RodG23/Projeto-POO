@@ -1,4 +1,4 @@
-public class MalaNU extends Mala implements ArtigoNU {
+public class MalaNU extends Mala implements ArtigoNU{
 
     public MalaNU(){
         super();

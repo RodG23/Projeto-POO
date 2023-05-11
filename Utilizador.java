@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Utilizador {
+public class Utilizador implements Serializable {
     private static int numUsers = 0; //Mantém contagem de users e é utilizada para o id de um user.
 
     private final int id; //Guarda a identificação única de um user, inalterável.

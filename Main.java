@@ -1,6 +1,8 @@
 //import java.io.IOException;
 
-public class Main{
+import java.io.Serializable;
+
+public class Main implements Serializable{
 
     public static void main(String[] args) throws ExceptionData{// throws IOException, InterruptedException{
 

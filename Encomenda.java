@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Encomenda {
+public class Encomenda implements Serializable {
     
     private static int numEncomenda = 0; ////Mantém contagem de encomendas e é utilizada para o id de uma encomenda.
 
@@ -159,7 +160,7 @@ public class Encomenda {
      */
     @Override
     public String toString() {
-        String header = "┌──────────────────── Encomenda ────────────────────\n";
+        String header = "\n┌──────────────────── Encomenda ────────────────────\n";
         String footer = "└─────────────────────────────────────────────────────\n";
     
         String id = String.format("│ Id:   %d \n", this.getId());

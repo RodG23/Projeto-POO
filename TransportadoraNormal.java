@@ -1,4 +1,4 @@
-public class TransportadoraNormal extends Transportadora implements TNormal {
+public class TransportadoraNormal extends Transportadora implements TNormal{
 
         /**
          * Construtor vazio.

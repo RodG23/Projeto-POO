@@ -1,12 +1,27 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.time.LocalDate;;
-public class Controller{
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.LocalDate;
+
+public class Controller implements Serializable{
     private Vintage model;
 
     public Controller(Vintage model) {
         this.model = model;
+    }
+
+    public void reiniciarSistema(){
+        this.model = model.reiniciarSistemaInterativo();
+    }
+
+    public void salvaEstadoObjSistema() throws IOException{
+        model.salvaEstadoObj();
+    }
+
+    public void carregaEstadoObjSistema(String path) throws IOException, ClassNotFoundException{
+        model.loadEstadoObj(path);
     }
 
     public void setDataSistema(LocalDate dataAtual){

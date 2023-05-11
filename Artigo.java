@@ -1,4 +1,6 @@
-public abstract class Artigo{
+import java.io.Serializable;
+
+public abstract class Artigo implements Serializable{
     
     private static int numArtigos = 0; //Mantém contagem de artigos e é utilizada para o codBarras de um artigo.
 

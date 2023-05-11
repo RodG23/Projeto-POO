@@ -1,12 +1,12 @@
 10/05/2023; Utilizador; jonas.com; 1; Encomendar; null
 10/05/2023; Utilizador; jonas.com; 2; Encomendar; null
-10/05/2023; Transportadora; BOLT; Alterar imposto; 3; null; null
-10/05/2023; Transportadora; BOLT; Alterar valor encomenda pequena; 15; null; null;
+10/05/2023; Transportadora; BOLT; Alterar imposto; 3; null
+10/05/2023; Transportadora; BOLT; Alterar valor encomenda pequena; 15; null
 10/05/2023; Utilizador; jonas.com; null; Finalizar encomenda; null
-10/05/2023; Transportadora; BOLT; Alterar imposto; 3; null; null
-13/05/2023; Transportadora; BOLT; Alterar valor encomenda pequena; 15; null; null;
+10/05/2023; Transportadora; BOLT; Alterar imposto; 3; null
+13/05/2023; Transportadora; BOLT; Alterar valor encomenda pequena; 15; null
 13/05/2023; Utilizador; jonas.com; 3; Alterar preco base; 150
 13/05/2023; Utilizador; jonas.com; 3; Alterar transportadora; BOLT
 13/05/2023; Utilizador; guga.com; 3; Encomendar; null
 13/05/2023; Utilizador; guga.com; null; Finalizar encomenda; null
-16/05/2023; Transportadora; CTT; Alterar imposto; 4; null; null
+16/05/2023; Transportadora; CTT; Alterar imposto; 4; null

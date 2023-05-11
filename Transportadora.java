@@ -1,4 +1,6 @@
-public abstract class Transportadora{
+import java.io.Serializable;
+
+public abstract class Transportadora implements Serializable{
     
     private String nome; //nome da transportadora
     private double custoPequena; //Guarda o valor base cobrado pela transportadora numa encomenda pequena.

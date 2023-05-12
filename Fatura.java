@@ -112,7 +112,7 @@ public class Fatura implements Serializable{
         Fatura f = (Fatura) obj;
 
         return  this.getNumEmissao() == f.getNumEmissao() && 
-                this.getEncomenda() == f.getEncomenda() &&
+                this.getEncomenda().equals(f.getEncomenda()) &&
                 this.getTipo().equals(f.getTipo()) && 
                 this.getValorTotal() == f.getValorTotal();
     }

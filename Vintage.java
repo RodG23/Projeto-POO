@@ -559,7 +559,7 @@ public class Vintage implements Serializable {
         encVendedor.alteraDimensao();
         encVendedor.valorEncomenda(this.dataAtual.getYear(), 0, 0, 0, taxaServiço);
 
-        vendfat.addEncFatura(encVendedor);
+        vendfat.setEncomenda(encVendedor);
         vendfat.calculaValorFatura();
 
         vendedor.addFatura(vendfat);
@@ -583,7 +583,7 @@ public class Vintage implements Serializable {
         //adiciona a fatura ao comprador
         encomenda.setEstado(Encomenda.St.ENTREGUE);
 
-        compfat.addEncFatura(encomenda);
+        compfat.setEncomenda(encomenda);
         compfat.calculaValorFatura();
         comprador.addFatura(compfat);
 

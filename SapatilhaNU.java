@@ -48,10 +48,11 @@ public class SapatilhaNU extends Sapatilha implements ArtigoNU {
 
     @Override
     public double calcularValorArtigo() {
-        double precoBase = super.getPrecoBase() * (1 - super.getCorrecaoPreco());
+        double precoBase = super.getPrecoBase();
         double valorFinal = precoBase;
-    
+        
         if (super.getTamanho() > 45 || super.getNumDonos() > 0) {
+            valorFinal = precoBase * (1 - super.getCorrecaoPreco());
             double descontoNDonos = precoBase * (super.getNumDonos() * 0.20); // 20% de desconto por cada dono que tenha tido
             double estado = (super.getEstado() != null) ? 1 + super.getEstado().ordinal() : 0.0; // 5% de desconto por cada ponto de estado, se houver estado
             double descontoEstado = precoBase * estado * 0.05;

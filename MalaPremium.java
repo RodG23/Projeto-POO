@@ -46,8 +46,7 @@ public class MalaPremium extends Mala implements ArtigoPremium {
     @Override
     public double calcularValorArtigo(){
         double precoBase = super.getPrecoBase();
-        double valorFinal = precoBase - (precoBase * super.getCorrecaoPreco());
-        return Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
+        return Math.round(precoBase * 100.0) / 100.0; // arredondar para 2 casas decimais
     }
 
     @Override

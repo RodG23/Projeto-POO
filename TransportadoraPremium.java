@@ -1,6 +1,11 @@
 public class TransportadoraPremium extends Transportadora implements TPremium {
     private double custoAdicional; // custo adicional para transportar artigos premium
 
+    public TransportadoraPremium() {
+        super();
+        this.custoAdicional = 0;
+    }
+
     public TransportadoraPremium(String nome, double cp, double cm, double cg, double imp, double custoAdicional) {
         super(nome, cp, cm, cg, imp);
         this.custoAdicional = custoAdicional;

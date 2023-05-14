@@ -53,7 +53,7 @@ public class TransportadoraNormal extends Transportadora implements TNormal{
         @Override
         public double calcularValorExpedicaoPequeno() {
             double precoBase = this.getCustoPequena();
-            double valorFinal = (precoBase * 0.50 * (1 + super.getImposto()))*0.5;
+            double valorFinal = (precoBase * (1 + super.getImposto())) * 1.5;
             return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
         }
     
@@ -63,7 +63,7 @@ public class TransportadoraNormal extends Transportadora implements TNormal{
         @Override
         public double calcularValorExpedicaoMedio() {
             double precoBase = super.getCustoMedia();
-            double valorFinal = (precoBase * 0.50 * (1 + super.getImposto())) * 0.6;
+            double valorFinal = (precoBase * (1 + super.getImposto())) * 2;
             return Math.round(valorFinal * 100.0) / 100.0;
         }
 
@@ -73,7 +73,7 @@ public class TransportadoraNormal extends Transportadora implements TNormal{
         @Override
         public double calcularValorExpedicaoGrande(){
             double precoBase = super.getCustoGrande();
-            double valorFinal = (precoBase * 0.50 * (1 + super.getImposto()))*0.9;
+            double valorFinal = (precoBase * (1 + super.getImposto())) * 3;
             return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais
         }
 
@@ -89,7 +89,9 @@ public class TransportadoraNormal extends Transportadora implements TNormal{
             else if(numeroArtigos > 5){
                 valorFinal = this.calcularValorExpedicaoGrande();
             } 
-            super.setTotalAuferido(valorFinal);
+            double aux = super.getTotalAuferido();
+            aux += valorFinal;
+            super.setTotalAuferido(aux);            
             return valorFinal;
         }
     }

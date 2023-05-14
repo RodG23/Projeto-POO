@@ -25,7 +25,7 @@ public class Fatura implements Serializable{
         this.valorTotal = 0;
     }
 
-    public Fatura(Tp tipo, Encomenda encomenda, Artigo artigo, double valorTotal) {
+    public Fatura(Tp tipo, Encomenda encomenda, double valorTotal) {
         numFaturas++;
         this.numEmissao = numFaturas;
         this.tipo = tipo;
@@ -112,17 +112,9 @@ public class Fatura implements Serializable{
         Fatura f = (Fatura) obj;
 
         return  this.getNumEmissao() == f.getNumEmissao() && 
-                this.getEncomenda() == f.getEncomenda() &&
+                this.getEncomenda().equals(f.getEncomenda()) &&
                 this.getTipo().equals(f.getTipo()) && 
                 this.getValorTotal() == f.getValorTotal();
-    }
-
-    //Encomenda feita pelo comprador
-    public void addEncFatura(Encomenda encomenda){
-        this.encomenda = encomenda.clone();
-    }
-    public void removeEncFatura(Encomenda encomenda){
-        this.encomenda = null;
     }
 
     public void calculaValorFatura() {

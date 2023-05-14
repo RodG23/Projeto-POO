@@ -48,7 +48,8 @@ public class MalaNU extends Mala implements ArtigoNU{
     public double calcularValorArtigo() {
 
         double precoBase = super.getPrecoBase();
-
+        double valorFinal = precoBase;
+        
         double valorComCorrecao = precoBase * (1 - super.getCorrecaoPreco());
         
         double descontoNDonos = precoBase * (super.getNumDonos() * 0.20); // 20% de desconto por cada dono que tenha tido
@@ -58,8 +59,10 @@ public class MalaNU extends Mala implements ArtigoNU{
         
         int estado = super.getEstado() != null ? super.getEstado().ordinal() + 1 : 0;
         double descontoEstado = precoBase * estado * 0.05; // 5% de desconto por cada ponto de estado
-
-        double valorFinal = valorComCorrecao - descontoNDonos - descontoDimensao - descontoEstado;
+        
+        if(descontoNDonos > 0) {
+            valorFinal = valorComCorrecao - descontoNDonos - descontoDimensao - descontoEstado;
+        }
         
         // Arredondar o valor final para 2 casas decimais
         valorFinal = Math.round(valorFinal * 100.0) / 100.0;

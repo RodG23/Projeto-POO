@@ -52,8 +52,8 @@ public class TshirtNU extends Tshirt implements ArtigoNU {
     @Override
     public double calcularValorArtigo(){
         double precoBase = super.getPrecoBase();
-        double valorFinal = precoBase - precoBase * super.getCorrecaoPreco();
-        if(!super.getPadrao().equals(Tshirt.Pad.LISO)){
+        double valorFinal = precoBase;
+        if((!super.getPadrao().equals(Tshirt.Pad.LISO)) && (super.getNumDonos() > 0)){
             valorFinal = precoBase * super.getDescBase();
         }
         return  Math.round(valorFinal * 100.0) / 100.0; // arredondar para 2 casas decimais

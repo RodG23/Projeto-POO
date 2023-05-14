@@ -585,7 +585,7 @@ public class Vintage implements Serializable {
         encVendedor.alteraDimensao();
         encVendedor.valorEncomenda(this.dataAtual.getYear(), 0, 0, 0, taxaServiço);
 
-        vendfat.addEncFatura(encVendedor);
+        vendfat.setEncomenda(encVendedor);
         vendfat.calculaValorFatura();
 
         vendedor.addFatura(vendfat);
@@ -609,7 +609,7 @@ public class Vintage implements Serializable {
         //adiciona a fatura ao comprador
         encomenda.setEstado(Encomenda.St.ENTREGUE);
 
-        compfat.addEncFatura(encomenda);
+        compfat.setEncomenda(encomenda);
         compfat.calculaValorFatura();
         comprador.addFatura(compfat);
 
@@ -861,7 +861,7 @@ public class Vintage implements Serializable {
             return faturamento;
         });
         try{
-            System.out.println("Lista dos id's dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getEmail).collect(Collectors.toList()));
+            System.out.println("Lista dos emails dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getEmail).collect(Collectors.toList()));
         }catch(NullPointerException e){
             System.out.println("Não existe utilizadores registados no sistema");
         }

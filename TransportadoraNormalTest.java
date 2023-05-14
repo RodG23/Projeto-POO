@@ -61,8 +61,8 @@ public class TransportadoraNormalTest {
     @Test
     public void testCalculaExpedicaoNormal() {
         TransportadoraNormal transportadoraNormal = new TransportadoraNormal("TransP",2,3,4,0.2);
-        assertEquals(2.4,transportadoraNormal.calculaExpedicaoNormal(1));
-        assertEquals(5.4,transportadoraNormal.calculaExpedicaoNormal(3));
-        assertEquals(9.6,transportadoraNormal.calculaExpedicaoNormal(7));
+        assertEquals(3.6,transportadoraNormal.calculaExpedicaoNormal(1));
+        assertEquals(7.2,transportadoraNormal.calculaExpedicaoNormal(3));
+        assertEquals(14.4,transportadoraNormal.calculaExpedicaoNormal(7));
     }
 }

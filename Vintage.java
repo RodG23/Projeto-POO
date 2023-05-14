@@ -437,7 +437,7 @@ public class Vintage implements Serializable {
         for (Map.Entry<Integer,Artigo> e : this.getStock().entrySet())
         {
             //só guarda os artigos que não estiverem a ser vendidos pelo utilizador
-            if(!user.getAVenda().containsKey(e.getKey())){
+            if(!user.getAVenda().containsKey(e.getKey()) && e.getValue().getTransportadora()!=null){
                 map.put(e.getKey(),e.getValue().clone());
             }    
         }
@@ -524,7 +524,6 @@ public class Vintage implements Serializable {
         double valorFinal = transportadoras.entrySet().stream().mapToDouble(transportadora -> {
             if (transportadora.getKey() instanceof TPremium) {
                 TransportadoraPremium tp = (TransportadoraPremium) transportadora.getKey();
-                System.out.println(sizeEncomenda);
                 double custoB = this.precoBaseT(tp.clone(), sizeEncomenda);
                 tp.setTotalAuferido(tp.calculaExpedicaoPremium(transportadora.getValue()) + custoB + tp.getTotalAuferido());
                 this.transpDisponiveis.put(tp.getNome(), tp.clone());
@@ -993,6 +992,9 @@ public class Vintage implements Serializable {
                     System.out.println(e.getMessage());
                 }
                 break;
+            }
+            default : {
+                System.out.println("Linha inválida.\n");
             }
         }
     }

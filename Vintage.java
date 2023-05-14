@@ -524,7 +524,6 @@ public class Vintage implements Serializable {
         double valorFinal = transportadoras.entrySet().stream().mapToDouble(transportadora -> {
             if (transportadora.getKey() instanceof TPremium) {
                 TransportadoraPremium tp = (TransportadoraPremium) transportadora.getKey();
-                System.out.println(sizeEncomenda);
                 double custoB = this.precoBaseT(tp.clone(), sizeEncomenda);
                 tp.setTotalAuferido(tp.calculaExpedicaoPremium(transportadora.getValue()) + custoB + tp.getTotalAuferido());
                 this.transpDisponiveis.put(tp.getNome(), tp.clone());
@@ -601,8 +600,6 @@ public class Vintage implements Serializable {
     }
 
     public void atualizaComprador(int numArtigos, Encomenda encomenda, Fatura compfat, Utilizador comprador){
-        
-        Map<Integer, Map<Integer, Encomenda>> encomendasSistemaCopia = this.getEncomendas();
         // Atualiza a dimensão da encomenda 
         encomenda.alteraDimensao();
 
@@ -615,16 +612,6 @@ public class Vintage implements Serializable {
 
         //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
         comprador.removeEncEncomenda(encomenda);
-
-        // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
-        if(!comprador.getEncomendas().isEmpty()){
-            encomendasSistemaCopia.put(comprador.getId(), comprador.getEncomendas());
-        }
-        else {
-            encomendasSistemaCopia.remove(comprador.getId());
-        }
-        this.encomendas.clear();
-        this.encomendas.putAll(encomendasSistemaCopia);
     }
 
     private Utilizador obterVendedorDoArtigo(Map<Integer, Utilizador> vendedoresProcessados) {
@@ -742,43 +729,55 @@ public class Vintage implements Serializable {
 
     //nao se adiciona aos vendidos do utilizador porque nunca se chegou a remover até que a entrega seja concluida
     public void devolveEncomenda(Utilizador utilizador) throws NullPointerException, ExceptionDevolver{
-        if(utilizador.getEncomendas().values().size()==0){
-            throw new ExceptionDevolver("O utilizador não tem encomendas para devoler.\n");
+        if(!this.encomendas.containsKey(utilizador.getId())){
+            throw new ExceptionDevolver("O utilizador não tem encomendas para devolver.\n");
         }
-        for (Encomenda encomenda : utilizador.getEncomendas().values()) {
-            //verificar se o dia da entrega da encomenda ainda não chegou
-            if (!this.getDataAtual().isBefore(encomenda.getDataEntrega())) {
-                throw new ExceptionDevolver("A data limite para a devolução do artigo foi ultrapassada.\n");
-            }
-            try{
-                // Obter a lista de artigos da encomenda
-                Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
-
-                //numero de artigos para saber o tamanho da encomenda;
-                for(Artigo artigo : artigosEncomenda.values()){
-
-                    // adiciona cada artigo de novo ao stock da vintage ficando assim disponivel para venda no utilizador que o estava a vender(nunca se chegou a remover da hashMap AVenda do vendedor)
-                    try{
-                        this.addStock(artigo.clone()); 
-                    } 
-                    catch(NullPointerException e)  {
-                        System.out.println("Artigo não encontrado\n");
-                    }
+        for (Map<Integer,Encomenda> encomendaUser : this.getEncomendas().values()) {
+            for(Encomenda encomenda : encomendaUser.values()){
+                //verificar se o dia da entrega da encomenda já passou há dois dias
+                LocalDate dataAux = encomenda.getDataEntrega().plusDays(2);
+                if (!this.getDataAtual().isBefore(dataAux)) {
+                    throw new ExceptionDevolver("A data limite para a devolução do artigo foi ultrapassada.\n");
                 }
-                //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
-                utilizador.removeEncEncomenda(encomenda.clone());
-            } 
-            catch(Exception e){
-                System.out.println("Nenhum encomenda encontrado para devolver do utilizador");
-            }
+                    // Obter a lista de artigos da encomenda
+                    Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
 
-            // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
-            if(!utilizador.getEncomendas().isEmpty()){
-                this.encomendas.replace(utilizador.getId(), utilizador.getEncomendas());
-            }
-            else {
-                this.encomendas.remove(utilizador.getId());
-            }
+                    //numero de artigos para saber o tamanho da encomenda;
+                    for(Artigo artigo : artigosEncomenda.values()){
+
+                        // adiciona cada artigo de novo ao stock da vintage ficando assim disponivel para venda no utilizador que o estava a vender(nunca se chegou a remover da hashMap AVenda do vendedor)
+                        try{
+                            this.addStock(artigo.clone()); 
+                        } 
+                        catch(NullPointerException e)  {
+                            System.out.println("Artigo não encontrado\n");
+                        }
+                        Utilizador vendedor = null;
+                        for (Utilizador vendedorAUX : this.getCreds().values()) {
+                            if (this.vendas.containsKey(vendedorAUX.getId())) {
+                                vendedor = vendedorAUX;
+                                break;
+                            }
+                        }
+                        vendedor.aVendaArtigo(this, artigo, artigo.getTransportadora());
+                        if(!vendedor.getVendeu().isEmpty()){
+                            this.vendas.replace(vendedor.getId(), vendedor.getVendeu());
+                        }
+                        else {
+                            this.vendas.remove(vendedor.getId());
+                        }
+                    }
+                    //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
+                    utilizador.removeEncEncomenda(encomenda.clone());        
+                } 
+
+                // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
+                if(!utilizador.getEncomendas().isEmpty()){
+                    this.encomendas.replace(utilizador.getId(), utilizador.getEncomendas());
+                }
+                else {
+                    this.encomendas.remove(utilizador.getId());
+                }
         }
     }
 
@@ -993,6 +992,9 @@ public class Vintage implements Serializable {
                     System.out.println(e.getMessage());
                 }
                 break;
+            }
+            default : {
+                System.out.println("A linha " + str + "é inválida.\n");
             }
         }
     }

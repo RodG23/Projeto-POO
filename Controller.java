@@ -12,6 +12,14 @@ public class Controller implements Serializable{
         this.model = model;
     }
 
+    public LocalDate data(){
+        return model.getDataAtual();
+    }
+
+    public void loadficheiroSistema(String filename) throws ExceptionData{
+        model.loadficheiro(filename);
+    }
+
     public void reiniciarSistema(){
         this.model = model.reiniciarSistemaInterativo();
     }
@@ -70,10 +78,6 @@ public class Controller implements Serializable{
        return model.getCreds().get(email);
     }
 
-    public void lerSistema(String caminho) throws ExceptionData, ExceptionUser{
-        model.leituraInterativo(caminho);
-    }
-
     public void avancaDataSistema(String dataAtual) throws ExceptionData{
         model.avancaData(dataAtual);
     }
@@ -110,6 +114,11 @@ public class Controller implements Serializable{
     //mostra os artigos à venda do utilizador
     public Map<Integer, Artigo>  artigosAvendaUser(Utilizador user){
         return model.artigosAVendaUserInterativo(user.clone());
+    }
+
+    //mostra os artigos vendidos do utilizador
+    public Map<Integer, Artigo>  artigosVendidosUser(Utilizador user){
+        return model.artigosVendidosUserInterativo(user.clone());
     }
 
     public void devolverEncomendaUser(Utilizador user){

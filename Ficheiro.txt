@@ -1,0 +1,28 @@
+Transportadora:CTT;Sim;2.5;5;7.5;0.23;1.5
+Transportadora:DHL;Nao;3;6;9;0.18;0
+Transportadora:UPS;Sim;4;8;12;0.20;2
+Utilizador:joao@gmail.com;Joao Silva;Rua da Praia, 123;123456789
+Utilizador:maria@hotmail.com;Maria Santos;Avenida Central, 456;987654321
+Utilizador:jose@gmail.com;Jose Ferreira;Rua da Liberdade, 789;246813579
+Utilizador:ana@gmail.com;Ana Rodrigues;Rua do Sol, 23;111222333
+Utilizador:pedro@hotmail.com;Pedro Oliveira;Rua dos Lírios, 45;444555666
+Utilizador:sofia@gmail.com;Sofia Alves;Avenida da Liberdade, 67;777888999
+Artigo:Mala;Sim;Muito bom;0;;Mala branca com alça de inox;Lacoste;200;0.05;Grande;Penas;2020
+Artigo:Sapatilha;Nao;Excelente;1;;Sapatilha beje com cordoes verdes;Lacoste;150;0;45;true;Beje;2023
+Artigo:Tshirt;;Mau;2;;Tshirt rasgada com o simbolo preto;Nike;30;0.1;XL;Riscas
+Artigo:Mala;Nao;Muito bom;1;;Mala com o simbolo verde;Bimba&Lola;250;0;Pequena;Pele;2020
+Artigo:Sapatilha;Sim;Excelente;0;;Sapatilha vermelha sem cordoes;Nike;99;0;43;false;Vermelha;2022
+Artigo:Tshirt;;Muito bom;1;;Tshirt em bom estado com o estampado verde;Nike;20;0.1;XL;Riscas
+Alterar custo transportadora:CTT;P;10.0
+Alterar custo transportadora:CTT;M;15.0
+Alterar custo transportadora:CTT;G;20.0
+Alterar custo transportadora:UPS;A;5.0
+Vender:maria@hotmail.com;1;CTT
+Vender:maria@hotmail.com;2;CTT
+Vender:maria@hotmail.com;3;UPS
+Alterar preco artigo:maria@hotmail.com;3;45.0
+Alterar transportadora:maria@hotmail.com;3;DHL
+Encomendar:jose@gmail.com;1
+Encomendar:jose@gmail.com;2
+Finalizar:jose@gmail.com
+

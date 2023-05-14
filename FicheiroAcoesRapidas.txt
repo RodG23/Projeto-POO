@@ -1,0 +1,14 @@
+Data:15/05/2023:Vender:ana@gmail.com;4;CTT
+Data:15/05/2023:Vender:ana@gmail.com;5;CTT
+Data:15/05/2023:Vender:ana@gmail.com;6;DHL
+Data:15/05/2023:Alterar preco artigo:ana@gmail.com;6;50.0
+Data:15/05/2023:Alterar transportadora:maria@hotmail.com;5;DHL
+Data:15/05/2023:Encomendar:joao@gmail.com;4
+Data:15/05/2023:Encomendar:joao@gmail.com;5
+Data:15/05/2023:Encomendar:joao@gmail.com;6
+Data:15/05/2023:Alterar custo transportadora:DHL;P;10.0
+Data:15/05/2023:Alterar custo transportadora:DHL;M;10.0
+Data:15/05/2023:Alterar custo transportadora:DHL;G;10.0
+Data:15/05/2023:Alterar custo transportadora:DHL;A;5.0
+Data:17/05/2023:Finalizar:joao@gmail.com
+

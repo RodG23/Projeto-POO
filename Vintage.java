@@ -861,7 +861,7 @@ public class Vintage implements Serializable {
             return faturamento;
         });
         try{
-            System.out.println("Lista dos id's dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getEmail).collect(Collectors.toList()));
+            System.out.println("Lista dos emails dos utilizadores que mais faturaram por ordem crescente: " + utilizadores.stream().sorted(comp).map(Utilizador::getEmail).collect(Collectors.toList()));
         }catch(NullPointerException e){
             System.out.println("Não existe utilizadores registados no sistema");
         }

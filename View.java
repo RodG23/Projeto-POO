@@ -159,7 +159,7 @@ public class View implements Serializable{
         System.out.print("\nNome da transportadora: ");
         String nome = scanner.nextLine();
         nome = nome.substring(0).toUpperCase();
-        System.out.print("O artigo é premium? (Sim, Nao): ");
+        System.out.print("A transportadora é premium? (Sim, Nao): ");
         String isPremium;
         double cp = 0.0;
         double cm = 0.0;

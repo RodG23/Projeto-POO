@@ -1,13 +1,12 @@
-
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -306,7 +305,10 @@ public class Vintage implements Serializable {
                 imposto, //imposto
                 custoAdicional // custo adicional
             );
-            this.addTransportadora(tp.clone());
+            if(!this.transpDisponiveis.containsKey(nome)){
+                this.addTransportadora(tp);
+            }
+            
         }
         else{
             TransportadoraNormal tn = new TransportadoraNormal(
@@ -316,7 +318,10 @@ public class Vintage implements Serializable {
                 cg, //custo de uma encomenda grande
                 imposto //imposto
             );
-            this.addTransportadora(tn.clone());
+            if(!this.transpDisponiveis.containsKey(nome)){
+                this.addTransportadora(tn);
+            }
+
         }
         System.out.println("Transportadora criada com sucesso\n");
     }
@@ -340,10 +345,6 @@ public class Vintage implements Serializable {
 
     public Utilizador encontraUserInterativo(String email){
         return this.creds.get(email);
-    }
-
-    public void leituraInterativo(String caminho) throws ExceptionData, ExceptionUser{
-        this.leitura(caminho);
     }
 
     public void colocaAvendaUserInterativo(Utilizador user, String tipoArtigo, String classeArtigo, Artigo.St estado, int numDonos, String nomeTransp, String descricao, String marca, double precoBase, double correcaoPreco, Mala.Dim dimensao, String material, int anoLancamento, Boolean atacadores, String cor, int tamanho, Tshirt.Tam tamTshirt, Tshirt.Pad padTshirt){
@@ -380,14 +381,24 @@ public class Vintage implements Serializable {
         Utilizador vendedor = obterVendedorDoArtigo(vendedoresProcessados);
         if (vendedor == null) {
             for (Utilizador vendedorAUX : this.getCreds().values()) {
-                if (vendedorAUX.getAVenda().containsKey(codBarras)) {
-                    vendedor = vendedorAUX;
-                    vendedoresProcessados.put(vendedor.getId(), vendedor.clone());
+                if(codBarras == 0){
                     break;
                 }
+                else{
+                    if (vendedorAUX.getAVenda().containsKey(codBarras)) {
+                        vendedor = vendedorAUX;
+                        vendedoresProcessados.put(vendedor.getId(), vendedor.clone());
+                        break;
+                    }
+                }
+
             }
         }
-        user.colocaEncomenda(this, vendedor.getAVenda().get(codBarras).clone());
+        try{
+            user.colocaEncomenda(this, vendedor.getAVenda().get(codBarras));
+        }catch(NullPointerException e){
+            System.out.println("O utilizado nao está a vender o artigo escolhido.\n");
+        }
         System.out.print("Artigo encomendado com sucesso.\n\n");
     }
 
@@ -404,9 +415,20 @@ public class Vintage implements Serializable {
         return user.getAVenda();
     }
 
+    public Map<Integer, Artigo> artigosVendidosUserInterativo(Utilizador user){
+        return user.getVendeu();
+    }
+
     public void devolveEncomendaInterativo(Utilizador user){
-        this.devolveEncomenda(user);
-        System.out.print("Encomenda devolvida com sucesso.\n");  
+        try{
+            this.devolveEncomenda(user);
+            System.out.print("Encomenda devolvida com sucesso.\n\n");  
+        }catch(NullPointerException e){
+            System.out.println(e.getMessage());
+        }
+        catch(ExceptionDevolver e){
+            System.out.println(e.getMessage());
+        }
     }
     
 
@@ -457,7 +479,10 @@ public class Vintage implements Serializable {
 
 
     public void addTransportadora(Transportadora t){
-        this.transpDisponiveis.put(t.getNome(), t.clone());
+        if(!this.transpDisponiveis.containsKey(t.getNome())){
+            this.transpDisponiveis.put(t.getNome(), t);
+        }
+
     }
 
     public void enviarEncomenda(Utilizador utilizador){
@@ -499,15 +524,16 @@ public class Vintage implements Serializable {
         double valorFinal = transportadoras.entrySet().stream().mapToDouble(transportadora -> {
             if (transportadora.getKey() instanceof TPremium) {
                 TransportadoraPremium tp = (TransportadoraPremium) transportadora.getKey();
+                System.out.println(sizeEncomenda);
                 double custoB = this.precoBaseT(tp.clone(), sizeEncomenda);
-                tp.setTotalAuferido(tp.calculaExpedicaoPremium(transportadora.getValue()) + custoB);
+                tp.setTotalAuferido(tp.calculaExpedicaoPremium(transportadora.getValue()) + custoB + tp.getTotalAuferido());
                 this.transpDisponiveis.put(tp.getNome(), tp.clone());
                 return tp.getTotalAuferido();
 
             } else if (transportadora.getKey() instanceof TNormal) {
                 TransportadoraNormal tn = (TransportadoraNormal) transportadora.getKey();
                 double custoB = this.precoBaseT(tn.clone(), sizeEncomenda);
-                tn.setTotalAuferido(tn.calculaExpedicaoNormal(transportadora.getValue()) + custoB);
+                tn.setTotalAuferido(tn.calculaExpedicaoNormal(transportadora.getValue()) + custoB + tn.getTotalAuferido());
                 this.transpDisponiveis.put(tn.getNome(), tn.clone());
                 return tn.getTotalAuferido();
 
@@ -708,58 +734,50 @@ public class Vintage implements Serializable {
         }
     }
 
+    //não leva clone que é para poder ser alterado diretamente
     public void registaUtilizador(String email, Utilizador utilizador){
         this.creds.put(email, utilizador);
         utilizador.setEmail(email);
     }
 
     //nao se adiciona aos vendidos do utilizador porque nunca se chegou a remover até que a entrega seja concluida
-    public void devolveEncomenda(Utilizador utilizador){
+    public void devolveEncomenda(Utilizador utilizador) throws NullPointerException, ExceptionDevolver{
         if(utilizador.getEncomendas().values().size()==0){
-            System.out.println("O utilizador nao tem encomendas para devolver\n");
+            throw new ExceptionDevolver("O utilizador não tem encomendas para devoler.\n");
         }
         for (Encomenda encomenda : utilizador.getEncomendas().values()) {
-
+            //verificar se o dia da entrega da encomenda ainda não chegou
+            if (!this.getDataAtual().isBefore(encomenda.getDataEntrega())) {
+                throw new ExceptionDevolver("A data limite para a devolução do artigo foi ultrapassada.\n");
+            }
             try{
-                //verificar se o dia da entrega da encomenda ainda não chegou
-                if (encomenda.getDataEntrega().isAfter(this.getDataAtual())) {
-                    
+                // Obter a lista de artigos da encomenda
+                Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
+
+                //numero de artigos para saber o tamanho da encomenda;
+                for(Artigo artigo : artigosEncomenda.values()){
+
+                    // adiciona cada artigo de novo ao stock da vintage ficando assim disponivel para venda no utilizador que o estava a vender(nunca se chegou a remover da hashMap AVenda do vendedor)
                     try{
-                        // Obter a lista de artigos da encomenda
-                        Map<Integer, Artigo> artigosEncomenda = encomenda.getArtigos();
-
-                        //numero de artigos para saber o tamanho da encomenda;
-                        for(Artigo artigo : artigosEncomenda.values()){
-
-                            // adiciona cada artigo de novo ao stock da vintage ficando assim disponivel para venda no utilizador que o estava a vender(nunca se chegou a remover da hashMap AVenda do vendedor)
-                            try{
-                                this.addStock(artigo.clone()); 
-                            } 
-                            catch(NullPointerException e)  {
-                                System.out.println("Artigo não encontrado\n");
-                            }
-                        }
+                        this.addStock(artigo.clone()); 
                     } 
-                    catch(Exception e){
-                        System.out.println("Nenhum encomenda encontrado para devolver do utilizador");
-                    }
-
-                    //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
-                    utilizador.removeEncEncomenda(encomenda.clone());
-
-                    // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
-                    if(!utilizador.getEncomendas().isEmpty()){
-                        this.encomendas.replace(utilizador.getId(), utilizador.getEncomendas());
-                    }
-                    else {
-                        this.encomendas.remove(utilizador.getId());
+                    catch(NullPointerException e)  {
+                        System.out.println("Artigo não encontrado\n");
                     }
                 }
-                else{
-                    System.out.println("Data de entrega da encomenda ultrapassada.\n");
-                }
-            }catch(NullPointerException e){
-                System.out.println("A encomenda ainda nao foi finalizada. Data de entrega null");
+                //Remover a encomenda que foi entregue da hashMap encomendas, do comprador
+                utilizador.removeEncEncomenda(encomenda.clone());
+            } 
+            catch(Exception e){
+                System.out.println("Nenhum encomenda encontrado para devolver do utilizador");
+            }
+
+            // Verificar se o comprador tem mais encomendas na hashMap da Vintage, se sim atualiza caso contrário remove a chave da mesma
+            if(!utilizador.getEncomendas().isEmpty()){
+                this.encomendas.replace(utilizador.getId(), utilizador.getEncomendas());
+            }
+            else {
+                this.encomendas.remove(utilizador.getId());
             }
         }
     }
@@ -807,7 +825,7 @@ public class Vintage implements Serializable {
             } 
         }
         try{
-        System.out.println("A transportadora que mais fatorou foi a " + transportadoraMaiorFaturamento.getNome() + " com um total de " + transportadoraMaiorFaturamento.getTotalAuferido());
+        System.out.println("A transportadora que mais fatorou foi a " + transportadoraMaiorFaturamento.getNome() + " com um total de " + Math.round(transportadoraMaiorFaturamento.getTotalAuferido()));
         }catch(NullPointerException e){
         System.out.println("Não há transportadoras registadas no sistema");
         }
@@ -836,7 +854,7 @@ public class Vintage implements Serializable {
             double faturamento = 0.0;
                 for (Fatura fatura : utilizador.getFaturas().values()) {
                     //só por na lista quem tem faturas;
-                    if (fatura.getEncomenda().getDataEntrega().isAfter(inferior) && fatura.getEncomenda().getDataEntrega().isBefore(superior)) {
+                    if (fatura.getEncomenda().getDataEntrega().isAfter(inferior) && (fatura.getEncomenda().getDataEntrega().isBefore(superior) || fatura.getEncomenda().getDataEntrega().isEqual(superior))) {
                         faturamento += fatura.getValorTotal();
                     }
                 }
@@ -848,197 +866,500 @@ public class Vintage implements Serializable {
             System.out.println("Não existe utilizadores registados no sistema");
         }
     }
-
-    public void leitura(String nomeFicheiro) throws ExceptionData, ExceptionUser{
-        String fileName = nomeFicheiro; // Nome do arquivo de dados
     
-        // Tentar ler eventos do arquivo e armazená-los na lista
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                String[] campos = linha.split("; ");
-                
-                LocalDate datacomando = formataData(campos[0]);
-    
-                if (datacomando.isBefore(this.dataAtual)) {
-                    throw new ExceptionData("Data do comando ultrapassada");
-                } 
-                else if(datacomando.isAfter(this.dataAtual)){
-                    this.avancaData(campos[0]);
-                }
-                else{;}
-
-                try {
-                    switch (campos[1]) {
-                        case "Utilizador": {
-                            Utilizador utilizador = this.creds.get(campos[2]);
-                            switch (campos[4]) {
-                                case "Encomendar": {
-                                    Utilizador vendedor = null;
-                                    for (Utilizador vendedorAUX : this.creds.values()) {
-                                        if (vendedorAUX.getAVenda().containsKey(Integer.parseInt(campos[3]))) {
-                                            vendedor = vendedorAUX;
-                                            break;
-                                        }
-                                    }
-                                    if (vendedor == null) {
-                                        throw new ExceptionUser("Nenhum vendedor está a vender esse artigo!");    
-                                    } 
-                                    utilizador.colocaEncomenda(this, vendedor.getAVenda().get(Integer.parseInt(campos[3])));
-                                    break;
-                                }
-                                case "Finalizar encomenda": {
-                                    utilizador.finalizarEncomenda(this);
-                                    break;
-                                }
-                                case "Alterar preco base":
-                                case "Alterar correcao preco":
-                                case "Alterar transportadora": {
-                                    Artigo artigoAux = utilizador.getAVenda().get(Integer.parseInt(campos[3]));
-                                    try {
-                                        switch (campos[4]) {
-                                            case "Alterar preco base": {
-                                                artigoAux.setPrecoBase(Double.parseDouble(campos[5]));
-                                                utilizador.addArtigoAVenda(artigoAux.clone());
-                                                break;
-                                            }
-                                            case "Alterar correcao preco": {
-                                                artigoAux.setPrecoBase(Double.parseDouble(campos[5]));
-                                                utilizador.addArtigoAVenda(artigoAux.clone());
-                                                break;
-                                            }
-                                            case "Alterar transportadora": {
-                                                Transportadora nova = this.getTranspDisponiveis().get(campos[5]);
-                                                artigoAux.setTransportadora(nova.clone());
-                                                utilizador.addArtigoAVenda(artigoAux.clone());
-                                                break;
-                                            }
-                                        }
-                                    } catch(NumberFormatException e){
-                                        System.out.println("Não é possível alterar a informação do artigo.");
-                                    }
-                                break;
-                                }
-                            }
-                        }             
-                        case "Transportadora": {
-                            try {
-                                Transportadora transp = transpDisponiveis.get(campos[2]);
-                                if (transp == null) {
-                                    System.out.println("A transportadora que pretende alterar não existe no sistema.");
-                                    break;
-                                }
-                                switch (campos[3]) {
-                                    case "Alterar imposto":
-                                        atualizarImposto(transp, Double.parseDouble(campos[4]));
-                                        break;
-                                    case "Alterar valor encomenda pequena":
-                                        atualizarCustoPequena(transp, Double.parseDouble(campos[4]));
-                                        break;
-                                    case "Alterar valor encomenda media":
-                                        atualizarCustoMedia(transp, Double.parseDouble(campos[4]));
-                                        break;
-                                    case "Alterar valor encomenda grande":
-                                        atualizarCustoGrande(transp, Double.parseDouble(campos[4]));
-                                        break;
-                                    default:
-                                        System.out.println("Opção inválida.");
-                                        break;
-                                }
-                            } catch (NumberFormatException e) {
-                                System.out.println("Valor inválido.");
-                            }
-                            break;
-                        }
-                        default: {
-                            System.out.println("Ação inválida: " + campos[1] + " na linha " + linha);
-                            break;
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Erro na conversão de tipo na linha " + linha);
-                    continue;
-                } catch (NullPointerException e) {
-                    System.out.println("Referência nula na linha " + linha);
-                    continue;
-                }
-            }
-        }catch (IOException e) {
-            System.out.println("Erro ao ler arquivo: " + e.getMessage());
-        }
-        catch(NullPointerException e){
-            System.out.println("Caminho para o ficheiro errado." + e.getMessage());
-        }
+    public void acoesRapidas(String filename) throws ExceptionData, ExceptionUser{
+       loadficheiro(filename);
     }    
 
-    // Métodos auxiliares para atualizar valores das transportadoras
-    private void atualizarImposto(Transportadora transp, double imposto) {
-        if (transp instanceof TransportadoraPremium) {
-            ((TransportadoraPremium) transp).setImposto(imposto);
-        } else if (transp instanceof TransportadoraNormal) {
-            ((TransportadoraNormal) transp).setImposto(imposto);
+    public List<String> lerFicheiro(String nomeFich){
+        List<String> lines = new ArrayList<>();
+        try {
+            lines = Files.readAllLines(Paths.get(nomeFich), StandardCharsets.UTF_8);
+        } catch (IOException exc) {
+            System.out.println(exc.getMessage());
         }
-        transpDisponiveis.replace(transp.getNome(), transp);
+        return lines;
     }
 
-    private void atualizarCustoPequena(Transportadora transp, double custo) {
-        if (transp instanceof TransportadoraPremium) {
-            ((TransportadoraPremium) transp).setCustoPequena(custo);
-        } else if (transp instanceof TransportadoraNormal) {
-            ((TransportadoraNormal) transp).setCustoPequena(custo);
+    public boolean isDate(String dateStr) {
+        try {
+            formataData(dateStr);
+            return true;
+        } catch (ExceptionData e) {
+            return false;
         }
-        transpDisponiveis.replace(transp.getNome(), transp);
     }
 
-    private void atualizarCustoMedia(Transportadora transp, double custo) {
-        if (transp instanceof TransportadoraPremium) {
-            ((TransportadoraPremium) transp).setCustoMedia(custo);
-        } else if (transp instanceof TransportadoraNormal) {
-            ((TransportadoraNormal) transp).setCustoMedia(custo);
+    public void loadficheiro(String filename) throws ExceptionData{
+        List<String> linhas = lerFicheiro(filename);
+        for (String linha : linhas) {
+            String[] linhaPartida = linha.split(":", 2);
+            switch(linhaPartida[0]){
+                case "Data":{
+                    String[] aux = linhaPartida[1].split(":", 2);
+                    parseData(aux[0]);
+                    parsingGeral(aux[1]);
+                    break;
+                }
+                default : {
+                    parsingGeral(linha);
+                }
+            }
         }
-        transpDisponiveis.replace(transp.getNome(), transp);
     }
 
-    private void atualizarCustoGrande(Transportadora transp, double custo) {
-        if (transp instanceof TransportadoraPremium) {
-            ((TransportadoraPremium) transp).setCustoGrande(custo);
-        } else if (transp instanceof TransportadoraNormal) {
-            ((TransportadoraNormal) transp).setCustoGrande(custo);
+    public void parsingGeral(String str){
+        String[] linhaPartida = str.split(":", 2);
+        switch(linhaPartida[0]){
+            case "Transportadora": {
+                parseTransportadora(linhaPartida[1]);
+                break;
+            }
+            case "Utilizador":{
+                parseUtilizador(linhaPartida[1]);
+                break;
+            }
+            case "Artigo":{
+                String tipo = tipo(linhaPartida[1]);
+                switch(tipo){
+                    case "Mala":{
+                        parseMala(linhaPartida[1]);                          
+                        break;
+                    }
+                    case "Sapatilha":{
+                        parseSapatilha(linhaPartida[1]);             
+                        break;
+                    }
+                    case "Tshirt":{
+                        parseTshirt(linhaPartida[1]);
+                        break;
+                    }
+                } 
+                break;
+            }
+            case "Vender":{
+                try{
+                    parseVendas(linhaPartida[1]);
+                }catch(ExceptionUser e){
+                    System.out.println(e.getMessage());
+                }catch(ExceptionTransportadora e){
+                    System.out.println(e.getMessage());
+                }
+                break;
+            }
+            case "Encomendar":{
+                try{
+                parseEncomendas(linhaPartida[1]);
+                }catch(ExceptionUser e){
+                    System.out.println(e.getMessage());
+                }
+                break;
+            }
+            case "Finalizar":{
+                try{
+                    parseFinaliar(linhaPartida[1]);
+                }catch(ExceptionUser e){
+                    System.out.println(e.getMessage());
+                }
+                break;
+            }
+            case "Alterar preco artigo":{
+                try{
+                    parsePreco(linhaPartida[1]);
+                }catch(ExceptionArtigo e){
+                    System.out.println(e.getMessage());
+                }catch(ExceptionUser e){
+                    System.out.println(e.getMessage());
+                }
+                break;
+            }
+            case "Alterar transportadora":{
+                try{
+                    parseT(linhaPartida[1]);
+                }catch(ExceptionTransportadora e){
+                    System.out.println(e.getMessage());
+                }catch(ExceptionArtigo e){
+                    System.out.println(e.getMessage());
+                }catch(ExceptionUser e){
+                    System.out.println(e.getMessage());
+                }
+                break;
+
+            }
+            case "Alterar custo transportadora":{
+                try{
+                    parseCustoT(linhaPartida[1]);
+                }catch(ExceptionTransportadora e){
+                    System.out.println(e.getMessage());
+                }
+                break;
+            }
         }
-        transpDisponiveis.replace(transp.getNome(), transp);
     }
 
-    //carregar de ficheiro objeto
-    public void loadEstadoObj(String file) throws IOException, ClassNotFoundException {
-        Vintage e = loadAux(file);
-        this.stock = e.stock;
-        this.encomendas = e.encomendas;
-        this.vendas = e.vendas;
-        this.creds = e.creds;
-        this.transpDisponiveis = e.transpDisponiveis;
-        this.totalAuferido = e.totalAuferido;
-        this.dataAtual = e.dataAtual;
+    public void parseData(String strData) throws ExceptionData{
+        String[] aux = strData.split(":", 2);
+        LocalDate datacomando = null;
+        if(isDate(aux[0])){
+            datacomando = formataData(aux[0]);
+
+            if (datacomando.isBefore(this.dataAtual)) {
+                throw new ExceptionData("Data do comando ultrapassada");
+            } 
+            else if(datacomando.isAfter(this.dataAtual)){
+                this.avancaData(aux[0]);
+            }
+            else{;}
+        }
+        this.setDataAtual(datacomando);
+    }
+    
+    public void parseCustoT(String srtPreco) throws ExceptionTransportadora{
+        String[] aux = srtPreco.split(";");
+        Transportadora transportadora = this.transpDisponiveis.get(aux[0]);
+        if(transportadora == null){
+            throw new ExceptionTransportadora("A transportadora nao existe no sistema.\n\n");
+        }
+        String tamanho = aux[1];
+        switch(tamanho){
+            case "P":{
+                transportadora.setCustoPequena(Double.parseDouble(aux[2]));
+            }
+            case "M":{
+                transportadora.setCustoMedia(Double.parseDouble(aux[2]));
+            }
+            case "G":{
+                transportadora.setCustoGrande(Double.parseDouble(aux[2]));
+            }
+            case "A":{
+                if( transportadora instanceof TransportadoraPremium){
+                    ((TransportadoraPremium) transportadora).setCustoAdicional(Double.parseDouble(aux[2]));
+                }
+            }
+        }
+        this.transpDisponiveis.replace(transportadora.getNome(), transportadora.clone());
     }
 
-    public Vintage loadAux(String file) throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-        Vintage e = (Vintage) ois.readObject();
-        ois.close();
-        return e;
+    public void parseT(String srtPreco) throws ExceptionTransportadora, ExceptionArtigo, ExceptionUser{
+        String[] aux = srtPreco.split(";");
+        String email = aux[0];
+        Utilizador user = this.creds.get(email);
+        if(user==null){
+            throw new ExceptionUser("O utilizador nao existe no sistema.\n");
+        }
+        int indice = Integer.parseInt(aux[1]);
+        Artigo artigo = this.stock.get(indice);
+        if(artigo==null){
+            throw new ExceptionArtigo("O artigo já não se encontra à venda para ser alterado o seu transportador.\n");
+        }
+        Transportadora transportadora = this.transpDisponiveis.get(aux[2]);
+        if(transportadora == null){
+            throw new ExceptionTransportadora("A transportadora nao existe no sistema.\n");
+        }
+        artigo.setTransportadora(transportadora.clone());
+        this.addStock(artigo.clone());
     }
 
-    public void saveEstado() throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Estado.obj"));
-        oos.writeObject(this);
-        oos.flush();
-        oos.close();
+    public void parsePreco(String srtPreco) throws ExceptionArtigo, ExceptionUser{
+        String[] aux = srtPreco.split(";");
+        String email = aux[0];
+        Utilizador user = this.creds.get(email);
+        if(user==null){
+            throw new ExceptionUser("O utilizador nao existe no sistema.\n");
+        }
+        int indice = Integer.parseInt(aux[1]);
+        Artigo artigo = this.stock.get(indice);
+        if(artigo==null){
+            throw new ExceptionArtigo("O artigo já não se encontra à venda para ser alterado o seu valor.\n");
+        }
+        artigo.setPrecoBase(Double.parseDouble(aux[2]));
+        user.addArtigoAVenda(artigo.clone());
+        this.creds.replace(email, user.clone());
     }
 
-    public void salvaEstadoObj() throws IOException {
-        this.saveEstado();
+    public void parseFinaliar(String srtFinalizar) throws ExceptionUser{
+        String[] aux = srtFinalizar.split(";");
+        String email = aux[0];
+        Utilizador user = this.creds.get(email);
+        if(user==null){
+            throw new ExceptionUser("O utilizador nao existe no sistema.\n");
+        }
+        user.finalizarEncomenda(this);
+        this.creds.replace(email, user.clone());
     }
 
-    public Vintage reiniciarSistemaInterativo(){
-        return new Vintage();
+    public void parseEncomendas(String srtEncomendas) throws ExceptionUser{
+        String[] aux = srtEncomendas.split(";");
+        String email = aux[0];
+        Utilizador user = this.creds.get(email);
+        if(user==null){
+            throw new ExceptionUser("O utilizador nao existe no sistema.\n");
+        }
+        int indice = Integer.parseInt(aux[1]);
+        Utilizador vendedor = null;
+            for (Utilizador vendedorAUX : this.getCreds().values()) {
+                if (vendedorAUX.getAVenda().containsKey(indice)) {
+                    vendedor = vendedorAUX;
+                    break;
+                }
+            }
+        Artigo artigo = vendedor.getAVenda().get(indice);
+        if(artigo == null){
+            throw new ExceptionUser("O artigo nao está à venda no sistema para ser encomendado.\n");
+        }
+        user.colocaEncomenda(this, artigo.clone());
+        this.creds.replace(email, user.clone());
     }
+
+    public void parseVendas(String srtVendas) throws ExceptionUser, ExceptionTransportadora{
+        String[] aux = srtVendas.split(";");
+        String email = aux[0];
+        Utilizador user = this.creds.get(email);
+
+        if(user==null){
+            throw new ExceptionUser("O utilizador nao existe no sistema.\n");
+        }
+
+        int indice = Integer.parseInt(aux[1]);
+        Artigo artigo =  this.stock.get(indice);
+        if(artigo == null){
+            throw new ExceptionUser("O artigo não foi criada para poder ser colocado à venda.\n");
+        }
+        String transportadora = aux[2];
+        Transportadora transp = null;
+
+        if (this.transpDisponiveis.containsKey(transportadora)) {
+             transp = this.transpDisponiveis.get(transportadora);
+        } else {
+            throw new ExceptionTransportadora("A transportadora não está registada no sistema.\n");
+        }
+        user.aVendaArtigo(this, artigo.clone(), transp);
+        this.creds.replace(email, user.clone());
+    }
+
+    public void parseUtilizador(String strUtilizador) {
+        String[] campos = strUtilizador.split(";");
+
+        String email = campos[0];
+        String nome = campos[1];
+        String morada = campos[2];
+        int nif = Integer.parseInt(campos[3]);
+
+        this.registaUtilizador(email, new Utilizador(email, nome, morada, nif, new HashMap<Integer,Artigo>(), new HashMap<Integer,Artigo>(), new HashMap<Integer,Artigo>(), new HashMap<Integer,Encomenda>(), new HashMap<Integer,Fatura>()));
+    }
+
+    public void parseTransportadora(String dadosTransportadora) {
+        String[] dados = dadosTransportadora.split(";");
+        String nome = dados[0];
+        String isPremium = dados[1];
+        double custop = Double.parseDouble(dados[2]);
+        double custom = Double.parseDouble(dados[3]);
+        double custog = Double.parseDouble(dados[4]);
+        double imposto = Double.parseDouble(dados[5]);
+        double custoadicional = 0.0;
+        if(isPremium.equals("Sim")){
+            custoadicional = Double.parseDouble(dados[6]);
+        }
+
+        if(isPremium.equals("Sim")){
+           this.addTransportadora(new TransportadoraPremium(nome, custop, custom, custog, imposto, custoadicional));
+        }
+        else{
+           this.addTransportadora(new TransportadoraNormal(nome, custop, custom, custog, imposto));
+        }
+    }
+
+    public String tipo(String string){
+        String[] dados = string.split(";");
+        return dados[0];
+    }
+
+    public void parseMala(String dadosMala){
+        String[] dados = dadosMala.split(";");
+        String isPremium = dados[1];
+        String estado = dados[2];
+        Artigo.St st = null;
+        int donos = Integer.parseInt(dados[3]);
+        String desc = dados[5];
+        String mrc = dados[6];
+        double pb = Double.parseDouble(dados[7]);
+        double cp = Double.parseDouble(dados[8]);
+        String dimensao = dados[9];
+        Mala.Dim dim = null;
+        String material = dados[10];
+        int anoLancamento = Integer.parseInt(dados[11]);
+
+        switch (dimensao) {
+            case "Pequena":
+                dim = Mala.Dim.PEQUENA;
+                break;
+            case "Média":
+                dim = Mala.Dim.MEDIA;
+                break;
+            case "Grande":
+                dim = Mala.Dim.GRANDE;
+                break;
+        }
+        switch (estado) {
+            case "Mau":
+                st = Artigo.St.MAU;
+                break;
+            case "Médio":
+                st = Artigo.St.MEDIO;
+                break;
+            case "Bom":
+                st = Artigo.St.BOM;
+                break;
+            case "Muito bom":
+                st = Artigo.St.MUITO_BOM;
+                break;
+            case "Execlente":
+                st = Artigo.St.EXCELENTE;
+                break;
+        }
+
+        if(isPremium.equals("Sim")){
+            this.addStock(new MalaPremium(st, donos, null, desc, mrc, pb, cp, dim, material, anoLancamento));
+         }
+         else{
+            this.addStock(new MalaNU(st, donos, null, desc, mrc, pb, cp, dim, material, anoLancamento));
+         }
+    }
+
+    public void parseTshirt(String dadosMala){
+        String[] dados = dadosMala.split(";");
+        String estado = dados[2];
+        Artigo.St st = null;
+        int donos = Integer.parseInt(dados[3]);
+        String desc = dados[5];
+        String mrc = dados[6];
+        double pb = Double.parseDouble(dados[7]);
+        double cp = Double.parseDouble(dados[8]);
+        String tamanho = dados[9];
+        Tshirt.Tam tam = null;
+        String padrao = dados[10];
+        Tshirt.Pad pad = null;
+
+        switch (estado) {
+            case "Mau":
+                st = Artigo.St.MAU;
+                break;
+            case "Médio":
+                st = Artigo.St.MEDIO;
+                break;
+            case "Bom":
+                st = Artigo.St.BOM;
+                break;
+            case "Muito bom":
+                st = Artigo.St.MUITO_BOM;
+                break;
+            case "Execlente":
+                st = Artigo.St.EXCELENTE;
+                break;
+        }
+
+        switch (tamanho) {
+            case "S":
+                tam = Tshirt.Tam.S;
+                break;
+            case "M":
+                tam = Tshirt.Tam.M;
+                break;
+            case "L":
+                tam = Tshirt.Tam.L;
+                break;
+            case "XL":
+                tam = Tshirt.Tam.XL;
+                break;
+        }
+        switch (padrao) {
+            case "Liso":
+                pad = Tshirt.Pad.LISO;
+                break;
+            case "Riscas":
+                pad = Tshirt.Pad.RISCAS;
+                break;
+            case "Palmeiras":
+                pad = Tshirt.Pad.PALMEIRAS;
+                break;
+        }
+
+        this.addStock(new TshirtNU(st, donos, null, desc, mrc, pb, cp, tam, pad));
+    }
+
+    public void parseSapatilha(String dadosMala){
+        String[] dados = dadosMala.split(";");
+        String isPremium = dados[1];
+        String estado = dados[2];
+        Artigo.St st = null;
+        int donos = Integer.parseInt(dados[3]);
+        String desc = dados[5];
+        String mrc = dados[6];
+        double pb = Double.parseDouble(dados[7]);
+        double cp = Double.parseDouble(dados[8]);
+        int tamanho = Integer.parseInt(dados[9]);
+        boolean atacadores = Boolean.parseBoolean(dados[10]);
+        String cor = dados[11];
+        int anoLancamento = Integer.parseInt(dados[12]);
+
+        switch (estado) {
+            case "Mau":
+                st = Artigo.St.MAU;
+                break;
+            case "Médio":
+                st = Artigo.St.MEDIO;
+                break;
+            case "Bom":
+                st = Artigo.St.BOM;
+                break;
+            case "Muito bom":
+                st = Artigo.St.MUITO_BOM;
+                break;
+            case "Excelente":
+                st = Artigo.St.EXCELENTE;
+                break;
+        }
+
+        if(isPremium.equals("Sim")){
+            this.addStock(new SapatilhaPremium(st, donos, null, desc, mrc, pb, cp, tamanho, atacadores, cor, anoLancamento));
+         }
+         else{
+            this.addStock(new SapatilhaNU(st, donos, null, desc, mrc, pb, cp, tamanho, atacadores, cor, anoLancamento));
+
+        }
+    }
+
+        //carregar de ficheiro objeto
+        public void loadEstadoObj(String file) throws IOException, ClassNotFoundException {
+            Vintage e = loadAux(file);
+            this.stock = e.stock;
+            this.encomendas = e.encomendas;
+            this.vendas = e.vendas;
+            this.creds = e.creds;
+            this.transpDisponiveis = e.transpDisponiveis;
+            this.totalAuferido = e.totalAuferido;
+            this.dataAtual = e.dataAtual;
+        }
+    
+        public Vintage loadAux(String file) throws IOException, ClassNotFoundException {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            Vintage e = (Vintage) ois.readObject();
+            ois.close();
+            return e;
+        }
+    
+        public void saveEstado() throws IOException {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Estado.obj"));
+            oos.writeObject(this);
+            oos.flush();
+            oos.close();
+        }
+
+        public void salvaEstadoObj() throws IOException {
+            this.saveEstado();
+        }
+    
+        public Vintage reiniciarSistemaInterativo(){
+            return new Vintage();
+        }
 }

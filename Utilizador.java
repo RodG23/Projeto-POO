@@ -304,16 +304,12 @@ public class Utilizador implements Serializable {
 
     // add um artigo para venda no sistema
     public void aVendaArtigo(Vintage vinted, Artigo artigo, Transportadora transportadora){
-        try{
-            artigo.setTransportadora(transportadora.clone());
-        }catch(NullPointerException e){
-            System.out.println("A transportador escolhida não está registada no sistema.");
-        }
-        
-        this.addArtigoAVenda(artigo.clone());
-        vinted.addStock(artigo.clone());
-        vinted.addTransportadora(transportadora.clone());
-    } 
+        artigo.setTransportadora(transportadora.clone());
+        this.addArtigoAVenda(artigo);
+        vinted.addStock(artigo);
+        vinted.addTransportadora(transportadora);
+}
+
 
     public Encomenda encontrarEncomendaPendente(Map<Integer,Encomenda> encomendas) {
         for (Encomenda enc : encomendas.values()) {
@@ -335,7 +331,6 @@ public class Utilizador implements Serializable {
             aux.addArtigoEncomenda(artigo.clone());
             aux.alteraDimensao();
             //valor da encomenda sem qualquer custo extra
-
             aux.valorEncomenda(vinted.getDataAtual().getYear(), 0.0, 0.0, 0.0, 0.0);
             this.addEncEncomendas(aux);//poe a encomenda dentro da hashMap das encomendas do utilizador
             vinted.remStock(artigo.clone());
@@ -401,4 +396,5 @@ public class Utilizador implements Serializable {
     public void removeFatura(Fatura fatura){
         this.faturas.remove(fatura.getNumEmissao());
     }
+    
 }

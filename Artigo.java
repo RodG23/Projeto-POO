@@ -157,7 +157,7 @@ public abstract class Artigo implements Serializable{
         String correcaoPreco = String.format("│ Correção de preço:   %.2f%%\n", this.getCorrecaoPreco());
         String transportadora = "";
         if (this.getTransportadora() != null) {
-            transportadora = String.format("│ Transportadora: \n", this.getTransportadora().toString());
+            transportadora = String.format("│ Transportadora: %s\n", this.getTransportadora().getNome());
         } else {
             transportadora = "│ Transportadora: Não associada\n";
         }

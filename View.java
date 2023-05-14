@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 //import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 public class View implements Serializable{
@@ -16,11 +15,10 @@ public class View implements Serializable{
 
 
     public void run(){ //throws InterruptedException, IOException {
-        LocalDate dataAtual = LocalDate.now();
-        controller.setDataSistema(dataAtual);
         Scanner scanner = new Scanner(System.in);
         int opcao = 0;
         do {
+            System.out.println("Data do sistema -> " + controller.data() + "\n");
             System.out.println("=== MENU INTERATIVO ===");
             System.out.println("1 - Admin");
             System.out.println("2 - User");
@@ -64,7 +62,6 @@ public class View implements Serializable{
                             try{
                                 controller.salvaEstadoObjSistema();
                                 System.out.println("Ficheiros salvos com sucesso!!!\n");
-                                controller.reiniciarSistema();
                             }catch (FileNotFoundException e) {
                                 System.out.println("O ficheiro que tentou guardar ainda nao existe.");
                             }
@@ -94,14 +91,15 @@ public class View implements Serializable{
                             break;
                         }
                         default:
-                            System.out.println("Opção inválida. Escolha um numero de 1 a 3.\n");
+                            System.out.println("Opção inválida.\n");
                             break;
                     }
             } catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Tente novamente.\n");
+                System.out.println("Opção inválida.\n");
                 scanner.next(); // consome a entrada inválida
             }
         } while (opcao != 5);
+        controller.reiniciarSistema();
         scanner.close();
     }
 
@@ -109,11 +107,12 @@ public class View implements Serializable{
     public void admin(Scanner scanner) throws ExceptionUser, ExceptionData{
         int opcao = 0;
         do{
+            System.out.println("Data do sistema -> " + controller.data() + "\n");
             System.out.println("\n=== ADMINISTRADOR ===");
             System.out.println("1 - Adicionar transportadora");
             System.out.println("2 - Eliminar utilizador");
             System.out.println("3 - Queries");
-            System.out.println("4 - Ler de um ficheiro");
+            System.out.println("4 - Executar ações rápidas");
             System.out.println("5 - Avançar data");
             System.out.println("6 - Terminar sessão e voltar ao menu principal");
             System.out.print("Opção: ");
@@ -133,8 +132,8 @@ public class View implements Serializable{
                         queries(scanner);
                         break;
                     }
-                    case 4:{                 
-                        ler(scanner);
+                    case 4:{             
+                        acoesR(scanner);
                         break;
                     }
                     case 5:{                     
@@ -146,11 +145,11 @@ public class View implements Serializable{
                         break;
                     }
                     default:
-                        System.out.println("Opção inválida. Escolha um numero de 1 a 6.\n");
+                        System.out.println("Opção inválida.\n");
                         break;
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Tente novamente.\n");
+                System.out.println("Opção inválida.\n");
                 scanner.next(); // consome a entrada inválida
             }
         } while (opcao != 6);
@@ -171,7 +170,7 @@ public class View implements Serializable{
             isPremium = scanner.nextLine();
             isPremium = isPremium.substring(0,1).toUpperCase()+ isPremium.substring(1).toLowerCase();
             if(!isPremium.equals("Sim") && !isPremium.equals("Nao")){
-                System.out.println("Insira uma opção válida (Sim, Nao).\n");
+                System.out.println("Opção inválida.\n");
                 return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
             }
             System.out.print("Custo de ume encomenda pequena: ");
@@ -192,7 +191,7 @@ public class View implements Serializable{
                 scanner.nextLine();
             }
         } catch (InputMismatchException e) {
-            System.out.println("Opção inválida. Insira um número.\n");
+            System.out.println("Opção inválida.\n");
             scanner.nextLine(); // consome a entrada inválida
             return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
         }
@@ -212,6 +211,7 @@ public class View implements Serializable{
     public void queries(Scanner scanner) throws ExceptionUser, ExceptionData{
         int opcao = 0;
         do{
+            System.out.println("Data do sistema -> " + controller.data() + "\n");
             System.out.println("\n=== QUERIES ===");
             System.out.println("1 - Qual é o vendedor que mais facturou num período ou desde sempre.");
             System.out.println("2 - Qual o transportador com maior volume de facturação.");
@@ -260,20 +260,20 @@ public class View implements Serializable{
                         break;
                     }
                     default:
-                        System.out.println("Opção inválida. Escolha um numero de 1 a 6.\n");
+                        System.out.println("Opção inválida.\n");
                         break;
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Tente novamente.\n");
+                System.out.println("Opção inválida.\n");
                 scanner.next(); // consome a entrada inválida
             }
         } while (opcao != 6);
     }
 
-    public void ler(Scanner scanner) throws ExceptionData, ExceptionUser{
+    public void acoesR(Scanner scanner) throws ExceptionData, ExceptionUser{
         System.out.println("Insira o caminho correto para o ficheiro que pretende que seja lido:");
         String caminho = scanner.nextLine();
-        controller.lerSistema(caminho);
+        controller.loadficheiroSistema(caminho);
     }
 
     public void avanca(Scanner scanner) throws ExceptionData{
@@ -285,6 +285,7 @@ public class View implements Serializable{
     public void user(Scanner scanner) throws ExceptionEncomenda, ExceptionTransportadora, ExceptionUser, ExceptionArtigo{
         int opcao = 0;
         do{
+            System.out.println("Data do sistema -> " + controller.data() + "\n");
             System.out.println("\n=== UTILIZADOR ===");
             System.out.println("1 - Criar utilizador");
             System.out.println("2 - Iniciar sessão");
@@ -309,7 +310,7 @@ public class View implements Serializable{
                 }
 
             }catch (InputMismatchException e) {
-                System.out.println("Opção inválida. Escolha um numero de 1 a 3.\n");
+                System.out.println("Opção inválida.\n");
                 scanner.next(); // consome a entrada inválida
             }
         }while(opcao != 3);
@@ -330,7 +331,7 @@ public class View implements Serializable{
             nif = scanner.nextInt();
             scanner.nextLine(); // consome a quebra de linha
         } catch (InputMismatchException e) {
-            System.out.println("Opção inválida. Insira um número inteiro.\n");
+            System.out.println("Opção inválida.\n");
             scanner.nextLine(); // consome a entrada inválida
             return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
         }
@@ -359,16 +360,18 @@ public class View implements Serializable{
     public void interativo2(Scanner scanner, String email) throws ExceptionEncomenda, ExceptionTransportadora, ExceptionArtigo{
         Utilizador user = this.controller.retornarLoggedUser(email);
         int opcao = 0;
-        do {
+        do {            
+            System.out.println("Data do sistema -> " + controller.data() + "\n");
             System.out.println("=== OPÇÕES ===");
             System.out.println("1 - Colocar à venda um artigo");
             System.out.println("2 - Encomendar um artigo");
             System.out.println("3 - Finalizar encomenda");
             System.out.println("4 - Visualizar encomenda");
             System.out.println("5 - Visualizar artigos comprados");
-            System.out.println("6 - Visualizar artigos à venda");
-            System.out.println("7 - Devolver encomenda");
-            System.out.println("8 - Terminar sessão");
+            System.out.println("6 - Visualizar artigos vendidos");
+            System.out.println("7 - Visualizar artigos à venda");
+            System.out.println("8 - Devolver encomenda");
+            System.out.println("9 - Terminar sessão");
             System.out.print("Opção: ");
             try {
                 opcao = scanner.nextInt();
@@ -399,18 +402,22 @@ public class View implements Serializable{
                         break;
                     }
                     case 7:{
-                        devolverEncomenda(scanner, user); 
+                        verArtigosAVenda(scanner, user);
                         break;
                     }
                     case 8:{
+                        devolverEncomenda(scanner, user); 
+                        break;
+                    }
+                    case 9:{
                         System.out.println("Sessão encerrada com o utilizador " + user.getNome());
                     }
                 }
             } catch (InputMismatchException e) {
-                    System.out.println("Opção inválida. Escolha um numero de 1 a 8.");
+                    System.out.println("Opção inválida.");
                     scanner.next(); // consome a entrada inválida
             }
-        } while (opcao != 8);
+        } while (opcao != 9);
     }
 
     public void criarArtigo(Scanner scanner, Utilizador user) throws ExceptionTransportadora, ExceptionArtigo{
@@ -420,7 +427,7 @@ public class View implements Serializable{
 
         tipoArtigo = tipoArtigo.substring(0,1).toUpperCase() + tipoArtigo.substring(1).toLowerCase();
         if(!tipoArtigo.equals("Mala") && !tipoArtigo.equals("Sapatilha") && !tipoArtigo.equals("Tshirt")){
-            throw new ExceptionArtigo("Opção inválida. Insira uma opção válida (Mala, Sapatilha, Tshirt).\n");
+            throw new ExceptionArtigo("Opção inválida.\n");
         }
         
         System.out.println("\n=== Classe ===");
@@ -430,7 +437,7 @@ public class View implements Serializable{
             classeArtigo = scanner.nextLine();
             classeArtigo = classeArtigo.substring(0,1).toUpperCase() + classeArtigo.substring(1).toLowerCase();
             if(!classeArtigo.equals("Sim") && !classeArtigo.equals("Nao")){
-                throw new ExceptionArtigo("Opção inválida. Insira uma opção válida (Sim, Nao).\n");
+                throw new ExceptionArtigo("Opção inválida.\n");
             }
         }
         
@@ -456,48 +463,10 @@ public class View implements Serializable{
             scanner.nextLine(); // consome a quebra de linha
 
         }catch(InputMismatchException e){
-            System.out.println("Opção inválida. Insira um número.\n");
+            System.out.println("Opção inválida.\n");
             scanner.nextLine(); // consome a entrada inválida
             return;
         }
-        
-        System.out.println("Escolha o estado do artigo:");
-        System.out.println("1 - Mau");
-        System.out.println("2 - Médio");
-        System.out.println("3 - Bom");
-        System.out.println("4 - Muito bom");
-        System.out.println("5 - Excelente");
-        System.out.print("Opção: ");
-        int estadoArtigo;
-        Artigo.St estado;
-        try{
-            estadoArtigo = scanner.nextInt();
-            switch (estadoArtigo) {
-                case 1:
-                    estado = Artigo.St.MAU;
-                    break;
-                case 2:
-                    estado = Artigo.St.MEDIO;
-                    break;
-                case 3:
-                    estado = Artigo.St.BOM;
-                    break;
-                case 4:
-                    estado = Artigo.St.MUITO_BOM;
-                    break;
-                case 5:
-                    estado = Artigo.St.EXCELENTE;
-                    break;
-                default:
-                    System.out.println("Opção inválida. Escolha um numero de 1 a 5.");
-                    return;
-            }
-        }catch(InputMismatchException e){
-            System.out.println("Opção inválida. Insira um número inteiro.");
-            scanner.nextLine(); // descarta a entrada inválida
-            return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
-        }
-        scanner.nextLine(); // consome a quebra de linha
         
         int numDonos = 0;
         try{
@@ -505,9 +474,54 @@ public class View implements Serializable{
             numDonos = scanner.nextInt();
             scanner.nextLine(); // consome a quebra de linha
         }catch(InputMismatchException e){
-            System.out.println("Opção inválida. Insira um número inteiro.\n");
+            System.out.println("Opção inválida.\n");
             scanner.nextLine(); // descarta a entrada inválida
             return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
+        }
+
+        Artigo.St estado;
+        //Se o artigo for usado, disponibilizar uma avaliação para o mesmo
+        if(numDonos>0){
+            try{
+                System.out.println("Escolha o estado do artigo:");
+                System.out.println("1 - Mau");
+                System.out.println("2 - Médio");
+                System.out.println("3 - Bom");
+                System.out.println("4 - Muito bom");
+                System.out.println("5 - Excelente");
+                System.out.print("Opção: ");
+                int estadoArtigo;
+
+                estadoArtigo = scanner.nextInt();
+                scanner.nextLine(); // consome a quebra de linha
+                switch (estadoArtigo) {
+                    case 1:
+                        estado = Artigo.St.MAU;
+                        break;
+                    case 2:
+                        estado = Artigo.St.MEDIO;
+                        break;
+                    case 3:
+                        estado = Artigo.St.BOM;
+                        break;
+                    case 4:
+                        estado = Artigo.St.MUITO_BOM;
+                        break;
+                    case 5:
+                        estado = Artigo.St.EXCELENTE;
+                        break;
+                    default:
+                        System.out.println("Opção inválida.");
+                        return;
+                }
+            }catch(InputMismatchException e){
+                System.out.println("Opção inválida.");
+                scanner.nextLine(); // descarta a entrada inválida
+                return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
+            }
+        }
+        else{
+            estado = Artigo.St.EXCELENTE;
         }
 
         int dim = 0;
@@ -540,11 +554,11 @@ public class View implements Serializable{
                             dimensao = Mala.Dim.GRANDE;
                             break;
                         default:
-                            System.out.println("Opção inválida. Escolha um numero de 1 a 3.");
+                            System.out.println("Opção inválida.");
                             return;
                     }
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.\n");
+                    System.out.println("Opção inválida.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -555,7 +569,7 @@ public class View implements Serializable{
                 try{
                     anoLancamento = scanner.nextInt();
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.\n");
+                    System.out.println("Opção inválida.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -567,7 +581,7 @@ public class View implements Serializable{
                     atacadores = scanner.nextBoolean();
                     scanner.nextLine();
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira 'true' ou 'false'.\n");
+                    System.out.println("Opção inválida.\n");
                     scanner.nextLine();
                     return;
                 }
@@ -585,7 +599,7 @@ public class View implements Serializable{
                     scanner.nextLine(); // consome a quebra de linha
         
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.\n");
+                    System.out.println("Opção inválida.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -601,7 +615,7 @@ public class View implements Serializable{
                 try{
                     tamanho = scanner.nextInt();
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Insira um número inteiro.\n");
+                    System.out.println("Opção inválida.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -619,7 +633,7 @@ public class View implements Serializable{
                         tamTshirt = Tshirt.Tam.XL;
                         break;
                     default:
-                        System.out.println("Opção inválida. Escolha um numero de 1 a 4.");
+                        System.out.println("Opção inválida.");
                         scanner.nextLine(); // consome a entrada inválida
                         return;
                 }
@@ -632,7 +646,7 @@ public class View implements Serializable{
                     padrao = scanner.nextInt();
                     scanner.nextLine(); // consome o quebra de linha
                 }catch(InputMismatchException e){
-                    System.out.println("Opção inválida. Escolha um numero de 1 a 3.\n");
+                    System.out.println("Opção inválida.\n");
                     scanner.nextLine(); // descarta a entrada inválida
                     return; // sai do método para evitar que o restante do código seja executado com a entrada inválida
                 }
@@ -684,13 +698,13 @@ public class View implements Serializable{
             try{
                 codBarras = scanner.nextInt();
                 scanner.nextLine(); // consome o quebra de linha
+                controller.encomendarArtigoUser(user, codBarras);
             } catch(InputMismatchException e){
                 System.out.println("Opção inválida. Insira um número inteiro.\n");
-                encomendarArtigo(scanner, user); // chama o método novamente para solicitar uma entrada válida
             }
-            controller.encomendarArtigoUser(user, codBarras);
         }
     }
+    
 
     public void verEncomenda(Scanner scanner, Utilizador user){
         System.out.println(controller.encomendaUser(user).toString() + "\n");
@@ -704,9 +718,14 @@ public class View implements Serializable{
         System.out.println("--------- Artigos comprados -----------" + "\n" +controller.artigosCompradosUser(user).toString() + "\n");
     }
 
-    public void verArtigosVendidos(Scanner scanner, Utilizador user){
+    public void verArtigosAVenda(Scanner scanner, Utilizador user){
         System.out.println("--------- Artigos à venda -----------" + "\n" + controller.artigosAvendaUser(user).toString() + "\n");
     }
+
+    public void verArtigosVendidos(Scanner scanner, Utilizador user){
+        System.out.println("--------- Artigos vendidos -----------" + "\n" + controller.artigosVendidosUser(user).toString() + "\n");
+    }
+
 
     public void devolverEncomenda(Scanner scanner, Utilizador user){
         controller.devolverEncomendaUser(user);   
